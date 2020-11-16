@@ -14,16 +14,16 @@ void main() {
 #version 330 core
 
 layout (location = 0) out vec4 color;
+uniform vec3 u_Light;
 uniform vec4 u_Color;
-uniform vec3 LightPosition_worldspace;
 
 void main() {
 	// Light emission properties
 	// You probably want to put them as uniforms
-	/*vec3 LightColor = vec3(1, 1, 1);
+	vec3 LightColor = vec3(1, 1, 1);
 	float LightPower = 50.0f;
 	vec3 MaterialAmbientColor = vec3(0.1, 0.1, 0.1);
-	float distance = length(LightPosition_worldspace - Position_worldspace);*/
+	float distance = length(u_Light - vec3(100, 57, 93));//Position_worldspace);
 
 	color = u_Color;
 	color.a = u_Color[3];

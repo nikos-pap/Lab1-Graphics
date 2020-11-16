@@ -14,6 +14,45 @@
 #include <array> 
 #include "shader.h"
 
+unsigned int circle_indices2[] = {
+		0, 1, 2,
+		3, 1, 4,
+		5, 1, 6,
+		7, 1, 8,
+		9, 1, 10,
+		11, 1, 12,
+		13, 1, 14,
+		15, 1, 16,
+		17, 1, 18,
+		19, 1, 20,
+		21, 1, 22,
+		23, 1, 24,
+		25, 1, 26,
+		27, 1, 28,
+		29, 1, 30,
+		31, 1, 32,
+		33, 1, 34,
+		35, 1, 36,
+		37, 1, 38,
+		39, 1, 40,
+		41, 1, 42,
+		43, 1, 44,
+		45, 1, 46,
+		47, 1, 48,
+		49, 1, 50,
+		51, 1, 52,
+		53, 1, 54,
+		55, 1, 56,
+		57, 1, 58,
+		59, 1, 60,
+		61, 1, 62,
+		63, 1, 64,
+		65, 1, 66,
+		67, 1, 68,
+		69, 1, 70,
+		71, 1, 72,
+};
+
 /*
 	Indices for cube triangle points have been numbered in the following way on the 2 faces back and front(+4)
 	1 - 3 5 - 7
@@ -36,7 +75,6 @@ unsigned int cube_indices[] = {
 		4, 0, 6,//bottom
 		0, 6, 2//bottom
 };
-
 
 DynamicShapeArray shapeArray;
 
@@ -64,6 +102,7 @@ int main(void) {
 
 	glm::mat4 View = glm::lookAt(
 		glm::vec3(100.0f, 150.0f, 100.0f), // Camera is at (4,3,3), in World Space
+		//glm::vec3(0.0f, 150.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, 0.0f), // and looks at the origin
 		glm::vec3(0.0f, 1.0f, 0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
@@ -73,7 +112,7 @@ int main(void) {
 
 	// Our ModelViewProjection : multiplication of our 3 matrices
 	glm::mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
-
+	//MVP = glm::mat4(1.0f);
 	// generate a buffer store its id in buffer and bind it
 	unsigned int buffer;
 	glGenBuffers(1, &buffer);
@@ -81,7 +120,12 @@ int main(void) {
 
 	//create main cube
 	shapeArray.CreateCube(0.0f, 0.0f, 0.0f, 100.0f);
+	int num_of_normals;
+	glm::vec3* normals = shapeArray.GetCubeNormals(0, &num_of_normals);
 	glBufferData(GL_ARRAY_BUFFER, 3 * 8 * sizeof(float), shapeArray.GetShape(0), GL_STATIC_DRAW);
+	for (int i = 0; i < num_of_normals; i++) {
+		std::cout << glm::to_string(normals[i]) << std::endl;
+	}
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
@@ -89,9 +133,8 @@ int main(void) {
 	// Enable depth
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	
-	glEnable(GL_LIGHTING);
 	glEnable(GL_BLEND);
+	glEnable(GL_LIGHTING);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// index buffer to tell which positions we need
@@ -101,23 +144,22 @@ int main(void) {
 	//bind object buffer to target
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * 2 * 6 * sizeof(unsigned int), cube_indices, GL_STATIC_DRAW);
-
+	//shapeArray.CreateCircle(0.0,0.0f,0.0f,10.0f);
+	//glBufferData(GL_ARRAY_BUFFER, 2 * 39 * sizeof(float), shapeArray.GetShape(1), GL_STATIC_DRAW);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*2*6 * sizeof(unsigned int), circle_indices2, GL_STATIC_DRAW);
 	Shader shader("Shader.shader");
+	glm::vec3 lightPos = glm::vec3(150.0f, 150.0f, 150.0f);
 	shader.SetUniformMat4f("u_MVP", MVP);
 	shader.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 0.1f);
+	shader.SetUniform3f("u_Light", 150.0f, 150.0f, 150.0f);
 	shader.Bind();
-	//unsigned int LightID = GetUniformLocation(shader, "LightPosition_worldspace");
-
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
 		shader.Bind();
 		/* render here */
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		shader.SetUniformMat4f("u_MVP", MVP);
 		//glUniform4f(colorID, 1.0f, 1.0f, 1.0f, 1.0f);
-		
-		glm::vec3 lightPos = glm::vec3(150, 150, 150);
-		//glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		shader.SetUniform3f("u_Light", 150.0f, 150.0f, 150.0f);
 		shader.SetUniform4f("u_Color", 1.0f, 0.0f, 1.0f, 0.3f);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);

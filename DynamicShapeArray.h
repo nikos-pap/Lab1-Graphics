@@ -3,8 +3,10 @@
 #define T_CUBE 0
 #define T_SPHERE 1
 #define T_CYLINDER 2
+#define T_CIRCLE 3
 #include <glm/glm.hpp>
 #include <array>
+
 struct Shape {
 	float * data;
 	int size;
@@ -25,7 +27,8 @@ public:
 	
 	void AddArray(float * element, int size, int shapeType);
 	void CreateCube(float x0, float y0, float z0, float size);
-	void GetNormals(int id);
+	void CreateCircle(float x, float y, float z, float radius);
+	glm::vec3 * GetCubeNormals(int id, int * n);
 	float * GetShape(int index);
 	float * GetSpeed(int id);
 	float * GetColor(int id);
