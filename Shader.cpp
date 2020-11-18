@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <string>
-#include <sstream>
 #include <GL/glew.h>
 
 Shader::Shader(const std::string& filepath)
@@ -41,6 +39,11 @@ void Shader::SetUniform1f(const std::string& name, float value)
 void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
 {
 	glUniform4f(GetUniformLocation(name), v0, v1, v2, v3);
+}
+
+void Shader::SetUniform4f(const std::string& name, float * v/*v0, float v1, float v2, float v3*/)
+{
+	glUniform4f(GetUniformLocation(name), v[0], v[1], v[2], v[3]);
 }
 
 void Shader::SetUniform3f(const std::string& name, float v0, float v1, float v2)
@@ -115,11 +118,12 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 		int length;
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
 
-		char* message = (char*)alloca(length * sizeof(char));
+		char* message = (char*)malloc(length * sizeof(char));
 		glGetShaderInfoLog(id, length, &length, message);
 		std::cout << "Failed to compile" << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader!" << std::endl;
 		std::cout << message << std::endl;
 		glDeleteShader(id);
+		free(message);
 		return 0;
 	}
 
@@ -141,3 +145,4 @@ unsigned int Shader::CreateShader(const std::string& vertexShader, const std::st
 
 	return program;
 }
+

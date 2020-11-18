@@ -1,12 +1,18 @@
-#include <cstdlib>
-#include <iostream>
 #include "DynamicShapeArray.h"
-#include <glm/glm.hpp>
-#include <glm/gtx/string_cast.hpp>
-#define _USE_MATH_DEFINES
-#include <math.h>
+//#define _USE_MATH_DEFINES
+//#include <math.h>
+#include <cstdlib>
 
-unsigned int cube_indices2[] = {
+
+/*
+	Indices for cube triangle points have been numbered in the following way on the 2 faces back and front(+4)
+	1 - 3 5 - 7
+	| X | | X |
+	0 - 2 4 - 6
+	back: 0123, front: 4567, left: 0145, right: 2367, bottom: 4062, top: 5173
+	to get actual pos though you need to multiply with 3
+*/
+unsigned int cube_indices[] = {
 		4, 5, 6,//front
 		5, 6, 7,//front
 		0, 1, 2,//back
@@ -83,7 +89,9 @@ void DynamicShapeArray::AddArray(float * element, int elementSize, int shapeType
 		for (int i = 0; i < elementSize; i++) {
 			tmpData[i] = element[i];
 		}
-		shapeArray[size++] = { tmpData, elementSize, shapeType };
+		int index = size++;
+		shapeArray[index] = { tmpData,elementSize, shapeType };
+		createBuffer(index);
 	} else {
 		std::cout << "not ok" << std::endl;
 	}
@@ -106,6 +114,30 @@ void DynamicShapeArray::CreateCube(float x0, float y0, float z0, float size) {
 	AddArray(positions, 8 * 3, T_CUBE);
 }
 
+unsigned int* DynamicShapeArray::GetIndexPointer(int shapeType)
+{
+	switch (shapeType)
+	{
+	case T_CUBE:
+		return &cube_indices[0];
+	case T_CIRCLE:
+		return &circle_indices[0];
+	}
+	return nullptr;
+}
+
+int DynamicShapeArray::GetIndexPointerSize(int shapeType)
+{
+	switch (shapeType)
+	{
+	case T_CUBE:
+		return 36;
+	case T_CIRCLE:
+		return 108;
+	}
+	return 0;
+}
+
 void DynamicShapeArray::printData(int id) {
 	for (int shape = 0; shape < 24; shape++) {
 		std::cout << shapeArray[id].data[shape] << std::endl;
@@ -118,9 +150,9 @@ glm::vec3 * DynamicShapeArray::GetCubeNormals(int id, int *n)
 	glm::vec3 * normals = (glm::vec3 *) malloc(12*3*sizeof(float));
 	if (normals != nullptr) {
 		for (int shape = 0,n = 0; shape < 36; n++) {
-			unsigned int p1_i = 3 * cube_indices2[shape++];
-			unsigned int p2_i = 3 * cube_indices2[shape++];
-			unsigned int p3_i = 3 * cube_indices2[shape++];
+			unsigned int p1_i = 3 * cube_indices[shape++];
+			unsigned int p2_i = 3 * cube_indices[shape++];
+			unsigned int p3_i = 3 * cube_indices[shape++];
 			glm::vec3 p1 = glm::vec3(shapeArray[id].data[p1_i], shapeArray[id].data[p1_i + 1], shapeArray[id].data[p1_i + 2]);
 			glm::vec3 p2 = glm::vec3(shapeArray[id].data[p2_i], shapeArray[id].data[p2_i + 1], shapeArray[id].data[p2_i + 2]);
 			glm::vec3 p3 = glm::vec3(shapeArray[id].data[p3_i], shapeArray[id].data[p3_i + 1], shapeArray[id].data[p3_i + 2]);
@@ -132,6 +164,16 @@ glm::vec3 * DynamicShapeArray::GetCubeNormals(int id, int *n)
 		}
 	}
 	return normals;
+}
+
+unsigned int DynamicShapeArray::GetVAOID(int index)
+{
+	return shapeArray[index].vao_id;
+}
+
+unsigned int DynamicShapeArray::GetIBOID(int index)
+{
+	return shapeArray[index].ib_id;
 }
 
 float * DynamicShapeArray::GetShape(int index)
@@ -168,22 +210,22 @@ unsigned int DynamicShapeArray::GetSize(int index)
 	return -1;
 }
 
-void DynamicShapeArray::SetColor(int id, float r_value, float g_value, float b_value, float alpha_value)
+void DynamicShapeArray::SetColor(int index, float r_value, float g_value, float b_value, float alpha_value)
 {
-	if (id < size) {
-		shapeArray[id].color[0] = r_value;
-		shapeArray[id].color[1] = g_value;
-		shapeArray[id].color[2] = b_value;
-		shapeArray[id].color[3] = alpha_value;
+	if (index < size) {
+		shapeArray[index].color[0] = r_value;
+		shapeArray[index].color[1] = g_value;
+		shapeArray[index].color[2] = b_value;
+		shapeArray[index].color[3] = alpha_value;
 	}
 }
 
-void DynamicShapeArray::SetSpeed(int id, float ux, float uy, float uz)
+void DynamicShapeArray::SetSpeed(int index, float ux, float uy, float uz)
 {
-	if (id < size) {
-		shapeArray[id].speed[0] = ux; 
-		shapeArray[id].speed[1] = uy; 
-		shapeArray[id].speed[2] = uz;
+	if (index < size) {
+		shapeArray[index].speed[0] = ux; 
+		shapeArray[index].speed[1] = uy; 
+		shapeArray[index].speed[2] = uz;
 	}
 }
 
@@ -202,8 +244,9 @@ void DynamicShapeArray::Extend()
 void DynamicShapeArray::CreateCircle(float x, float y, float z, float radius) {
 	int num_of_sides = 34;
 	int num_of_vertices = num_of_sides + 2;
-	float twicePi = 2.0f * M_PI;
-	float * vertices = (float *) malloc((2*(num_of_vertices)+ 3)*sizeof(float));
+	int n = 3 + (2 * num_of_vertices);
+	float twicePi = 2.0f * 3.14159256f;
+	float * vertices = (float *) malloc(sizeof(float) * n);
 	if (vertices != nullptr) {
 		vertices[0] = x;
 		vertices[1] = y;
@@ -215,4 +258,63 @@ void DynamicShapeArray::CreateCircle(float x, float y, float z, float radius) {
 		}
 		AddArray(vertices, (2 * (num_of_vertices)+3), T_CIRCLE);
 	}
+}
+
+void DynamicShapeArray::DrawShape(int index, Shader shader)
+{
+	Shape shape = shapeArray[index];
+	unsigned int vao = shape.vao_id;
+	unsigned int ib = shape.ib_id;
+	unsigned int ib_size = GetIndexPointerSize(index);
+	//bind everything
+	//shader.Bind();
+	std::cout << vao << ":" << ib << std::endl;
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
+	glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
+}
+
+void DynamicShapeArray::Bindshape(int index) {
+	Shape shape = shapeArray[index];
+	unsigned int vao = shape.vao_id;
+	unsigned int ib = shape.ib_id;
+	unsigned int ib_size = GetIndexPointerSize(index);
+	//bind everything
+	//shader.Bind();
+	std::cout << vao << ":" << ib << std::endl;
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
+}
+
+void DynamicShapeArray::createBuffer(int shape_index) {
+	unsigned int buffer_id;
+	float * shape = GetShape(shape_index);
+	int shape_size = GetSize(shape_index);
+	int index_pointer_size = GetIndexPointerSize(shape_index);
+	unsigned int * index_array = GetIndexPointer(shape_index);
+
+	unsigned int vao;
+	//create and bind the vao
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	//create a buffer to keep out positions
+	glGenBuffers(1, &buffer_id);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
+	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float), shape, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+	//create a buffer for the indexes
+	unsigned int ibo;
+	//glGenBuffers creates the random id for that buffer and stores it in the variable
+	glGenBuffers(1, &ibo);
+	//bind object buffer to target
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,  index_pointer_size * sizeof(unsigned int), index_array, GL_STATIC_DRAW);
+
+	//keep the three buffers in the shape
+	shapeArray[shape_index].vao_id = vao;
+	shapeArray[shape_index].vb_id = buffer_id;
+	shapeArray[shape_index].ib_id = ibo;
+	std::cout << "buffer created id's are:" << vao << ", " << buffer_id << ", " << ibo << std::endl;
 }
