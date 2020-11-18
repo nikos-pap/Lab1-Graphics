@@ -28,42 +28,183 @@ unsigned int cube_indices[] = {
 };
 
 unsigned int circle_indices[] = {
-		0, 1, 2,
-		3, 1, 4,
-		5, 1, 6,
-		7, 1, 8,
-		9, 1, 10,
-		11, 1, 12,
-		13, 1, 14,
-		15, 1, 16,
-		17, 1, 18,
-		19, 1, 20,
-		21, 1, 22,
-		23, 1, 24,
-		25, 1, 26,
-		27, 1, 28,
-		29, 1, 30,
-		31, 1, 32,
-		33, 1, 34,
-		35, 1, 36,
+		1, 0, 2,
+		2, 0, 3,
+		3, 0, 4,
+		4, 0, 5,
+		5, 0, 6,
+		6, 0, 7,
+		7, 0, 8,
+		8, 0, 9,
+		9, 0, 10,
+		10, 0, 11,
+		11, 0, 12,
+		12, 0, 13,
+		13, 0, 14,
+		14, 0, 15,
+		15, 0, 16,
+		16, 0, 17,
+		17, 0, 18,
+		18, 0, 19,
+		19, 0, 20,
+		20, 0, 21,
+		21, 0, 22,
+		22, 0, 23,
+		23, 0, 24,
+		24, 0, 25,
+		25, 0, 26,
+		26, 0, 27,
+		27, 0, 28,
+		28, 0, 29,
+		29, 0, 30,
+		30, 0, 31,
+		31, 0, 32,
+		32, 0, 33,
+		33, 0, 34,
+		34, 0, 35
+};
+unsigned int cylinder_indices[] = {
+		//Base circle
+		1, 0, 2,
+		2, 0, 3,
+		3, 0, 4,
+		4, 0, 5,
+		5, 0, 6,
+		6, 0, 7,
+		7, 0, 8,
+		8, 0, 9,
+		9, 0, 10,
+		10, 0, 11,
+		11, 0, 12,
+		12, 0, 13,
+		13, 0, 14,
+		14, 0, 15,
+		15, 0, 16,
+		16, 0, 17,
+		17, 0, 18,
+		18, 0, 19,
+		19, 0, 20,
+		20, 0, 21,
+		21, 0, 22,
+		22, 0, 23,
+		23, 0, 24,
+		24, 0, 25,
+		25, 0, 26,
+		26, 0, 27,
+		27, 0, 28,
+		28, 0, 29,
+		29, 0, 30,
+		30, 0, 31,
+		31, 0, 32,
+		32, 0, 33,
+		33, 0, 34,
+		34, 0, 35,
+
+		//Top circle
+		37, 36, 38,
+		38, 36, 39,
+		39, 36, 40,
+		40, 36, 41,
+		41, 36, 42,
+		42, 36, 43,
+		43, 36, 44,
+		44, 36, 45,
+		45, 36, 46,
+		46, 36, 47,
+		47, 36, 48,
+		48, 36, 49,
+		49, 36, 50,
+		50, 36, 51,
+		51, 36, 52,
+		52, 36, 53,
+		53, 36, 54,
+		54, 36, 55,
+		55, 36, 56,
+		56, 36, 57,
+		57, 36, 58,
+		58, 36, 59,
+		59, 36, 60,
+		60, 36, 61,
+		61, 36, 62,
+		62, 36, 63,
+		63, 36, 64,
+		64, 36, 65,
+		65, 36, 66,
+		66, 36, 67,
+		67, 36, 68,
+		68, 36, 69,
+		69, 36, 70,
+		70, 36, 71,
+
+		//Connective triangles
+		1, 38, 2,
 		37, 1, 38,
-		39, 1, 40,
-		41, 1, 42,
-		43, 1, 44,
-		45, 1, 46,
-		47, 1, 48,
-		49, 1, 50,
-		51, 1, 52,
-		53, 1, 54,
-		55, 1, 56,
-		57, 1, 58,
-		59, 1, 60,
-		61, 1, 62,
-		63, 1, 64,
-		65, 1, 66,
-		67, 1, 68,
-		69, 1, 70,
-		71, 1, 72,
+		2, 39, 3,
+		38, 2, 39,
+		3, 40, 4,
+		39, 3, 40,
+		4, 41, 5,
+		40, 4, 41,
+		5, 42, 6,
+		41, 5, 42,
+		6, 43, 7,
+		42, 6, 43,
+		7, 44, 8,
+		43, 7, 44,
+		8, 45, 9,
+		44, 8, 45,
+		9, 46, 10,
+		45, 9, 46,
+		10, 47, 11,
+		46, 10, 47,
+		11, 48, 12,
+		47, 11, 48,
+		12, 49, 13,
+		48, 12, 49,
+		13, 50, 14,
+		49, 13, 50,
+		14, 51, 15,
+		50, 14, 51,
+		15, 52, 16,
+		51, 15, 52,
+		16, 53, 17,
+		52, 16, 53,
+		17, 54, 18,
+		53, 17, 54,
+		18, 55, 19,
+		54, 18, 55,
+		19, 56, 20,
+		55, 19, 56,
+		20, 57, 21,
+		56, 20, 57,
+		21, 58, 22,
+		57, 21, 58,
+		22, 59, 23,
+		58, 22, 59,
+		23, 60, 24,
+		59, 23, 60,
+		24, 61, 25,
+		60, 24, 61,
+		25, 62, 26,
+		61, 25, 62,
+		26, 63, 27,
+		62, 26, 63,
+		27, 64, 28,
+		63, 27, 64,
+		28, 65, 29,
+		64, 28, 65,
+		29, 66, 30,
+		65, 29, 66,
+		30, 67, 31,
+		66, 30, 67,
+		31, 68, 32,
+		67, 31, 68,
+		32, 69, 33,
+		68, 32, 69,
+		33, 70, 34,
+		69, 33, 70,
+		34, 71, 35,
+		70, 34, 71
 };
 
 DynamicShapeArray::DynamicShapeArray()
@@ -114,26 +255,34 @@ void DynamicShapeArray::CreateCube(float x0, float y0, float z0, float size) {
 	AddArray(positions, 8 * 3, T_CUBE);
 }
 
-unsigned int* DynamicShapeArray::GetIndexPointer(int shapeType)
+unsigned int* DynamicShapeArray::GetIndexPointer(int shape_index)
 {
+	int shapeType = shapeArray[shape_index].shapeType;
 	switch (shapeType)
 	{
 	case T_CUBE:
+		//std::cout << "eimai kybos" << std::endl;
 		return &cube_indices[0];
 	case T_CIRCLE:
+		//std::cout << "KYKLAKOS SEKS" << std::endl;
 		return &circle_indices[0];
+	case T_CYLINDER:
+		return &cylinder_indices[0];
 	}
 	return nullptr;
 }
 
-int DynamicShapeArray::GetIndexPointerSize(int shapeType)
+int DynamicShapeArray::GetIndexPointerSize(int shape_index)
 {
+	int shapeType = shapeArray[shape_index].shapeType;
 	switch (shapeType)
 	{
 	case T_CUBE:
 		return 36;
 	case T_CIRCLE:
 		return 108;
+	case T_CYLINDER:
+		return 420;
 	}
 	return 0;
 }
@@ -241,23 +390,47 @@ void DynamicShapeArray::Extend()
 	}
 }
 
-void DynamicShapeArray::CreateCircle(float x, float y, float z, float radius) {
+float* DynamicShapeArray::CreateCircle(float x, float y, float z, float radius) {
 	int num_of_sides = 34;
 	int num_of_vertices = num_of_sides + 2;
-	int n = 3 + (2 * num_of_vertices);
+	int n = 3 * num_of_vertices;//3 + (2 * num_of_vertices);
 	float twicePi = 2.0f * 3.14159256f;
 	float * vertices = (float *) malloc(sizeof(float) * n);
 	if (vertices != nullptr) {
 		vertices[0] = x;
 		vertices[1] = y;
 		vertices[2] = z;
-		for (int i = 3; i < num_of_vertices;)
-		{
-			vertices[i++] = x + (radius * cos(i * twicePi / num_of_sides));
-			vertices[i++] = z + (radius * sin(i * twicePi / num_of_sides));
+		std::cout << "Starting points: " << x << " , " << y << " , " << z << std::endl;
+		for (int i = 3,p=1; p < num_of_vertices;p++)
+		{		
+			float tempx, tempz;
+			tempx = x + (radius * cos(p * twicePi / num_of_sides));
+			tempz = z + (radius * sin(p * twicePi / num_of_sides));
+			vertices[i] = tempx;
+			i++;
+			vertices[i++] = y;
+			vertices[i] = tempz;
+			i++;
+			z + (radius * sin(p * twicePi / num_of_sides));
+			std::cout << "Next point[ "<< p <<"]: " << tempx << " , " << y << " , " << tempz << std::endl;
 		}
-		AddArray(vertices, (2 * (num_of_vertices)+3), T_CIRCLE);
+		return vertices;
+		//AddArray(vertices, (3 * (num_of_vertices)), T_CIRCLE);
 	}
+	return nullptr;
+}
+void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, float height) {
+	float *circle1, *circle2;
+	circle1 = CreateCircle(x, y, z, radius);
+	circle2 = CreateCircle(x, (y+height), z, radius);
+	float cylinder_pos[216];
+	for (int i = 0; i < 108; i++) {
+		cylinder_pos[i] = circle1[i];
+		cylinder_pos[i+108] = circle2[i];
+	}
+
+	AddArray(cylinder_pos, 216, T_CYLINDER);
+
 }
 
 void DynamicShapeArray::DrawShape(int index, Shader shader)

@@ -37,7 +37,8 @@ public:
 	
 	void AddArray(float * element, int size, int shapeType);
 	void CreateCube(float x0, float y0, float z0, float size);
-	void CreateCircle(float x, float y, float z, float radius);
+	float* CreateCircle(float x, float y, float z, float radius);
+	void CreateCylinder(float x, float y, float z, float radius, float height);
 	void DrawShape(int index, Shader shader);
 
 	void Bindshape(int index);

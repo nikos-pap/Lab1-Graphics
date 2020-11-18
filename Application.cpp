@@ -13,6 +13,10 @@ DynamicShapeArray shapeArray;
 void createBuffer(int shape_index) {
 	unsigned int buffer_id;
 	float* shape = shapeArray.GetShape(shape_index);
+	for (int i = 0; i < 108;i+=3) {
+		std::cout << "x: " << shape[i] << ", y: " << shape[i+1] << ", z: " << shape[i+2] << std::endl;
+
+	}
 	int shape_size = shapeArray.GetSize(shape_index);
 	int index_pointer_size = shapeArray.GetIndexPointerSize(shape_index);
 	unsigned int* index_array = shapeArray.GetIndexPointer(shape_index);
@@ -25,6 +29,9 @@ void createBuffer(int shape_index) {
 	glGenBuffers(1, &buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
 	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float), shape, GL_STATIC_DRAW);
+	if (shape_size != 108) {
+		std::cout << "kati paei strava" << std::endl;
+	}
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 
@@ -104,19 +111,20 @@ int main(void) {
 	//MVP = glm::mat4(1.0f);
 
 	//create main cube
-	shapeArray.CreateCube(0.0f, 0.0f, 0.0f, 100.0f);
-	shapeArray.SetColor(0, 1.0f, 0.0f, 1.0f, 0.3f);
-	createBuffer(0);
+	//shapeArray.CreateCube(0.0f, 0.0f, 0.0f, 100.0f);
+	//shapeArray.SetColor(0, 1.0f, 0.0f, 1.0f, 0.3f);
+	//createBuffer(0);
 	
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
+	//glEnable(GL_BLEND);
 	glEnable(GL_LIGHTING);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	//shapeArray.CreateCircle(0.0,0.0f,0.0f,10.0f);
-	//glBindVertexArray(shapeArray.GetVAOID(0));
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,shapeArray.GetIBOID(0));
+	shapeArray.CreateCylinder(50.0f,0.0f,50.0f,100.0f,120.0f);
+	createBuffer(0);
+	glBindVertexArray(shapeArray.GetVAOID(0));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,shapeArray.GetIBOID(0));
 	Shader shader("Shader.shader");
 	glm::vec3 lightPos = glm::vec3(150.0f, 150.0f, 150.0f);
 	shader.SetUniformMat4f("u_MVP", MVP);
@@ -140,8 +148,8 @@ int main(void) {
 		shader.SetUniformMat4f("u_MVP", MVP);
 		shader.SetUniform3f("u_Light", 150.0f, 150.0f, 150.0f);
 		shader.SetUniform4f("u_Color", 1.0f, 0.0f, 1.0f, 0.3f);
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glDrawElements(GL_TRIANGLES, 420, GL_UNSIGNED_INT, nullptr);
 
 		
 		/* Swap front and back buffers */
