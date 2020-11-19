@@ -22,3 +22,5 @@ x64/Debug/Lab1Graphics.vcxproj.FileListAbsolute.txt
 x64/Debug/Shader.obj
 x64/Debug/vc142.idb
 x64/Debug/vc142.pdb
+.vs/Lab1Graphics/v16/ipch/AutoPCH/e9c7c730cecb3891/DYNAMICSHAPEARRAY.ipch
+.vs/Lab1Graphics/v16/ipch/AutoPCH/5a4e3c41d8ef655c/APPLICATION.ipch
