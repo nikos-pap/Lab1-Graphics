@@ -1630,7 +1630,7 @@ float* DynamicShapeArray::CreateCircle(float x, float y, float z, float radius) 
 		vertices[0] = x;
 		vertices[1] = y;
 		vertices[2] = z;
-		std::cout << "Starting points: " << x << " , " << y << " , " << z << std::endl;
+		//std::cout << "Starting points: " << x << " , " << y << " , " << z << std::endl;
 		for (int i = 3,p=1; p < num_of_vertices;p++)
 		{		
 			float tempx, tempz;
@@ -1642,7 +1642,7 @@ float* DynamicShapeArray::CreateCircle(float x, float y, float z, float radius) 
 			vertices[i] = tempz;
 			i++;
 			z + (radius * sin(p * twicePi / num_of_sides));
-			std::cout << "Next point[ "<< p <<"]: " << tempx << " , " << y << " , " << tempz << std::endl;
+			//std::cout << "Next point[ "<< p <<"]: " << tempx << " , " << y << " , " << tempz << std::endl;
 		}
 		return vertices;
 		//AddArray(vertices, (3 * (num_of_vertices)), T_CIRCLE);

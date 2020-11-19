@@ -13,10 +13,10 @@ DynamicShapeArray shapeArray;
 void createBuffer(int shape_index) {
 	unsigned int buffer_id;
 	float* shape = shapeArray.GetShape(shape_index);
-	for (int i = 0; i < 108;i+=3) {
+	/*for (int i = 0; i < 108;i+=3) {
 		std::cout << "x: " << shape[i] << ", y: " << shape[i+1] << ", z: " << shape[i+2] << std::endl;
 
-	}
+	}*/
 	int shape_size = shapeArray.GetSize(shape_index);
 	int index_pointer_size = shapeArray.GetIndexPointerSize(shape_index);
 	unsigned int* index_array = shapeArray.GetIndexPointer(shape_index);
@@ -29,9 +29,6 @@ void createBuffer(int shape_index) {
 	glGenBuffers(1, &buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
 	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float), shape, GL_STATIC_DRAW);
-	if (shape_size != 108) {
-		std::cout << "kati paei strava" << std::endl;
-	}
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 
@@ -94,10 +91,10 @@ int main(void) {
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 	std::cout << glGetString(GL_VERSION) << std::endl;
-	glm::mat4 Projection = glm::ortho(-200.0f, 200.0f, -200.0f, 150.0f, 250.0f, 0.0f);
+	glm::mat4 Projection = glm::perspective(glm::radians(40.0f),1.0f,0.001f,1000.0f); //ortho coords: -200.0f, 200.0f, -200.0f, 150.0f, 250.0f, 0.0f
 
 	glm::mat4 View = glm::lookAt(
-		glm::vec3(100.0f, 150.0f, 100.0f), // Camera is at (4,3,3), in World Space
+		glm::vec3(200.0f, 200.0f, 200.0f), // Camera is at (100,150,100), in World Space
 		//glm::vec3(0.0f, 150.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, 0.0f), // and looks at the origin
 		glm::vec3(0.0f, 1.0f, 0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
@@ -117,14 +114,21 @@ int main(void) {
 	
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	//glEnable(GL_BLEND);
+	glEnable(GL_BLEND);
 	glEnable(GL_LIGHTING);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	shapeArray.CreateSphere(50.0f,36,18);
 	createBuffer(0);
-	glBindVertexArray(shapeArray.GetVAOID(0));
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,shapeArray.GetIBOID(0));
+	shapeArray.SetColor(0, 0.3f, 0.0f, 0.1f, 0.5f);
+	shapeArray.CreateCylinder(100.0f, 100.0f, 100.0f, 20.0f, 20.0f);
+	createBuffer(1);
+	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);
+	shapeArray.CreateCube(0.0f, 0.0f, 0.0f, 100.0f);
+	createBuffer(2);
+	shapeArray.SetColor(2, 0.0f, 0.0f, 1.0f, 0.5f);
+	//glBindVertexArray(shapeArray.GetVAOID(0));
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,shapeArray.GetIBOID(0));
 	Shader shader("Shader.shader");
 	glm::vec3 lightPos = glm::vec3(150.0f, 150.0f, 150.0f);
 	shader.SetUniformMat4f("u_MVP", MVP);
@@ -137,27 +141,51 @@ int main(void) {
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
 		shader.Bind();
-
-		/* render here */
-		vao = shapeArray.GetVAOID(0);
-		ib = shapeArray.GetIBOID(0);
-		//ib_size = shapeArray.GetIndexPointerSize(0);
-		//glBindVertexArray(vao);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
+		int shapeArrSize = shapeArray.GetSize();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		shader.SetUniformMat4f("u_MVP", MVP);
-		shader.SetUniform3f("u_Light", 150.0f, 150.0f, 150.0f);
-		shader.SetUniform4f("u_Color", 1.0f, 0.0f, 1.0f, 0.3f);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDrawElements(GL_TRIANGLES, 3672, GL_UNSIGNED_INT, nullptr);
-
-		
+		for (int i = 0; i < shapeArrSize; i++) {
+			float* color = shapeArray.GetColor(i);
+			//std::cout << "1" << std::endl;
+			vao = shapeArray.GetVAOID(i);
+			ib = shapeArray.GetIBOID(i);
+			ib_size = shapeArray.GetIndexPointerSize(i);
+			//std::cout << "index buffer size: " << ib_size << std::endl;
+			glBindVertexArray(vao);
+			//std::cout << "2" << std::endl;
+			//glEnableVertexAttribArray(0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);	
+			//std::cout << "3" << std::endl;
+			shader.SetUniformMat4f("u_MVP", MVP);
+			shader.SetUniform4f("u_Color",color);
+			//shader.SetUniform3f("u_Light", 150.0f, 150.0f, 150.0f);
+			//shader.SetUniform4f("u_Color", 1.0f, 0.0f, 1.0f, 0.3f);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			if (i == 1) {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}
+			else {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+			
+			glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
+			//std::cout << "4" << std::endl;
+			//glDrawElementsInstanced(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, shapeArray.GetIndexPointer(i), shapeArrSize);
+			//std::cout << "5" << std::endl;
+			glBindVertexArray(0);
+			//std::cout << "6" << std::endl;
+		}
+		//std::cout << "7" << std::endl;
+		/* render here */
+				
 		/* Swap front and back buffers */
 		//DrawShape(1, shader, MVP);
 		glfwSwapBuffers(window);
+		//std::cout << "8" << std::endl;
 		/* Poll for and process events */
 		glfwPollEvents();
+		//std::cout << "9" << std::endl;
 		shader.Unbind();
+		//std::cout << "10" << std::endl;
 	}
 	//glDeleteProgram(shader);
 	glfwTerminate();
