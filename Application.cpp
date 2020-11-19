@@ -133,7 +133,8 @@ int main(void) {
 	glm::vec3 lightPos = glm::vec3(150.0f, 150.0f, 150.0f);
 	shader.SetUniformMat4f("u_MVP", MVP);
 	//shader.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 0.1f);
-	shader.SetUniform3f("u_Light", 150.0f, 150.0f, 150.0f);
+	float light[3] = { 150.0f,150.0f,150.0f};
+	shader.SetUniform3f("u_Light", light);
 	shader.Bind();
 	unsigned int vao;
 	unsigned int ib;

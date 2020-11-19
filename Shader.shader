@@ -6,6 +6,7 @@ layout (location = 0) in vec4 position;
 
 uniform mat4 u_MVP;
 
+
 void main() {
 	gl_Position = u_MVP * position;
 };
@@ -14,7 +15,6 @@ void main() {
 #version 330 core
 
 layout (location = 0) out vec4 color;
-
 
 uniform vec3 u_Light;
 uniform vec4 u_Color;
@@ -25,9 +25,9 @@ void main() {
 	vec3 LightColor = vec3(1, 1, 1);
 	float LightPower = 50.0f;
 	vec3 MaterialAmbientColor = vec3(0.1, 0.1, 0.1);
-	float distance = length(u_Light - vec3(100, 57, 93));//Position_worldspace);
+	//float distance = length(u_Light - vec3(100, 57, 93));//Position_worldspace);
 
-	color = u_Color;
+	color = u_Color+0.00f*vec4(u_Light,1.0f);
 	color.a = u_Color[3];
 	//color = vec4(0.0, 0.0, 0.5, 0.1);
 };
