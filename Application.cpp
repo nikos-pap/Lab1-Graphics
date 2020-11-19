@@ -79,7 +79,7 @@ int main(void) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(600, 600, u8"Συγκρουόμενα", NULL, NULL);
+	window = glfwCreateWindow(600, 600, u8"Συγκρουόμενα Φούντο γαμιέσαι", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		return -1;
@@ -121,7 +121,7 @@ int main(void) {
 	glEnable(GL_LIGHTING);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	shapeArray.CreateCylinder(50.0f,0.0f,50.0f,100.0f,120.0f);
+	shapeArray.CreateSphere(50.0f,36,18);
 	createBuffer(0);
 	glBindVertexArray(shapeArray.GetVAOID(0));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,shapeArray.GetIBOID(0));
@@ -149,7 +149,7 @@ int main(void) {
 		shader.SetUniform3f("u_Light", 150.0f, 150.0f, 150.0f);
 		shader.SetUniform4f("u_Color", 1.0f, 0.0f, 1.0f, 0.3f);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDrawElements(GL_TRIANGLES, 420, GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, 3672, GL_UNSIGNED_INT, nullptr);
 
 		
 		/* Swap front and back buffers */

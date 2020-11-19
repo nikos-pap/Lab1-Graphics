@@ -8,11 +8,14 @@
 #include <glm/gtx/string_cast.hpp>
 #include "Shader.h"
 
+#define PI 3.14159265f
+
 #define T_NULL -1
 #define T_CUBE 0
 #define T_SPHERE 1
 #define T_CYLINDER 2
 #define T_CIRCLE 3
+
 
 struct Shape {
 	float * data;
@@ -39,6 +42,7 @@ public:
 	void CreateCube(float x0, float y0, float z0, float size);
 	float* CreateCircle(float x, float y, float z, float radius);
 	void CreateCylinder(float x, float y, float z, float radius, float height);
+	void CreateSphere(float radius, int sectorCount, int stackCount);
 	void DrawShape(int index, Shader shader);
 
 	void Bindshape(int index);
