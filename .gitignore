@@ -28,3 +28,4 @@ x64/Debug/vc142.pdb
 .vs/Lab1Graphics/v16/Browse.VC.db-wal
 .vs/Lab1Graphics/v16/Browse.VC.opendb
 .vs/Lab1Graphics/v16/ipch/AutoPCH/c9a8130d7221fd05/SPHEREFUNC.ipch
+*.ipch
