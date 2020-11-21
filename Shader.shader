@@ -35,7 +35,7 @@ void main() {
 	//float distance = length(u_Light - vec3(100, 57, 93));//Position_worldspace);
 
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(FragPos - u_Light);
+	vec3 lightDir = normalize(u_Light - FragPos);
 	float diff = clamp(dot(norm, lightDir), 0.0, 1.0);
 	vec3 diffuse = diff * LightColor;
 
