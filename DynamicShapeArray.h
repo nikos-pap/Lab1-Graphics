@@ -57,6 +57,7 @@ public:
 
 	//creates Shapes and adds them to the Array
 	void CreateShape(float x, float y, float z, int size, int ShapeType);
+	void CreateRandomShape();
 	
 	//Binds VAO and ib of the shape at the index
 	void BindShape(int index);
@@ -73,7 +74,7 @@ public:
 	int GetIndexPointerSize(int shapeType);
 
 	//Returns the Normals of the Cube might replace it with a function that works for every shape
-	glm::vec3 * GetCubeNormals(int index, int * n);//needs a fix for sure we should not always calculate this
+	void GetCubeNormals();//needs a fix for sure we should not always calculate this
 	
 	float * GetSpeed(int index); //not used fix, delete or use it
 	float * GetShape(int index); //not used in the new implementation consider removing
@@ -96,6 +97,8 @@ private:
 	int capacity;
 
 	//newly private functions check if all OK
+	int RandomInt(int min, int max);
+	float RandomFloat(float min, float max);
 	void AddArray(float* element, int size, int shapeType);
 	void CreateCube(float x0, float y0, float z0, float size);
 	void CreateCylinder(float x, float y, float z, float radius, float height);

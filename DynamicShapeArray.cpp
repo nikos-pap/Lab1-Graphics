@@ -1,5 +1,7 @@
 #include "DynamicShapeArray.h"
 #include <cstdlib>
+#include <chrono>
+#include <random>
 
 /*
 	Indices for cube triangle points have been numbered in the following way on the 2 faces back and front(+4)
@@ -10,11 +12,13 @@
 	The only easy enough to do by hand
 */
 
+float cube_normals[36];
+
 unsigned int cube_indices[] = {
 		4, 6, 5,//front
 		7, 5, 6,//front
-		0, 2, 1,//back
-		3, 1, 2,//back
+		0, 1, 2,//back
+		3, 2, 1,//back
 		0, 4, 1,//left
 		5, 1, 4,//left
 		2, 3, 6,//right
@@ -38,6 +42,7 @@ DynamicShapeArray::DynamicShapeArray() {
 	size = 0;
     InitSphereIndices();
 	InitCylinderIndices();
+	GetCubeNormals();
 }
 
 /*
@@ -47,8 +52,35 @@ Simple Destructor
 //remember to free the rest
 DynamicShapeArray::~DynamicShapeArray() {
 	free(shapeArray);
-	free(sphere_indices);
 	free(cylinder_indices);
+	free(sphere_indices);
+}
+
+
+int DynamicShapeArray::RandomInt(int min, int max) {
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine generator(seed);
+	std::uniform_int_distribution<int> distributionInteger(min, max);
+	return distributionInteger(generator);
+}
+
+float DynamicShapeArray::RandomFloat(float min, float max) {
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine generator(seed);
+	std::uniform_real_distribution<float> distributionDouble(min, max);
+	return (float) distributionDouble(generator);
+}
+
+void DynamicShapeArray::CreateRandomShape() {
+	int shapeType = RandomInt(0, 3);
+	int shape_size = RandomInt(1, 10);
+	float r, g, b;
+	r = RandomFloat(0.0f, 1.0f);
+	g = RandomFloat(0.0f, 1.0f);
+	b = RandomFloat(0.0f, 1.0f);
+	std::cout << "r: " << r << " g: " << g << " b: " << b << std::endl;
+	CreateShape(0.0f, 0.0f, 0.0f, shape_size, shapeType);
+	SetColor(size - 1,r,g,b);
 }
 
 /*
@@ -62,10 +94,10 @@ void DynamicShapeArray::CreateShape(float x, float y, float z, int size, int Sha
 		CreateCube(x, y, z, size);
 		break;
 	case T_SPHERE:
-		CreateSphere(x, y, z, size / 2);
+		CreateSphere(x+ size / 2, y+ size / 2, z+ size / 2, size / 2);
 		break;
 	case T_CYLINDER:
-		CreateCylinder(x, y, z, size / 2, size);
+		CreateCylinder(x+ size / 2, y, z+ size / 2, size / 2, size);
 		break;
 	}
 }
@@ -112,26 +144,37 @@ int DynamicShapeArray::GetIndexPointerSize(int index) {
 	return 0;
 }
 
-glm::vec3 * DynamicShapeArray::GetCubeNormals(int id, int *n)
-{
-	*n = 12;
-	glm::vec3 * normals = (glm::vec3 *) malloc(12*3*sizeof(float));
-	if (normals != nullptr) {
-		for (int shape = 0,n = 0; shape < 36; n++) {
-			unsigned int p1_i = 3 * cube_indices[shape++];
-			unsigned int p2_i = 3 * cube_indices[shape++];
-			unsigned int p3_i = 3 * cube_indices[shape++];
-			glm::vec3 p1 = glm::vec3(shapeArray[id].data[p1_i], shapeArray[id].data[p1_i + 1], shapeArray[id].data[p1_i + 2]);
-			glm::vec3 p2 = glm::vec3(shapeArray[id].data[p2_i], shapeArray[id].data[p2_i + 1], shapeArray[id].data[p2_i + 2]);
-			glm::vec3 p3 = glm::vec3(shapeArray[id].data[p3_i], shapeArray[id].data[p3_i + 1], shapeArray[id].data[p3_i + 2]);
-			glm::vec3 u, v, N;
-			u = p2 - p1;
-			v = p3 - p1;
-			N = normalize(cross(u, v));
-			normals[n] = N;
-		}
+void DynamicShapeArray::GetCubeNormals()
+{	
+	float x0 = 0, y0 = 0, z0 = 0;
+	float x1 = 1, y1 = 1, z1 = 1;
+
+	float positions[] = {
+		x0, y0, z0,//00  back(0)0
+		x0, y1, z0,//01 back(0)1
+		x1, y0, z0,//10 back(0)2
+		x1, y1, z0,//11 back(0)3
+		x0, y0, z1,//00 front(1)4
+		x0, y1, z1,//01 front(1)5
+		x1, y0, z1,//10 front(1)6
+		x1, y1, z1,//11 front(1)7
+	};
+	for (int shape = 0,n = 0; shape < 36; n++) {
+		int p1_i = 3 * cube_indices[shape++];
+		int p2_i = 3 * cube_indices[shape++];
+		int p3_i = 3 * cube_indices[shape++];
+		glm::vec3 p1 = glm::vec3(positions[p1_i], positions[p1_i + 1], positions[p1_i + 2]);
+		glm::vec3 p2 = glm::vec3(positions[p2_i], positions[p2_i + 1], positions[p2_i + 2]);
+		glm::vec3 p3 = glm::vec3(positions[p3_i], positions[p3_i + 1], positions[p3_i + 2]);
+		glm::vec3 u, v, N;
+		u = p2 - p1;
+		v = p3 - p1;
+		N = normalize(cross(u, v));
+		std::cout << "normal: " << N.x << " , " << N.y << " , " << N.z << std::endl;
+		cube_normals[n++] = N.x;
+		cube_normals[n++] = N.y;
+		cube_normals[n++] = N.z;
 	}
-	return normals;
 }
 
 float * DynamicShapeArray::GetSpeed(int index) {
@@ -365,9 +408,19 @@ void DynamicShapeArray::createBuffer(int index) {
 	//create a buffer to keep out positions
 	glGenBuffers(1, &buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
-	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float), shape, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float) + 36 * sizeof(float), 0, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, shape_size * sizeof(float), shape);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	
+	glBufferSubData(GL_ARRAY_BUFFER, shape_size * sizeof(float), 36 * sizeof(float), cube_normals);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(shape_size * sizeof(float)));
+	//if (shapeArray[index].shapeType == T_CUBE) {
+	//	glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(float), cube_normals, GL_STATIC_DRAW);
+	//	glEnableVertexAttribArray(1);
+	//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,(void *) (shape_size * sizeof(float))/*(void *) (36 * sizeof(float))*/);
+	//}
 
 	//create a buffer for the indexes
 	unsigned int ibo;

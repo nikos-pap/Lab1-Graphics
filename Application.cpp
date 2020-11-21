@@ -87,61 +87,58 @@ int main(void) {
 	glm::mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
 	//MVP = glm::mat4(1.0f);
 	
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	//glEnable(GL_DEPTH_TEST);
+	//glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 	glEnable(GL_LIGHTING);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_LIGHT0);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/*look here I replaced the individual shape functions with a single function*/
-	//shapeArray.CreateSphere(50.0f);
-	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_SPHERE);
-	//createBuffer(0); //moved to shapeArray.CreateShape consider removing
+	/*shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_SPHERE);
 	shapeArray.SetColor(0, 1.0f, 0.0f, 0.1f, 0.5f);
-	//shapeArray.CreateCylinder(100.0f, 100.0f, 100.0f, 20.0f, 20.0f);
 	shapeArray.CreateShape(100.0f, 100.0f, 100.0f, 40.0f, T_CYLINDER);
-	//createBuffer(1); //moved to shapeArray.CreateShape consider removing
-	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);
-	//shapeArray.CreateCube(0.0f, 0.0f, 0.0f, 100.0f);
+	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);*/
 	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);
-	//createBuffer(2); //moved to shapeArray.CreateShape consider removing
-	shapeArray.SetColor(2, 0.0f, 0.0f, 1.0f, 0.5f);
+	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 1.0f);
 
 	Shader shader("Shader.shader");
-	glm::vec3 lightPos = glm::vec3(150.0f, 150.0f, 150.0f);//not used consider removing
-	float light[3] = { 150.0f,150.0f,150.0f};
+	//glm::vec3 lightPos = glm::vec3(150.0f, 150.0f, 150.0f);//not used consider removing
+	float light[3] = { 150.0f,0.0f,150.0f};
 	shader.SetUniform3f("u_Light", light);
-	unsigned int vao; //replaced with BindShape consider removing !!!!
-	unsigned int ib; //replaced with BindShape consider removing !!!!
+	shader.SetUniformMat4f("model", Model);
 	unsigned int ib_size;
 	int shapeArrSize;
+	bool spaceChecker = true;
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
+
 		shader.Bind();
 		shapeArrSize = shapeArray.GetSize();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)&&spaceChecker) {
+			spaceChecker = false;
+			shapeArray.CreateRandomShape();
+		}
+		else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
+			spaceChecker = true;
+		}
 		for (int i = 0; i < shapeArrSize; i++) {
 			float* color = shapeArray.GetColor(i);
-			//std::cout << "1" << std::endl;
-			//vao = shapeArray.GetVAOID(i); //replaced with BindShape consider removing !!!!
-			//ib = shapeArray.GetIBOID(i); //replaced with BindShape consider removing !!!!
 			ib_size = shapeArray.GetIndexPointerSize(i);
-			//std::cout << "index buffer size: " << ib_size << std::endl;
-			//glBindVertexArray(vao); //replaced with BindShape consider removing !!!!
-			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib); //replaced with BindShape consider removing !!!!
-			//std::cout << "2" << std::endl;
-			//glEnableVertexAttribArray(0); //This is for the inputs of the shader remember!!
 			shapeArray.BindShape(i);
 			//std::cout << "3" << std::endl;
 			shader.SetUniformMat4f("u_MVP", MVP);
 			shader.SetUniform4f("u_Color",color);
 			//shader.SetUniform3f("u_Light", 150.0f, 150.0f, 150.0f);
-			if (i == 1) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			/*if (i == 1) {
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			}
 			else {
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			}
+			}*/
 			
 			glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
 			//glBindVertexArray(0); //it works without this*/
