@@ -99,16 +99,16 @@ int main(void) {
 	glDisable(GL_TEXTURE_2D);
 
 	/*look here I replaced the individual shape functions with a single function*/
-	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_SPHERE);
+	/*shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_SPHERE);
 	shapeArray.SetColor(0, 1.0f, 0.0f, 0.1f, 0.5f);
 	shapeArray.CreateShape(0.0f, 100.0f, 100.0f, 10.0f, T_CYLINDER);
-	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);
-	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 20.0f, T_CUBE);
-	shapeArray.SetColor(2, 0.0f, 0.0f, 1.0f, 1.0f);
+	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);*/
+	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);
+	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 0.5f);
 
 	Shader shader("Shader.shader");
 	//glm::vec3 lightPos = glm::vec3(150.0f, 150.0f, 150.0f);//not used consider removing
-	float light[3] = { 150.0f,100000.0f,50.0f};
+	float light[3] = { 150.0f,-100000.0f,50.0f};
 	shader.SetUniform3f("u_Light", light);
 	shader.SetUniformMat4f("model", Model);
 	unsigned int ib_size;

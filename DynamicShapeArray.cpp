@@ -149,6 +149,7 @@ int DynamicShapeArray::GetIndexPointerSize(int index) {
 
 void DynamicShapeArray::GetCubeNormals()
 {	
+	/*
 	float x0 = 0, y0 = 0, z0 = 0;
 	float x1 = 1, y1 = 1, z1 = 1;
 
@@ -180,6 +181,19 @@ void DynamicShapeArray::GetCubeNormals()
 		cube_normals[n++] = N.x;
 		cube_normals[n++] = N.y;
 		cube_normals[n++] = N.z;
+	}*/
+	float ube_normals[] = {
+		-sqrt(2.0f),-sqrt(2.0f),-sqrt(2.0f),
+		-sqrt(2.0f),sqrt(2.0f),-sqrt(2.0f),
+		sqrt(2.0f),-sqrt(2.0f),-sqrt(2.0f),
+		sqrt(2.0f),sqrt(2.0f),-sqrt(2.0f),
+		-sqrt(2.0f),-sqrt(2.0f),sqrt(2.0f),
+		-sqrt(2.0f),sqrt(2.0f),sqrt(2.0f),
+		sqrt(2.0f),-sqrt(2.0f),sqrt(2.0f),
+		sqrt(2.0f),sqrt(2.0f),sqrt(2.0f),
+	};
+	for (int i = 0; i < 24; i++) {
+		cube_normals[i] = ube_normals[i];
 	}
 }
 
