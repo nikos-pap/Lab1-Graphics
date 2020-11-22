@@ -13,8 +13,8 @@ out vec3 Normal;
 void main() {
 	//lighting calculations
 	gl_Position = u_MVP * vec4(position,1.0);
-	FragPos = vec4(model * vec4(position,1.0)).xyz;
-	Normal = mat3(model)*aNormal;
+	FragPos = position;//vec4(model * vec4(position,1.0)).xyz;
+	Normal = aNormal;
 };
 
 #shader fragment
@@ -30,7 +30,7 @@ in vec3 FragPos;
 void main() {
 	// Light emission properties
 	// You probably want to put them as uniforms
-	vec3 LightColor = vec3(0.6, 0.6, 0.6);
+	vec3 LightColor = vec3(1.0, 1.0, 1.0);
 	vec3 ambient = vec3(0.2, 0.2, 0.16);
 	//float distance = length(u_Light - vec3(100, 57, 93));//Position_worldspace);
 

@@ -87,13 +87,13 @@ int main(void) {
 	glm::mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
 	//MVP = glm::mat4(1.0f);
 	
-	//glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
-	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+	//glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glEnable(GL_LIGHT0);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/*look here I replaced the individual shape functions with a single function*/
 	/*shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_SPHERE);
@@ -101,11 +101,11 @@ int main(void) {
 	shapeArray.CreateShape(100.0f, 100.0f, 100.0f, 40.0f, T_CYLINDER);
 	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);*/
 	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);
-	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 1.0f);
+	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 0.5f);
 
 	Shader shader("Shader.shader");
 	//glm::vec3 lightPos = glm::vec3(150.0f, 150.0f, 150.0f);//not used consider removing
-	float light[3] = { 150.0f,0.0f,150.0f};
+	float light[3] = { 150.0f,0.0f,50.0f};
 	shader.SetUniform3f("u_Light", light);
 	shader.SetUniformMat4f("model", Model);
 	unsigned int ib_size;

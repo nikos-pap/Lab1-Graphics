@@ -52,8 +52,8 @@ Simple Destructor
 //remember to free the rest
 DynamicShapeArray::~DynamicShapeArray() {
 	free(shapeArray);
-	free(cylinder_indices);
-	free(sphere_indices);
+	//free(cylinder_indices);
+	//free(sphere_indices);
 }
 
 
