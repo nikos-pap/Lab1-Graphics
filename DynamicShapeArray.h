@@ -16,6 +16,8 @@
 #define SPHERE_SECTOR_NUM 36
 #define SPHERE_STACK_NUM 18
 #define CIRCLE_TRIANGLE_NUM 34
+
+#define GLOBAL_SPEED 60
 //this is for a new implementation I thought subject to change
 /*
 struct Original {

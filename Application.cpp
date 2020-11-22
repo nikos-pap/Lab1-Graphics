@@ -3,44 +3,50 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 DynamicShapeArray shapeArray;
+//camera 
+glm::vec3 cameraPos(200.0f, 200.0f, 200.0f);
+glm::vec3 cameraFront(-1.0f, -1.0f, -1.0f);
+glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
+glm::mat4 View = glm::lookAt(
+	cameraPos, // Camera is at (100,150,100), in World Space
+	//glm::vec3(0.0f, 150.0f, 0.0f),
+	(cameraPos + cameraFront), // and looks at the origin
+	cameraUp  // Head is up (set to 0,-1,0 to look upside-down)
+);
 
-//not used anymore consider removing
-void createBuffer(int shape_index) {
-	unsigned int buffer_id;
-	float* shape = shapeArray.GetShape(shape_index);
-	/*for (int i = 0; i < 108;i+=3) {
-		std::cout << "x: " << shape[i] << ", y: " << shape[i+1] << ", z: " << shape[i+2] << std::endl;
+//speeds
+float cameraSpeed = 20.0f / GLOBAL_SPEED;
+float yawSpeed = 1.0f / GLOBAL_SPEED;
 
-	}*/
-	int shape_size = shapeArray.GetSize(shape_index);
-	int index_pointer_size = shapeArray.GetIndexPointerSize(shape_index);
-	unsigned int* index_array = shapeArray.GetIndexPointer(shape_index);
-
-	unsigned int vao;
-	//create and bind the vao
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-	//create a buffer to keep out positions
-	glGenBuffers(1, &buffer_id);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
-	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float), shape, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-
-	//create a buffer for the indexes
-	unsigned int ibo;
-	//glGenBuffers creates the random id for that buffer and stores it in the variable
-	glGenBuffers(1, &ibo);
-	//bind object buffer to target
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_pointer_size * sizeof(unsigned int), index_array, GL_STATIC_DRAW);
-
-	//keep the three buffers in the shape
-	shapeArray.SetVAOID(shape_index, vao);
-	shapeArray.SetBufferID(shape_index, buffer_id);
-	shapeArray.SetIBOID(shape_index, ibo);
-	std::cout << "buffer created id's are:" << vao << ", " << buffer_id << ", " << ibo << std::endl;
+void processCameraMovement(GLFWwindow* window) {
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		cameraPos += cameraUp * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+		cameraPos -= cameraUp * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+		cameraFront += yawSpeed * cameraUp;
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+		cameraFront -= yawSpeed * cameraUp;
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+		cameraFront -= glm::normalize(glm::cross(cameraFront, cameraUp)) * (yawSpeed / 2);
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+		cameraFront += glm::normalize(glm::cross(cameraFront, cameraUp)) * (yawSpeed / 2);
+	View = glm::lookAt(
+		cameraPos, // Camera is at (100,150,100), in World Space
+		//glm::vec3(0.0f, 150.0f, 0.0f),
+		(cameraPos + cameraFront), // and looks at the origin
+		cameraUp  // Head is up (set to 0,-1,0 to look upside-down)
+	);
 }
+
 
 int main(void) {
 	GLFWwindow* window;
@@ -73,44 +79,42 @@ int main(void) {
 	std::cout << glGetString(GL_VERSION) << std::endl;
 	glm::mat4 Projection = glm::perspective(glm::radians(40.0f),1.0f,0.001f,1000.0f); //ortho coords: -200.0f, 200.0f, -200.0f, 150.0f, 250.0f, 0.0f
 
-	glm::mat4 View = glm::lookAt(
-		glm::vec3(200.0f, 200.0f, 200.0f), // Camera is at (100,150,100), in World Space
-		//glm::vec3(0.0f, 150.0f, 0.0f),
-		glm::vec3(0.0f, 0.0f, 0.0f), // and looks at the origin
-		glm::vec3(0.0f, 1.0f, 0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
-	);
+
 
 	// Model matrix : an identity matrix (model will be at the origin)
 	glm::mat4 Model = glm::mat4(1.0f);
 
 	// Our ModelViewProjection : multiplication of our 3 matrices
-	glm::mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
+	glm::mat4 MVP;// = Projection * View * Model; // Remember, matrix multiplication is the other way around
 	//MVP = glm::mat4(1.0f);
 	
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
+	glEnable(GL_NORMALIZE);
 	//glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
-	glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHTING);
 	//glEnable(GL_LIGHT0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_TEXTURE_2D);
 
 	/*look here I replaced the individual shape functions with a single function*/
-	/*shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_SPHERE);
+	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_SPHERE);
 	shapeArray.SetColor(0, 1.0f, 0.0f, 0.1f, 0.5f);
-	shapeArray.CreateShape(100.0f, 100.0f, 100.0f, 40.0f, T_CYLINDER);
-	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);*/
-	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);
-	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 0.5f);
+	shapeArray.CreateShape(0.0f, 100.0f, 100.0f, 10.0f, T_CYLINDER);
+	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);
+	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 20.0f, T_CUBE);
+	shapeArray.SetColor(2, 0.0f, 0.0f, 1.0f, 1.0f);
 
 	Shader shader("Shader.shader");
 	//glm::vec3 lightPos = glm::vec3(150.0f, 150.0f, 150.0f);//not used consider removing
-	float light[3] = { 150.0f,0.0f,50.0f};
+	float light[3] = { 150.0f,100000.0f,50.0f};
 	shader.SetUniform3f("u_Light", light);
 	shader.SetUniformMat4f("model", Model);
 	unsigned int ib_size;
 	int shapeArrSize;
 	bool spaceChecker = true;
+
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
 
@@ -124,6 +128,10 @@ int main(void) {
 		else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
 			spaceChecker = true;
 		}
+		
+		processCameraMovement(window);
+		MVP = Projection * View * Model;
+
 		for (int i = 0; i < shapeArrSize; i++) {
 			float* color = shapeArray.GetColor(i);
 			ib_size = shapeArray.GetIndexPointerSize(i);
@@ -131,6 +139,7 @@ int main(void) {
 			//std::cout << "3" << std::endl;
 			shader.SetUniformMat4f("u_MVP", MVP);
 			shader.SetUniform4f("u_Color",color);
+			shader.SetUniformMat4f("model", View);
 			//shader.SetUniform3f("u_Light", 150.0f, 150.0f, 150.0f);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			/*if (i == 1) {

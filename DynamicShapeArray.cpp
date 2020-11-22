@@ -13,6 +13,9 @@
 */
 
 float cube_normals[36];
+float sphere_normals[2 * 3 * (SPHERE_STACK_NUM - 1) * SPHERE_SECTOR_NUM];
+float cylinder_normals[CIRCLE_TRIANGLE_NUM * 3 * 4];
+bool firstCylinder = true;
 
 unsigned int cube_indices[] = {
 		4, 6, 5,//front
@@ -29,7 +32,7 @@ unsigned int cube_indices[] = {
 		2, 6, 0//bottom
 };
 
-unsigned int* cylinder_indices;
+unsigned int cylinder_indices[CIRCLE_TRIANGLE_NUM * 3 * 4];
 unsigned int * sphere_indices;
 
 /*
@@ -169,13 +172,17 @@ void DynamicShapeArray::GetCubeNormals()
 		glm::vec3 u, v, N;
 		u = p2 - p1;
 		v = p3 - p1;
-		N = normalize(cross(u, v));
+		N.x = (u.y * v.z) - (u.z * v.y);
+		N.y = (u.z * v.x) - (u.x * v.z);
+		N.z = (u.x * v.y) - (u.y * v.x);
+		N = normalize(N);
 		std::cout << "normal: " << N.x << " , " << N.y << " , " << N.z << std::endl;
 		cube_normals[n++] = N.x;
 		cube_normals[n++] = N.y;
 		cube_normals[n++] = N.z;
 	}
 }
+
 
 float * DynamicShapeArray::GetSpeed(int index) {
 	if (index < size) {
@@ -318,8 +325,27 @@ void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, 
 		cylinder_pos[i] = circle1[i];
 		cylinder_pos[i + 108] = circle2[i];
 	}
-
 	AddArray(cylinder_pos, 216, T_CYLINDER);
+
+	if (firstCylinder) {
+		for (int shape = 0, n = 0; shape < CIRCLE_TRIANGLE_NUM * 3 * 4; n++) {
+			int p1_i = 3 * cylinder_indices[shape++];
+			int p2_i = 3 * cylinder_indices[shape++];
+			int p3_i = 3 * cylinder_indices[shape++];
+			glm::vec3 p1 = glm::vec3(cylinder_pos[p1_i], cylinder_pos[p1_i + 1], cylinder_pos[p1_i + 2]);
+			glm::vec3 p2 = glm::vec3(cylinder_pos[p2_i], cylinder_pos[p2_i + 1], cylinder_pos[p2_i + 2]);
+			glm::vec3 p3 = glm::vec3(cylinder_pos[p3_i], cylinder_pos[p3_i + 1], cylinder_pos[p3_i + 2]);
+			glm::vec3 u, v, N;
+			u = p2 - p1;
+			v = p3 - p1;
+			N = normalize(cross(u, v));
+			//std::cout << "normal: " << N.x << " , " << N.y << " , " << N.z << std::endl;
+			cylinder_normals[n++] = N.x;
+			cylinder_normals[n++] = N.y;
+			cylinder_normals[n++] = N.z;
+		}
+		firstCylinder = false;
+	}
 
 }
 
@@ -355,7 +381,7 @@ float* DynamicShapeArray::CreateCircle(float x, float y, float z, float radius) 
 void DynamicShapeArray::CreateSphere(float x0, float y0, float z0, float radius) {
 
 	float x, y, z, xy;                              // vertex position
-	//float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
+	float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
 	//float s, t;                                    // vertex texCoord
 	int size = (SPHERE_SECTOR_NUM + 1) * (SPHERE_STACK_NUM + 1) * 3;
 	float sectorStep = 2 * PI / SPHERE_SECTOR_NUM;
@@ -380,12 +406,23 @@ void DynamicShapeArray::CreateSphere(float x0, float y0, float z0, float radius)
 		{
 			sectorAngle = j * sectorStep;           // starting from 0 to 2pi
 
+
+
 			// vertex position (x, y, z)
 			x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
 			y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
 			points[n] = x + x0;
 			points[n+1] = y + y0;
 			points[n+2] = z + z0;
+
+			// calculating normals
+			nx = x * lengthInv;
+			ny = y * lengthInv;
+			nz = z * lengthInv;
+			
+			sphere_normals[n] = nx;
+			sphere_normals[n+1] = ny;
+			sphere_normals[n+2] = nz;
 
 			//std::cout << x << ", " << y << ", " << z << "," << std::endl;
 			n += 3;
@@ -408,12 +445,11 @@ void DynamicShapeArray::createBuffer(int index) {
 	//create a buffer to keep out positions
 	glGenBuffers(1, &buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
-	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float) + 36 * sizeof(float), 0, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float) + index_pointer_size * sizeof(float), 0, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, shape_size * sizeof(float), shape);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-	
-	glBufferSubData(GL_ARRAY_BUFFER, shape_size * sizeof(float), 36 * sizeof(float), cube_normals);
+	glBufferSubData(GL_ARRAY_BUFFER, shape_size * sizeof(float), index_pointer_size * sizeof(float), cube_normals);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(shape_size * sizeof(float)));
 	//if (shapeArray[index].shapeType == T_CUBE) {
@@ -441,7 +477,7 @@ void DynamicShapeArray::createBuffer(int index) {
 //Cylinder
 void DynamicShapeArray::InitCylinderIndices() {
 	int offset = CIRCLE_TRIANGLE_NUM + 2;
-	cylinder_indices = (unsigned int*)malloc(CIRCLE_TRIANGLE_NUM * 3 * 4 *sizeof(unsigned int));
+	//cylinder_indices = (unsigned int*)malloc(CIRCLE_TRIANGLE_NUM * 3 * 4 *sizeof(unsigned int));
 
 	if (cylinder_indices == nullptr) {
 		std::cout << "Failed to allocate memory for cylinder_indices" << std::endl;
