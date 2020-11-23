@@ -8,7 +8,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #define PI 3.14159265f
-
+#define SQRT_2 1.41421356237f
 #define T_CUBE 0
 #define T_SPHERE 1
 #define T_CYLINDER 2
@@ -42,6 +42,9 @@ struct Shape {
 	unsigned int vb_id = 0;
 	unsigned int ib_id = 0;
 	glm::mat4 Model;
+	bool* collisions;
+	float center[3];
+	float d;
 /*public:
 	bool operator>(const Shape other) {
 		return center > other.center;
@@ -65,7 +68,7 @@ public:
 	//Binds VAO and ib of the shape at the index
 	void BindShape(int index);
 
-
+	void CheckCollision(int index);
 	//Getters
 	//Returns the color of the shape to pass into the shader
 	float * GetColor(int index);
@@ -102,7 +105,7 @@ private:
 	//newly private functions check if all OK
 	int RandomInt(int min, int max);
 	float RandomFloat(float min, float max);
-	void AddArray(float* element, int size, int shapeType);
+	void AddArray(float* element, int size, int shapeType, float x0, float y0, float z0, float d);
 	void CreateCube(float x0, float y0, float z0, float size);
 	void CreateCylinder(float x, float y, float z, float radius, float height);
 	float* CreateCircle(float x, float y, float z, float radius);

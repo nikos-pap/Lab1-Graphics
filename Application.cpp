@@ -4,8 +4,8 @@
 
 DynamicShapeArray shapeArray;
 //camera 
-glm::vec3 cameraPos(200.0f, 200.0f, 200.0f);
-glm::vec3 cameraFront(-1.0f, -1.0f, -1.0f);
+glm::vec3 cameraPos(-200.0f, 200.0f, 200.0f);
+glm::vec3 cameraFront(1.0f, -1.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 glm::mat4 View = glm::lookAt(
 	cameraPos, // Camera is at (100,150,100), in World Space
@@ -28,7 +28,7 @@ int processCameraMovement(GLFWwindow* window) {
 		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
 		//std::cout << count << std::endl;
 
-		/**/
+		/*
 		std::cout << "Left Stick X Axis: " << axes[0] << std::endl; // tested with PS4 controller connected via micro USB cable
 		std::cout << "Left Stick Y Axis: " << axes[1] << std::endl; // tested with PS4 controller connected via micro USB cable
 		std::cout << "Right Stick X Axis: " << axes[2] << std::endl; // tested with PS4 controller connected via micro USB cable
@@ -170,7 +170,7 @@ int main(void) {
 
 	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);
 	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 0.5f);
-	shapeArray.CreateShape(25.0f, 25.0f, 25.0f, 50.0f, T_SPHERE);
+	shapeArray.CreateShape(25.0f, 25.0f, 25.0f, 50.0f, T_CYLINDER);
 	shapeArray.SetColor(1, 1.0f, 0.0f, 0.1f, 1.0f);
 	/*shapeArray.CreateShape(0.0f, 100.0f, 100.0f, 10.0f, T_CYLINDER);
 	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);*/
@@ -205,6 +205,7 @@ int main(void) {
 			ib_size = shapeArray.GetIndexPointerSize(i);
 			shapeArray.BindShape(i);
 			//std::cout << "3" << std::endl;
+			shapeArray.CheckCollision(2);
 			shapeArray.Move(i);
 			Model = shapeArray.GetModel(i);
 			MVP = Projection * View * Model;
