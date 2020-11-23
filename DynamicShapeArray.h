@@ -41,6 +41,7 @@ struct Shape {
 	unsigned int vao_id = 0;
 	unsigned int vb_id = 0;
 	unsigned int ib_id = 0;
+	glm::mat4 Model;
 /*public:
 	bool operator>(const Shape other) {
 		return center > other.center;
@@ -71,13 +72,13 @@ public:
 	
 	//Returns the size of the ShapeArray
 	inline int GetSize() { return size; };
-	
+	glm::mat4 GetModel(int index);
 	//Returns the size of the ib to use when drawing
 	int GetIndexPointerSize(int shapeType);
 
 	//Returns the Normals of the Cube might replace it with a function that works for every shape
 	void GetCubeNormals();//needs a fix for sure we should not always calculate this
-	
+	void Move(int index);
 	float * GetSpeed(int index); //not used fix, delete or use it
 	float * GetShape(int index); //not used in the new implementation consider removing
 	int GetSize(int index); //not used in the new implementation consider removing

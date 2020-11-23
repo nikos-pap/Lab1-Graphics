@@ -84,6 +84,7 @@ void DynamicShapeArray::CreateRandomShape() {
 	std::cout << "r: " << r << " g: " << g << " b: " << b << std::endl;
 	CreateShape(0.0f, 0.0f, 0.0f, shape_size, shapeType);
 	SetColor(size - 1,r,g,b);
+	SetSpeed(size - 1, 1.0f, 1.0f, 1.0f);
 }
 
 /*
@@ -305,7 +306,13 @@ void DynamicShapeArray::AddArray(float * element, int elementSize, int shapeType
 			tmpData[i] = element[i];
 		}
 		int index = size++;
-		shapeArray[index] = { tmpData,elementSize, shapeType };
+		shapeArray[index].data = tmpData;
+		shapeArray[index].size = elementSize;
+		shapeArray[index].shapeType = shapeType;
+		shapeArray[index].Model = glm::mat4(1.0f);
+		shapeArray[index].speed[0] = 0.0f;
+		shapeArray[index].speed[1] = 0.0f;
+		shapeArray[index].speed[2] = 0.0f;
 		createBuffer(index);
 	} else {
 		std::cout << "not ok" << std::endl;
@@ -361,6 +368,17 @@ void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, 
 		firstCylinder = false;
 	}
 
+}
+
+void DynamicShapeArray::Move(int index) {
+	float * speed = shapeArray[index].speed;
+	float size = shapeArray[index].size;
+	if (speed[0] && speed[1] && speed[2]) 
+		shapeArray[index].Model = glm::translate(glm::mat4(1.0f), glm::vec3(speed[0], speed[1], speed[2])) * shapeArray[index].Model;
+}
+
+glm::mat4 DynamicShapeArray::GetModel(int index) {
+	return shapeArray[index].Model;
 }
 
 float* DynamicShapeArray::CreateCircle(float x, float y, float z, float radius) {
@@ -450,6 +468,13 @@ void DynamicShapeArray::createBuffer(int index) {
 	float * shape = shapeArray[index].data;
 	int shape_size = shapeArray[index].size;
 	int index_pointer_size = GetIndexPointerSize(index);
+	int index_pointer_size2 = GetIndexPointerSize(index);
+	if (shapeArray[index].shapeType == T_CUBE) {
+		index_pointer_size2 = 24;
+	}
+	else if (shapeArray[index].shapeType == T_SPHERE){
+		index_pointer_size2 = 1109;
+	}
 	unsigned int * index_array = GetIndexPointer(index);
 
 	unsigned int vao;
@@ -459,11 +484,11 @@ void DynamicShapeArray::createBuffer(int index) {
 	//create a buffer to keep out positions
 	glGenBuffers(1, &buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
-	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float) + index_pointer_size * sizeof(float), 0, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float) + index_pointer_size2 * sizeof(float), 0, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, shape_size * sizeof(float), shape);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-	glBufferSubData(GL_ARRAY_BUFFER, shape_size * sizeof(float), index_pointer_size * sizeof(float), cube_normals);
+	glBufferSubData(GL_ARRAY_BUFFER, shape_size * sizeof(float), index_pointer_size2 * sizeof(float), cube_normals);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(shape_size * sizeof(float)));
 	//if (shapeArray[index].shapeType == T_CUBE) {

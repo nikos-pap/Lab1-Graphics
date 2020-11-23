@@ -17,8 +17,77 @@ glm::mat4 View = glm::lookAt(
 //speeds
 float cameraSpeed = 20.0f / GLOBAL_SPEED;
 float yawSpeed = 1.0f / GLOBAL_SPEED;
+bool spaceChecker = true;
+bool joystick_space = false;
 
-void processCameraMovement(GLFWwindow* window) {
+int processCameraMovement(GLFWwindow* window) {
+	int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
+	if (1 == present)
+	{
+		int axesCount;
+		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
+		//std::cout << count << std::endl;
+
+		/**/
+		std::cout << "Left Stick X Axis: " << axes[0] << std::endl; // tested with PS4 controller connected via micro USB cable
+		std::cout << "Left Stick Y Axis: " << axes[1] << std::endl; // tested with PS4 controller connected via micro USB cable
+		std::cout << "Right Stick X Axis: " << axes[2] << std::endl; // tested with PS4 controller connected via micro USB cable
+		std::cout << "Right Stick Y Axis: " << axes[3] << std::endl; // tested with PS4 controller connected via micro USB cable
+		std::cout << "Left Trigger/L2: " << axes[4] << std::endl; // tested with PS4 controller connected via micro USB cable
+		std::cout << "Right Trigger/R2: " << axes[5] << std::endl; // tested with PS4 controller connected via micro USB cable
+		/**/
+
+		int buttonCount;
+		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
+		if (GLFW_PRESS == buttons[1] && spaceChecker)
+		{
+			std::cout << "joystick_space: " << joystick_space  << std::endl;
+			joystick_space = true;
+			spaceChecker = false;
+			shapeArray.CreateRandomShape();
+		}
+		else if (GLFW_RELEASE == buttons[1] && joystick_space){
+			joystick_space = false;
+			spaceChecker = true;
+		}
+
+		if (GLFW_PRESS == buttons[0]) {
+			return GLFW_PRESS;
+		}
+
+		const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
+		//std::cout << name << std::endl;
+		if (axes[5] >= -1)//R2
+			cameraPos += (axes[5] + 1) * cameraFront;
+		if (axes[4] >= -1)//L2
+			cameraPos -= (axes[4] + 1) * cameraFront;
+		if (abs(axes[3]) >= 0.2)//RY
+			cameraPos -= (axes[3] / 1) * cameraUp;
+		if (abs(axes[2]) >= 0.2)//RX
+			cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[2]);
+		if (abs(axes[1]) >= 0.2)//LY
+			cameraFront -= (axes[1]/30) * cameraUp;
+		if (abs(axes[0]) >= 0.2)//LX
+			cameraFront += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[0] / 30);
+		/*
+		if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+			cameraFront += yawSpeed * cameraUp;
+		if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+			cameraFront -= yawSpeed * cameraUp;
+		if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+			cameraFront -= glm::normalize(glm::cross(cameraFront, cameraUp)) * (yawSpeed / 2);
+		if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+			cameraFront += glm::normalize(glm::cross(cameraFront, cameraUp)) * (yawSpeed / 2);*/
+	}
+
+	if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) && spaceChecker && !joystick_space) {
+		spaceChecker = false;
+		shapeArray.CreateRandomShape();
+	}
+	else if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) && !joystick_space) {
+		spaceChecker = true;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		cameraPos += cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -45,6 +114,7 @@ void processCameraMovement(GLFWwindow* window) {
 		(cameraPos + cameraFront), // and looks at the origin
 		cameraUp  // Head is up (set to 0,-1,0 to look upside-down)
 	);
+	return glfwGetKey(window, GLFW_KEY_ESCAPE);
 }
 
 
@@ -87,7 +157,7 @@ int main(void) {
 	// Our ModelViewProjection : multiplication of our 3 matrices
 	glm::mat4 MVP;// = Projection * View * Model; // Remember, matrix multiplication is the other way around
 	//MVP = glm::mat4(1.0f);
-	
+	//glfwSwapInterval(1);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
@@ -98,13 +168,12 @@ int main(void) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_TEXTURE_2D);
 
-	/*look here I replaced the individual shape functions with a single function*/
-	/*shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_SPHERE);
-	shapeArray.SetColor(0, 1.0f, 0.0f, 0.1f, 0.5f);
-	shapeArray.CreateShape(0.0f, 100.0f, 100.0f, 10.0f, T_CYLINDER);
-	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);*/
 	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);
 	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 0.5f);
+	shapeArray.CreateShape(25.0f, 25.0f, 25.0f, 50.0f, T_SPHERE);
+	shapeArray.SetColor(1, 1.0f, 0.0f, 0.1f, 1.0f);
+	/*shapeArray.CreateShape(0.0f, 100.0f, 100.0f, 10.0f, T_CYLINDER);
+	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);*/
 
 	Shader shader("Shader.shader");
 	//glm::vec3 lightPos = glm::vec3(150.0f, 150.0f, 150.0f);//not used consider removing
@@ -113,30 +182,32 @@ int main(void) {
 	shader.SetUniformMat4f("model", Model);
 	unsigned int ib_size;
 	int shapeArrSize;
-	bool spaceChecker = true;
+	
 
 
-	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
-
+	while (processCameraMovement(window) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
 		shader.Bind();
 		shapeArrSize = shapeArray.GetSize();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)&&spaceChecker) {
+		/*if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)&&spaceChecker) {
 			spaceChecker = false;
 			shapeArray.CreateRandomShape();
 		}
 		else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
 			spaceChecker = true;
-		}
+		}*/
 		
-		processCameraMovement(window);
+		//processCameraMovement(window);
 		MVP = Projection * View * Model;
 
-		for (int i = 0; i < shapeArrSize; i++) {
+		for (int i = shapeArrSize-1; i >= 0; i--) {
 			float* color = shapeArray.GetColor(i);
 			ib_size = shapeArray.GetIndexPointerSize(i);
 			shapeArray.BindShape(i);
 			//std::cout << "3" << std::endl;
+			shapeArray.Move(i);
+			Model = shapeArray.GetModel(i);
+			MVP = Projection * View * Model;
 			shader.SetUniformMat4f("u_MVP", MVP);
 			shader.SetUniform4f("u_Color",color);
 			shader.SetUniformMat4f("model", View);
@@ -148,7 +219,7 @@ int main(void) {
 			else {
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}*/
-			
+			//std::cout << shapeArray.GetSpeed(i)[0] << shapeArray.GetSpeed(i)[1] << shapeArray.GetSpeed(i)[2] << std::endl;
 			glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
 			//glBindVertexArray(0); //it works without this*/
 		}
@@ -160,6 +231,7 @@ int main(void) {
 		glfwPollEvents();
 		shader.Unbind();
 	}
+	Model = glm::mat4(1.0f);
 	//glDeleteProgram(shader);
 	glfwTerminate();
 
