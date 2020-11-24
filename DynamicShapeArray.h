@@ -103,6 +103,7 @@ private:
 	int size = 0;
 	int capacity;
 
+	float * GetNormals(int shapeType);
 	//newly private functions check if all OK
 	int RandomInt(int min, int max);
 	float RandomFloat(float min, float max);

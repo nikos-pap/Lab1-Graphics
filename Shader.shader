@@ -14,7 +14,7 @@ void main() {
 	//lighting calculations
 	gl_Position = u_MVP * vec4(position,1.0);
 	FragPos = vec4(model * vec4(position,1.0)).xyz;
-	Normal = transpose(inverse(mat3(model))) * aNormal;
+	Normal = transpose(inverse(mat3(model))) * normalize(aNormal);
 };
 
 #shader fragment

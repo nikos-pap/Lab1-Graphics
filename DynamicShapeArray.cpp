@@ -12,9 +12,19 @@
 	The only easy enough to do by hand
 */
 
-float cube_normals[36];
-float sphere_normals[2 * 3 * (SPHERE_STACK_NUM - 1) * SPHERE_SECTOR_NUM];
-float cylinder_normals[CIRCLE_TRIANGLE_NUM * 3 * 4];
+float cube_normals[] = {
+		-sqrt(2.0f),-sqrt(2.0f),-sqrt(2.0f),
+		-sqrt(2.0f),sqrt(2.0f),-sqrt(2.0f),
+		sqrt(2.0f),-sqrt(2.0f),-sqrt(2.0f),
+		sqrt(2.0f),sqrt(2.0f),-sqrt(2.0f),
+		-sqrt(2.0f),-sqrt(2.0f),sqrt(2.0f),
+		-sqrt(2.0f),sqrt(2.0f),sqrt(2.0f),
+		sqrt(2.0f),-sqrt(2.0f),sqrt(2.0f),
+		sqrt(2.0f),sqrt(2.0f),sqrt(2.0f)
+};
+
+float sphere_normals[1109];
+float cylinder_normals[216];
 bool firstCylinder = true;
 
 unsigned int cube_indices[] = {
@@ -45,7 +55,6 @@ DynamicShapeArray::DynamicShapeArray() {
 	size = 0;
     InitSphereIndices();
 	InitCylinderIndices();
-	GetCubeNormals();
 }
 
 /*
@@ -84,7 +93,7 @@ void DynamicShapeArray::CreateRandomShape() {
 	CreateShape(0.0f, 0.0f, 0.0f, shape_size, shapeType);
 	std::cout << "r: " << r << " g: " << g << " b: " << b << ", " << shape_size << " "<< shapeType<< std::endl;
 	SetColor(size - 1,r,g,b);
-	SetSpeed(size - 1, 0.02f, 0.02f, 0.02f);
+	SetSpeed(size - 1, 0.1f, 0.1f, 0.1f);
 }
 
 /*
@@ -132,7 +141,7 @@ float* DynamicShapeArray::GetColor(int id) {
 
 /*
 Index Buffer Pointer Size
-- this is needed to draw the right amound of triangles for each shape
+- this is needed to draw the right amount of triangles for each shape
 */
 int DynamicShapeArray::GetIndexPointerSize(int index) {
 	int shapeType = shapeArray[index].shapeType;
@@ -146,56 +155,6 @@ int DynamicShapeArray::GetIndexPointerSize(int index) {
 		return 2 * 3 * (SPHERE_STACK_NUM - 1) * SPHERE_SECTOR_NUM;
 	}
 	return 0;
-}
-
-void DynamicShapeArray::GetCubeNormals()
-{	
-	/*
-	float x0 = 0, y0 = 0, z0 = 0;
-	float x1 = 1, y1 = 1, z1 = 1;
-
-	float positions[] = {
-		x0, y0, z0,//00  back(0)0
-		x0, y1, z0,//01 back(0)1
-		x1, y0, z0,//10 back(0)2
-		x1, y1, z0,//11 back(0)3
-		x0, y0, z1,//00 front(1)4
-		x0, y1, z1,//01 front(1)5
-		x1, y0, z1,//10 front(1)6
-		x1, y1, z1,//11 front(1)7
-	};
-	for (int shape = 0,n = 0; shape < 36; n++) {
-		int p1_i = 3 * cube_indices[shape++];
-		int p2_i = 3 * cube_indices[shape++];
-		int p3_i = 3 * cube_indices[shape++];
-		glm::vec3 p1 = glm::vec3(positions[p1_i], positions[p1_i + 1], positions[p1_i + 2]);
-		glm::vec3 p2 = glm::vec3(positions[p2_i], positions[p2_i + 1], positions[p2_i + 2]);
-		glm::vec3 p3 = glm::vec3(positions[p3_i], positions[p3_i + 1], positions[p3_i + 2]);
-		glm::vec3 u, v, N;
-		u = p2 - p1;
-		v = p3 - p1;
-		N.x = (u.y * v.z) - (u.z * v.y);
-		N.y = (u.z * v.x) - (u.x * v.z);
-		N.z = (u.x * v.y) - (u.y * v.x);
-		N = normalize(N);
-		std::cout << "normal: " << N.x << " , " << N.y << " , " << N.z << std::endl;
-		cube_normals[n++] = N.x;
-		cube_normals[n++] = N.y;
-		cube_normals[n++] = N.z;
-	}*/
-	float ube_normals[] = {
-		-sqrt(2.0f),-sqrt(2.0f),-sqrt(2.0f),
-		-sqrt(2.0f),sqrt(2.0f),-sqrt(2.0f),
-		sqrt(2.0f),-sqrt(2.0f),-sqrt(2.0f),
-		sqrt(2.0f),sqrt(2.0f),-sqrt(2.0f),
-		-sqrt(2.0f),-sqrt(2.0f),sqrt(2.0f),
-		-sqrt(2.0f),sqrt(2.0f),sqrt(2.0f),
-		sqrt(2.0f),-sqrt(2.0f),sqrt(2.0f),
-		sqrt(2.0f),sqrt(2.0f),sqrt(2.0f),
-	};
-	for (int i = 0; i < 24; i++) {
-		cube_normals[i] = ube_normals[i];
-	}
 }
 
 void DynamicShapeArray::CheckCollision(int index) {
@@ -342,21 +301,6 @@ unsigned int* DynamicShapeArray::GetIndexPointer(int index) {
 	return nullptr;
 }
 
-unsigned int DynamicShapeArray::GetVAOID(int index) {
-	if (index < size) {
-		return shapeArray[index].vao_id;
-	}
-
-	return 0;
-}
-
-unsigned int DynamicShapeArray::GetIBOID(int index) {
-	if (index < size) {
-		return shapeArray[index].ib_id;
-	}
-
-	return 0;
-}
 
 //Setters
 
@@ -380,20 +324,6 @@ void DynamicShapeArray::SetSpeed(int index, float ux, float uy, float uz)
 		shapeArray[index].speed[1] = uy; 
 		shapeArray[index].speed[2] = uz;
 	}
-}
-
-//Setters that are not used anymore
-
-void DynamicShapeArray::SetBufferID(int index, int id) { 
-	shapeArray[index].vb_id = id;
-}
-
-void DynamicShapeArray::SetVAOID(int index, int id) {
-	shapeArray[index].vao_id = id; 
-}
-
-void DynamicShapeArray::SetIBOID(int index, int id) {
-	shapeArray[index].ib_id = id; 
 }
 
 void DynamicShapeArray::MoveSphere(int index, glm::vec3 speed)
@@ -479,27 +409,24 @@ void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, 
 		cylinder_pos[i] = circle1[i];
 		cylinder_pos[i + 108] = circle2[i];
 	}
-	AddArray(cylinder_pos, 216, T_CYLINDER, x, y+height/2, z, 2*radius);
 
 	if (firstCylinder) {
-		for (int shape = 0, n = 0; shape < CIRCLE_TRIANGLE_NUM * 3 * 4; n++) {
-			int p1_i = 3 * cylinder_indices[shape++];
-			int p2_i = 3 * cylinder_indices[shape++];
-			int p3_i = 3 * cylinder_indices[shape++];
-			glm::vec3 p1 = glm::vec3(cylinder_pos[p1_i], cylinder_pos[p1_i + 1], cylinder_pos[p1_i + 2]);
-			glm::vec3 p2 = glm::vec3(cylinder_pos[p2_i], cylinder_pos[p2_i + 1], cylinder_pos[p2_i + 2]);
-			glm::vec3 p3 = glm::vec3(cylinder_pos[p3_i], cylinder_pos[p3_i + 1], cylinder_pos[p3_i + 2]);
-			glm::vec3 u, v, N;
-			u = p2 - p1;
-			v = p3 - p1;
-			N = normalize(cross(u, v));
+		cylinder_normals[0] = cylinder_normals[2] = cylinder_normals[108] = cylinder_normals[110] = 0;
+		cylinder_normals[1] = 34 * sin((2 * PI) / 34);
+		cylinder_normals[109] = -34 * sin((2 * PI) / 34);
+		for (int i = 1, n = 1; i < 36; i++) {
 			//std::cout << "normal: " << N.x << " , " << N.y << " , " << N.z << std::endl;
-			cylinder_normals[n++] = N.x;
-			cylinder_normals[n++] = N.y;
-			cylinder_normals[n++] = N.z;
+			cylinder_normals[3 * i] = cos(2 * PI * n / 34) + cos(2 * PI * (n + 1) / 34) + cos(PI * (2 * n + 1) / 34);
+			cylinder_normals[3 * i + 1] = 2 * sin((2 * PI) / 34);
+			cylinder_normals[3 * i + 2] = sin(2 * PI * n / 34) + sin(2 * PI * (n + 1) / 34) + sin(PI * (2 * n + 1) / 34);
+			cylinder_normals[3 * i + 108] = cos(2 * PI * n / 34) + cos(2 * PI * (n + 1) / 34) + cos(PI * (2 * n + 1) / 34);
+			cylinder_normals[3 * i + 109] = -2 * sin((2 * PI) / 34);
+			cylinder_normals[3 * i + 110] = sin(2 * PI * n / 34) + sin(2 * PI * (n + 1) / 34) + sin(PI * (2 * n + 1) / 34);
 		}
 		firstCylinder = false;
 	}
+
+	AddArray(cylinder_pos, 216, T_CYLINDER, x, y + height / 2, z, 2 * radius);
 
 }
 
@@ -521,7 +448,7 @@ glm::mat4 DynamicShapeArray::GetModel(int index) {
 float* DynamicShapeArray::CreateCircle(float x, float y, float z, float radius) {
 	int num_of_sides = CIRCLE_TRIANGLE_NUM;
 	int num_of_vertices = num_of_sides + 2;
-	int n = 3 * num_of_vertices;//3 + (2 * num_of_vertices);
+	int n = 3 * num_of_vertices;
 	float twicePi = 2.0f * PI;
 	float * vertices = (float *) malloc(sizeof(float) * n);
 	if (vertices != nullptr) {
@@ -576,8 +503,6 @@ void DynamicShapeArray::CreateSphere(float x0, float y0, float z0, float radius)
 		{
 			sectorAngle = j * sectorStep;           // starting from 0 to 2pi
 
-
-
 			// vertex position (x, y, z)
 			x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
 			y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
@@ -594,11 +519,23 @@ void DynamicShapeArray::CreateSphere(float x0, float y0, float z0, float radius)
 			sphere_normals[n+1] = ny;
 			sphere_normals[n+2] = nz;
 
-			//std::cout << x << ", " << y << ", " << z << "," << std::endl;
 			n += 3;
 		}
 	} 
 	AddArray(points, size, T_SPHERE, x0, y0, z0, 2*radius);
+}
+
+float* DynamicShapeArray::GetNormals(int shapeType) {
+	switch (shapeType)
+	{
+	case T_CUBE:
+		return cube_normals;
+	case T_SPHERE:
+		return sphere_normals;
+	case T_CYLINDER:
+		return cylinder_normals;
+	}
+	return nullptr;
 }
 
 void DynamicShapeArray::createBuffer(int index) {
@@ -607,11 +544,15 @@ void DynamicShapeArray::createBuffer(int index) {
 	int shape_size = shapeArray[index].size;
 	int index_pointer_size = GetIndexPointerSize(index);
 	int index_pointer_size2 = GetIndexPointerSize(index);
+	float* normals = GetNormals(shapeArray[index].shapeType);
 	if (shapeArray[index].shapeType == T_CUBE) {
 		index_pointer_size2 = 24;
 	}
-	else if (shapeArray[index].shapeType == T_SPHERE){
+	else if (shapeArray[index].shapeType == T_SPHERE) {
 		index_pointer_size2 = 1109;
+	}
+	else if (shapeArray[index].shapeType == T_CYLINDER) {
+		index_pointer_size2 = 216;
 	}
 	unsigned int * index_array = GetIndexPointer(index);
 
@@ -619,21 +560,19 @@ void DynamicShapeArray::createBuffer(int index) {
 	//create and bind the vao
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
+	
 	//create a buffer to keep out positions
 	glGenBuffers(1, &buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
 	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float) + index_pointer_size2 * sizeof(float), 0, GL_STATIC_DRAW);
+	
 	glBufferSubData(GL_ARRAY_BUFFER, 0, shape_size * sizeof(float), shape);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-	glBufferSubData(GL_ARRAY_BUFFER, shape_size * sizeof(float), index_pointer_size2 * sizeof(float), cube_normals);
+	
+	glBufferSubData(GL_ARRAY_BUFFER, shape_size * sizeof(float), index_pointer_size2 * sizeof(float), normals);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(shape_size * sizeof(float)));
-	//if (shapeArray[index].shapeType == T_CUBE) {
-	//	glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(float), cube_normals, GL_STATIC_DRAW);
-	//	glEnableVertexAttribArray(1);
-	//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,(void *) (shape_size * sizeof(float))/*(void *) (36 * sizeof(float))*/);
-	//}
 
 	//create a buffer for the indexes
 	unsigned int ibo;
@@ -654,7 +593,6 @@ void DynamicShapeArray::createBuffer(int index) {
 //Cylinder
 void DynamicShapeArray::InitCylinderIndices() {
 	int offset = CIRCLE_TRIANGLE_NUM + 2;
-	//cylinder_indices = (unsigned int*)malloc(CIRCLE_TRIANGLE_NUM * 3 * 4 *sizeof(unsigned int));
 
 	if (cylinder_indices == nullptr) {
 		std::cout << "Failed to allocate memory for cylinder_indices" << std::endl;
@@ -702,8 +640,6 @@ void DynamicShapeArray::InitSphereIndices() {
 				sphere_indices[n++] = k1;
 				sphere_indices[n++] = k2;
 				sphere_indices[n++] = k1 + 1;
-				//addIndices(k1, k2, k1 + 1);   // k1---k2---k1+1
-				//std::cout << k1 << ", " << k2 << ", " << k1 + 1 << std::endl;
 			}
 
 			if (i != (SPHERE_STACK_NUM - 1))
@@ -711,8 +647,6 @@ void DynamicShapeArray::InitSphereIndices() {
 				sphere_indices[n++] = k1 + 1;
 				sphere_indices[n++] = k2;
 				sphere_indices[n++] = k2 + 1;
-				//std::cout << k1 + 1 << ", " << k2 << ", " << k2 + 1 << std::endl;
-				//addIndices(k1 + 1, k2, k2 + 1); // k1+1---k2---k2+1
 			}
 		}
 	}
@@ -727,17 +661,5 @@ void DynamicShapeArray::Extend()
 			temp[i] = shapeArray[i];
 		}
 		shapeArray = temp;
-	}
-}
-
-//not needed consider removing
-int DynamicShapeArray::GetShapeType(int index) {
-	return shapeArray[index].shapeType; 
-}
-
-//not needed consider removing
-void DynamicShapeArray::printData(int id) {
-	for (int shape = 0; shape < 24; shape++) {
-		std::cout << shapeArray[id].data[shape] << std::endl;
 	}
 }

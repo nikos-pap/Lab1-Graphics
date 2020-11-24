@@ -9,7 +9,6 @@ glm::vec3 cameraFront(1.0f, -1.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 glm::mat4 View = glm::lookAt(
 	cameraPos, // Camera is at (100,150,100), in World Space
-	//glm::vec3(0.0f, 150.0f, 0.0f),
 	(cameraPos + cameraFront), // and looks at the origin
 	cameraUp  // Head is up (set to 0,-1,0 to look upside-down)
 );
@@ -57,18 +56,12 @@ int processCameraMovement(GLFWwindow* window) {
 
 		const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
 		//std::cout << name << std::endl;
-		/*if (axes[5] >= -1)//R2
-			cameraPos += (axes[5] + 1) * cameraFront;
-		if (axes[4] >= -1)//L2
-			cameraPos -= (axes[4] + 1) * cameraFront;*/
-		if (axes[3] >= -1)//RY
+		if (abs(axes[3]) >= 0.2)//RY
 			cameraPos -= (axes[3]) * cameraFront;
 		if (abs(axes[5]) >= 0.2)//R2
 			cameraPos += (axes[5] + 1) * cameraUp;
 		if (abs(axes[4]) >= 0.2)//L2
 			cameraPos -= (axes[4] + 1) * cameraUp;
-		/*if (abs(axes[3]) >= 0.2)//RY
-			cameraPos -= (axes[3] / 1) * cameraUp;*/
 		if (abs(axes[2]) >= 0.2)//RX
 			cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[2]);
 		if (abs(axes[1]) >= 0.2)//LY
@@ -128,10 +121,13 @@ int processCameraMovement(GLFWwindow* window) {
 		shapeArray.MoveSphere(1, glm::vec3(0.0f, 1.0f, 0.0f));
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 		shapeArray.MoveSphere(1, glm::vec3(0.0f, -1.0f, 0.0f));
+	if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS)
+		shapeArray.MoveSphere(1, glm::vec3(0.0f, 0.0f, -1.0f));
+	if (glfwGetKey(window, GLFW_KEY_KP_ADD) == GLFW_PRESS)
+		shapeArray.MoveSphere(1, glm::vec3(0.0f, 0.0f, 1.0f));
 
 	View = glm::lookAt(
 		cameraPos, // Camera is at (100,150,100), in World Space
-		//glm::vec3(0.0f, 150.0f, 0.0f),
 		(cameraPos + cameraFront), // and looks at the origin
 		cameraUp  // Head is up (set to 0,-1,0 to look upside-down)
 	);
@@ -177,7 +173,7 @@ int main(void) {
 
 	// Our ModelViewProjection : multiplication of our 3 matrices
 	glm::mat4 MVP;// = Projection * View * Model; // Remember, matrix multiplication is the other way around
-	//MVP = glm::mat4(1.0f);
+
 	//glfwSwapInterval(1);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -193,11 +189,8 @@ int main(void) {
 	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 0.5f);
 	shapeArray.CreateShape(35.0f, 35.0f, 35.0f, 30.0f, T_CYLINDER);
 	shapeArray.SetColor(1, 1.0f, 0.0f, 0.1f, 1.0f);
-	/*shapeArray.CreateShape(0.0f, 100.0f, 100.0f, 10.0f, T_CYLINDER);
-	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);*/
 
 	Shader shader("Shader.shader");
-	//glm::vec3 lightPos = glm::vec3(150.0f, 150.0f, 150.0f);//not used consider removing
 	float light[3] = { 150.0f,-100000.0f,50.0f};
 	shader.SetUniform3f("u_Light", light);
 	shader.SetUniformMat4f("model", Model);
@@ -210,22 +203,13 @@ int main(void) {
 		shader.Bind();
 		shapeArrSize = shapeArray.GetSize();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		/*if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)&&spaceChecker) {
-			spaceChecker = false;
-			shapeArray.CreateRandomShape();
-		}
-		else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
-			spaceChecker = true;
-		}*/
 		
-		//processCameraMovement(window);
 		MVP = Projection * View * Model;
 
 		for (int i = shapeArrSize-1; i >= 0; i--) {
 			float* color = shapeArray.GetColor(i);
 			ib_size = shapeArray.GetIndexPointerSize(i);
 			shapeArray.BindShape(i);
-			//std::cout << "3" << std::endl;
 			shapeArray.CheckCollision(2);
 			shapeArray.Move(i);
 			Model = shapeArray.GetModel(i);
@@ -241,7 +225,6 @@ int main(void) {
 			else {
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}*/
-			//std::cout << shapeArray.GetSpeed(i)[0] << shapeArray.GetSpeed(i)[1] << shapeArray.GetSpeed(i)[2] << std::endl;
 			glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
 			//glBindVertexArray(0); //it works without this*/
 		}
@@ -253,8 +236,6 @@ int main(void) {
 		glfwPollEvents();
 		shader.Unbind();
 	}
-	Model = glm::mat4(1.0f);
-	//glDeleteProgram(shader);
 	glfwTerminate();
 
 	return 0;
