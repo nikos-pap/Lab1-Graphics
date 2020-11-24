@@ -84,7 +84,7 @@ void DynamicShapeArray::CreateRandomShape() {
 	CreateShape(0.0f, 0.0f, 0.0f, shape_size, shapeType);
 	std::cout << "r: " << r << " g: " << g << " b: " << b << ", " << shape_size << " "<< shapeType<< std::endl;
 	SetColor(size - 1,r,g,b);
-	SetSpeed(size - 1, 0.1f, 0.1f, 0.1f);
+	SetSpeed(size - 1, 0.02f, 0.02f, 0.02f);
 }
 
 /*
@@ -277,28 +277,25 @@ void DynamicShapeArray::CheckCollision(int index) {
 					}
 				}
 				else if (shapeArray[i].shapeType == T_CYLINDER) {
-					if (dx >= (size1 / 2 + size0 / 2)) { col[i] = false; }
+					dsqr = dx * dx + dz * dz;
+					//col[i] = (dsqr <= (size1 / 2) * (size1 / 2) + (size0 / 2) * (size0 / 2) && dy <= ((size1 / 2) + (size0 / 2)));
+					if (dsqr > (size1/2+size0/2)*(size1 / 2 + size0 / 2)) { col[i] = false;}
 					else if (dy >= (size1 / 2 + size0 / 2)) { col[i] = false; }
-					else if (dz >= (size1 / 2 + size0 / 2)) { col[i] = false; }
-					//be completely in 
-					else if ((dx < abs((size1 / 2) - (size0 / 2)) && (dy < abs((size1 / 2) - (size0 / 2))) && (dz < abs((size1 / 2) - (size0 / 2))))) { col[i] = false; }
-
-					else if (dx < (size1 / 2)) { col[i] = true; }
-					else if (dy < (size1 / 2)) { col[i] = true; }
-					else if (dz < (size1 / 2)) { col[i] = true; }
+					else if (dy < (size1 / 2)) {col[i] = true;}
 					else {
-						float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
-							((dy - size1 / 2) * (dy - size1 / 2)) +
-							((dz - size1 / 2) * (dz - size1 / 2));
-						col[i] = (cornerDistance_sq < (size0* size0 / 2));
+						dsqr = dx * dx + dy * dy + dz * dz;
+						col[i] = dsqr <= (SQRT_2 * size0 / 2 + SQRT_2 * size1 / 2) * (SQRT_2 * size0 + SQRT_2 * size1 / 2);
 					}
 				}
 					
 			}
 			if (col[i]) {
 				dsqr = dx * dx + dy * dy + dz * dz;
-				std::cout << "dsqr: " << sqrt(dsqr) << " Radius 1: " << size1/2 << " Radius 2: " << size0 / 2 << std::endl;
-				std::cout << "current pos: " << pos[0] << " " << pos[0] << " " << pos[0] << ", Shape " << size1 << " collision: " << i << std::endl;
+				if (i == 1) {
+					std::cout << "dsqr: " << sqrt(dsqr) << " Radius 1: " << size1 / 2 << " Radius 2: " << size0 / 2 << std::endl;
+					std::cout << "current pos: " << pos[0] << " " << pos[0] << " " << pos[0] << ", Shape " << size1 << " collision: " << i << std::endl;
+					std::cout << "dx: " << dx << " dy: " << dy << " dz: " << dz << std::endl;
+				}
 			}
 		}
 		
