@@ -191,7 +191,7 @@ int main(void) {
 
 	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);
 	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 0.5f);
-	shapeArray.CreateShape(35.0f, 35.0f, 35.0f, 30.0f, T_CUBE);
+	shapeArray.CreateShape(35.0f, 35.0f, 35.0f, 30.0f, T_CYLINDER);
 	shapeArray.SetColor(1, 1.0f, 0.0f, 0.1f, 1.0f);
 	/*shapeArray.CreateShape(0.0f, 100.0f, 100.0f, 10.0f, T_CYLINDER);
 	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);*/
