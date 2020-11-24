@@ -57,27 +57,37 @@ int processCameraMovement(GLFWwindow* window) {
 
 		const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
 		//std::cout << name << std::endl;
-		if (axes[5] >= -1)//R2
+		/*if (axes[5] >= -1)//R2
 			cameraPos += (axes[5] + 1) * cameraFront;
 		if (axes[4] >= -1)//L2
-			cameraPos -= (axes[4] + 1) * cameraFront;
-		if (abs(axes[3]) >= 0.2)//RY
-			cameraPos -= (axes[3] / 1) * cameraUp;
+			cameraPos -= (axes[4] + 1) * cameraFront;*/
+		if (axes[3] >= -1)//RY
+			cameraPos -= (axes[3]) * cameraFront;
+		if (abs(axes[5]) >= 0.2)//R2
+			cameraPos += (axes[5] + 1) * cameraUp;
+		if (abs(axes[4]) >= 0.2)//L2
+			cameraPos -= (axes[4] + 1) * cameraUp;
+		/*if (abs(axes[3]) >= 0.2)//RY
+			cameraPos -= (axes[3] / 1) * cameraUp;*/
 		if (abs(axes[2]) >= 0.2)//RX
 			cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[2]);
 		if (abs(axes[1]) >= 0.2)//LY
 			cameraFront -= (axes[1]/30) * cameraUp;
 		if (abs(axes[0]) >= 0.2)//LX
 			cameraFront += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[0] / 30);
-		/*
-		if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-			cameraFront += yawSpeed * cameraUp;
-		if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
-			cameraFront -= yawSpeed * cameraUp;
-		if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
-			cameraFront -= glm::normalize(glm::cross(cameraFront, cameraUp)) * (yawSpeed / 2);
-		if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-			cameraFront += glm::normalize(glm::cross(cameraFront, cameraUp)) * (yawSpeed / 2);*/
+		if (buttons[11] == GLFW_PRESS)
+			shapeArray.MoveSphere(1, glm::vec3(1.0f, 0.0f, 0.0f));
+		if (buttons[13] == GLFW_PRESS)
+			shapeArray.MoveSphere(1, glm::vec3(-1.0f, 0.0f, 0.0f));
+		if (buttons[10] == GLFW_PRESS)
+			shapeArray.MoveSphere(1, glm::vec3(0.0f, 1.0f, 0.0f));
+		if (buttons[12] == GLFW_PRESS)
+			shapeArray.MoveSphere(1, glm::vec3(0.0f, -1.0f, 0.0f));
+		if (buttons[4] == GLFW_PRESS)
+			shapeArray.MoveSphere(1, glm::vec3(0.0f, 0.0f, 1.0f));
+		if (buttons[5] == GLFW_PRESS)
+			shapeArray.MoveSphere(1, glm::vec3(0.0f, 0.0f, -1.0f));
+
 	}
 
 	if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) && spaceChecker && !joystick_space) {
@@ -108,6 +118,17 @@ int processCameraMovement(GLFWwindow* window) {
 		cameraFront -= glm::normalize(glm::cross(cameraFront, cameraUp)) * (yawSpeed / 2);
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		cameraFront += glm::normalize(glm::cross(cameraFront, cameraUp)) * (yawSpeed / 2);
+
+	//Sphere Controls
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		shapeArray.MoveSphere(1, glm::vec3(1.0f, 0.0f, 0.0f));
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		shapeArray.MoveSphere(1, glm::vec3(-1.0f, 0.0f, 0.0f));
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		shapeArray.MoveSphere(1, glm::vec3(0.0f, 1.0f, 0.0f));
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		shapeArray.MoveSphere(1, glm::vec3(0.0f, -1.0f, 0.0f));
+
 	View = glm::lookAt(
 		cameraPos, // Camera is at (100,150,100), in World Space
 		//glm::vec3(0.0f, 150.0f, 0.0f),
@@ -170,7 +191,7 @@ int main(void) {
 
 	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);
 	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 0.5f);
-	shapeArray.CreateShape(25.0f, 25.0f, 25.0f, 50.0f, T_CYLINDER);
+	shapeArray.CreateShape(35.0f, 35.0f, 35.0f, 30.0f, T_CUBE);
 	shapeArray.SetColor(1, 1.0f, 0.0f, 0.1f, 1.0f);
 	/*shapeArray.CreateShape(0.0f, 100.0f, 100.0f, 10.0f, T_CYLINDER);
 	shapeArray.SetColor(1, 0.0f, 0.7f, 0.5f, 1.0f);*/

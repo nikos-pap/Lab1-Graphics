@@ -96,6 +96,7 @@ public:
 	void SetVAOID(int index, int id); //not used in the new implementation consider removing
 	void SetBufferID(int index, int id);//not used in the new implementation consider removing
 	void SetIBOID(int index, int id); //not used in the new implementation consider removing
+	void MoveSphere(int index, glm::vec3 speed);
 
 private:
 	Shape* shapeArray;

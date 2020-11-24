@@ -82,7 +82,7 @@ void DynamicShapeArray::CreateRandomShape() {
 	g = RandomFloat(0.0f, 1.0f);
 	b = RandomFloat(0.0f, 1.0f);
 	CreateShape(0.0f, 0.0f, 0.0f, shape_size, shapeType);
-	std::cout << "r: " << r << " g: " << g << " b: " << b << ", " << size << " "<< shapeType<< std::endl;
+	std::cout << "r: " << r << " g: " << g << " b: " << b << ", " << shape_size << " "<< shapeType<< std::endl;
 	SetColor(size - 1,r,g,b);
 	SetSpeed(size - 1, 1.0f, 1.0f, 1.0f);
 }
@@ -98,10 +98,10 @@ void DynamicShapeArray::CreateShape(float x, float y, float z, int size, int Sha
 		CreateCube(x, y, z, size);
 		break;
 	case T_SPHERE:
-		CreateSphere(x+ size / 2, y+ size / 2, z+ size / 2, size / 2);
+		CreateSphere(x+ size / 2.0f, y+ size / 2.0f, z+ size / 2.0f, size / 2.0f);
 		break;
 	case T_CYLINDER:
-		CreateCylinder(x+ size / 2, y, z+ size / 2, size / 2, size);
+		CreateCylinder(x+ size / 2.0f, y, z+ size / 2.0f, size / 2.0f, size);
 		break;
 	}
 }
@@ -213,22 +213,25 @@ void DynamicShapeArray::CheckCollision(int index) {
 			pos1 = shapeArray[i].center;
 			size1 = shapeArray[i].d;
 			dx = abs(pos[0] - pos1[0]);
-			dy = abs(pos[1] - pos1[0]);
-			dz = abs(pos[2] - pos1[0]);
+			dy = abs(pos[1] - pos1[1]);
+			dz = abs(pos[2] - pos1[2]);
 			if (shapeType == T_SPHERE) {
+				std::cout << 1 << std::endl;
 				if (shapeArray[i].shapeType == T_SPHERE) {
 					dsqr = dx * dx + dy * dy + dz * dz;
-					col[i] = dsqr <= (size0) * (size1);
-					std::cout << "dsqr: " << dsqr << " what are you? " << (size0) * (size1) << std::endl;
+					col[i] = (dsqr <= (size0/2 + size1/2) * (size0/2 + size1/2)) && (dsqr >= size1 * size1/4);
+					//std::cout << "dsqr: " << sqrt(dsqr) << " what are you? " << (size0+size1) * (size0 + size1)/4 << std::endl;
 				}
 				else if (shapeArray[i].shapeType == T_CUBE) {
-					if (dx >= (size1 / 2 + size0 / 2)) { col[i] = false; }
-					else if (dy >= (size1 / 2 + size0 / 2)) { col[i] = false; }
-					else if (dz >= (size1 / 2 + size0 / 2)) { col[i] = false; }
-
-					else if (dx < (size1 / 2)) { col[i] = true; }
-					else if (dy < (size1 / 2)) { col[i] = true; }
-					else if (dz < (size1 / 2)) { col[i] = true; }
+					if (dx > (size1 / 2 + size0 / 2)) { col[i] = false; }
+					else if (dy > (size1 / 2 + size0 / 2)) { col[i] = false; }
+					else if (dz > (size1 / 2 + size0 / 2)) { col[i] = false; }
+					//be completely in 
+					else if ((dx < (size1 / 2)&& (dy < (size1 / 2)) && (dz < (size1 / 2)))) { col[i] = false;}
+					
+					else if (dx <= (size1 / 2)) { col[i] = true; }
+					else if (dy <= (size1 / 2)) { col[i] = true; }
+					else if (dz <= (size1 / 2)) { col[i] = true; }
 					else {
 						float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
 							((dy - size1 / 2) * (dy - size1 / 2)) +
@@ -249,10 +252,13 @@ void DynamicShapeArray::CheckCollision(int index) {
 
 				}
 			}
+			if (col[i]) {
+				dsqr = dx * dx + dy * dy + dz * dz;
+				std::cout << "dsqr: " << sqrt(dsqr) << " Radius 1: " << size1/2 << " Radius 2: " << size0 / 2 << std::endl;
+				std::cout << "current pos: " << pos[0] << " " << pos[0] << " " << pos[0] << ", Shape " << size1 << " collision: " << i << std::endl;
+			}
 		}
-		if (col[i] && i) {
-			std::cout << "current pos: "<< pos[0]<< " " << pos[1] << " " << pos[2] << ", Shape " << i << " collision: " << col[i] << std::endl;
-		}
+		
 	}
 }
 
@@ -348,6 +354,22 @@ void DynamicShapeArray::SetVAOID(int index, int id) {
 
 void DynamicShapeArray::SetIBOID(int index, int id) {
 	shapeArray[index].ib_id = id; 
+}
+
+void DynamicShapeArray::MoveSphere(int index, glm::vec3 speed)
+{
+	int next_center[3] = { shapeArray[index].center[0] + speed[0],
+	shapeArray[index].center[1] + speed[1],
+	shapeArray[index].center[2] + speed[2]};
+	float upper_limit = 100.0f - shapeArray[index].d / 2;
+	float lower_limit = 0 + shapeArray[index].d / 2;
+	if (next_center[0] > upper_limit || next_center[1] > upper_limit || next_center[2] > upper_limit || next_center[0] < lower_limit || next_center[1] < lower_limit || next_center[2] < lower_limit)
+		return;
+	shapeArray[index].Model = glm::translate(glm::mat4(1.0f), speed) * shapeArray[index].Model;
+	shapeArray[index].center[0] = next_center[0];
+	shapeArray[index].center[1] = next_center[1];
+	shapeArray[index].center[2] = next_center[2];
+	//std::cout << shapeArray[index].center[0] << ", " << shapeArray[index].center[1] << ", " << shapeArray[index].center[2] << "," << std::endl;
 }
 
 
@@ -490,6 +512,7 @@ void DynamicShapeArray::CreateSphere(float x0, float y0, float z0, float radius)
 	float x, y, z, xy;                              // vertex position
 	float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
 	//float s, t;                                    // vertex texCoord
+	std::cout << x0 << ", " << y0 << ", " << z0 << "," << std::endl;
 	int size = (SPHERE_SECTOR_NUM + 1) * (SPHERE_STACK_NUM + 1) * 3;
 	float sectorStep = 2 * PI / SPHERE_SECTOR_NUM;
 	float stackStep = PI / SPHERE_STACK_NUM;
