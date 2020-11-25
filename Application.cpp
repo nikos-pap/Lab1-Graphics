@@ -257,8 +257,6 @@ int main(void) {
 	shapeArray.SetColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
 
 	Shader shader("Shader.shader");
-	float light[3] = { 150.0f,-100000.0f,50.0f};
-	shader.SetUniform3f("u_Light", light);
 	shader.SetUniformMat4f("model", Model);
 	unsigned int ib_size;
 	int shapeArrSize;
@@ -282,7 +280,9 @@ int main(void) {
 			ib_size = shapeArray.GetIndexPointerSize(i);
 			shapeArray.BindShape(i);
 			shapeArray.CheckCollision(2);
-			shapeArray.Move(i);
+			if (i > 1) {
+				shapeArray.Move(i);
+			}
 			Model = shapeArray.GetModel(i);
 			MVP = Projection * View * Model;
 			shader.SetUniformMat4f("u_MVP", MVP);
