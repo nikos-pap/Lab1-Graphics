@@ -412,8 +412,8 @@ void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, 
 
 	if (firstCylinder) {
 		cylinder_normals[0] = cylinder_normals[2] = cylinder_normals[108] = cylinder_normals[110] = 0;
-		cylinder_normals[1] = -34 * sin((2 * PI) / 34);
-		cylinder_normals[109] = 34 * sin((2 * PI) / 34);
+		cylinder_normals[1] = -34 * cos((2 * PI) / 34);
+		cylinder_normals[109] = 34 * cos((2 * PI) / 34);
 		for (int i = 1, n = 1; i < 36; i++) {
 			//std::cout << "normal: " << N.x << " , " << N.y << " , " << N.z << std::endl;
 			cylinder_normals[3 * i] = cos(2 * PI * n / 34) + cos(2 * PI * (n + 1) / 34) + cos(PI * (2 * n + 1) / 34);
