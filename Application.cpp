@@ -168,11 +168,11 @@ int main(void) {
 
 
 
-	// Model matrix : an identity matrix (model will be at the origin)
+	// Model Matrix
 	glm::mat4 Model = glm::mat4(1.0f);
 
-	// Our ModelViewProjection : multiplication of our 3 matrices
-	glm::mat4 MVP;// = Projection * View * Model; // Remember, matrix multiplication is the other way around
+	//ModelViewProjection Matrix
+	glm::mat4 MVP;// = Projection * View * Model;
 
 	//glfwSwapInterval(1);
 	glEnable(GL_DEPTH_TEST);
@@ -187,7 +187,7 @@ int main(void) {
 
 	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);
 	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 0.5f);
-	shapeArray.CreateShape(35.0f, 35.0f, 35.0f, 30.0f, T_CYLINDER);
+	shapeArray.CreateShape(35.0f, 35.0f, 35.0f, 30.0f, T_SPHERE);
 	shapeArray.SetColor(1, 1.0f, 0.0f, 0.1f, 1.0f);
 
 	Shader shader("Shader.shader");
@@ -196,14 +196,18 @@ int main(void) {
 	shader.SetUniformMat4f("model", Model);
 	unsigned int ib_size;
 	int shapeArrSize;
-	
-
+	float x = 1.0f;
+	float l = 1.0f;
 
 	while (processCameraMovement(window) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
 		shader.Bind();
 		shapeArrSize = shapeArray.GetSize();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+		x += l;
+		if (x == 150.0f || x == 0.0f) {
+			l = (-1.0f)*l;
+			std::cout << "change" << std::endl;
+		}
 		MVP = Projection * View * Model;
 
 		for (int i = shapeArrSize-1; i >= 0; i--) {
@@ -216,8 +220,8 @@ int main(void) {
 			MVP = Projection * View * Model;
 			shader.SetUniformMat4f("u_MVP", MVP);
 			shader.SetUniform4f("u_Color",color);
-			shader.SetUniformMat4f("model", View);
-			//shader.SetUniform3f("u_Light", 150.0f, 150.0f, 150.0f);
+			shader.SetUniformMat4f("model", Model);
+			shader.SetUniform3f("u_Light", 150.0f, x, 150.0f);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			/*if (i == 1) {
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

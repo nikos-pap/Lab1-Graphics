@@ -23,7 +23,7 @@ float cube_normals[] = {
 		sqrt(2.0f),sqrt(2.0f),sqrt(2.0f)
 };
 
-float sphere_normals[1109];
+float sphere_normals[2109];
 float cylinder_normals[216];
 bool firstCylinder = true;
 
@@ -373,10 +373,10 @@ void DynamicShapeArray::AddArray(float * element, int elementSize, int shapeType
 		else {
 			shapeArray[index].collisions = nullptr;
 		}
-		createBuffer(index);
 		for (int i = 2; i < (size-1); i++) {
 			shapeArray[i].collisions = (bool*)realloc(shapeArray[i].collisions,(size) * sizeof(bool));
 		}
+		createBuffer(index);
 	} else {
 		std::cout << "not ok" << std::endl;
 	}
@@ -412,16 +412,17 @@ void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, 
 
 	if (firstCylinder) {
 		cylinder_normals[0] = cylinder_normals[2] = cylinder_normals[108] = cylinder_normals[110] = 0;
-		cylinder_normals[1] = 34 * sin((2 * PI) / 34);
-		cylinder_normals[109] = -34 * sin((2 * PI) / 34);
+		cylinder_normals[1] = -34 * sin((2 * PI) / 34);
+		cylinder_normals[109] = 34 * sin((2 * PI) / 34);
 		for (int i = 1, n = 1; i < 36; i++) {
 			//std::cout << "normal: " << N.x << " , " << N.y << " , " << N.z << std::endl;
 			cylinder_normals[3 * i] = cos(2 * PI * n / 34) + cos(2 * PI * (n + 1) / 34) + cos(PI * (2 * n + 1) / 34);
-			cylinder_normals[3 * i + 1] = 2 * sin((2 * PI) / 34);
+			cylinder_normals[3 * i + 1] = -2 * sin((2 * PI) / 34);
 			cylinder_normals[3 * i + 2] = sin(2 * PI * n / 34) + sin(2 * PI * (n + 1) / 34) + sin(PI * (2 * n + 1) / 34);
 			cylinder_normals[3 * i + 108] = cos(2 * PI * n / 34) + cos(2 * PI * (n + 1) / 34) + cos(PI * (2 * n + 1) / 34);
-			cylinder_normals[3 * i + 109] = -2 * sin((2 * PI) / 34);
+			cylinder_normals[3 * i + 109] = 2 * cos((2 * PI) / 34);
 			cylinder_normals[3 * i + 110] = sin(2 * PI * n / 34) + sin(2 * PI * (n + 1) / 34) + sin(PI * (2 * n + 1) / 34);
+			n += 1;
 		}
 		firstCylinder = false;
 	}
@@ -549,7 +550,7 @@ void DynamicShapeArray::createBuffer(int index) {
 		index_pointer_size2 = 24;
 	}
 	else if (shapeArray[index].shapeType == T_SPHERE) {
-		index_pointer_size2 = 1109;
+		index_pointer_size2 = 2109;
 	}
 	else if (shapeArray[index].shapeType == T_CYLINDER) {
 		index_pointer_size2 = 216;
@@ -581,7 +582,7 @@ void DynamicShapeArray::createBuffer(int index) {
 	//bind object buffer to target
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,  index_pointer_size * sizeof(unsigned int), index_array, GL_STATIC_DRAW);
-
+	
 	//keep the three buffers in the shape
 	shapeArray[index].vao_id = vao;
 	shapeArray[index].vb_id = buffer_id;
