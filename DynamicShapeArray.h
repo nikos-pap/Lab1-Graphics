@@ -99,10 +99,11 @@ public:
 	void MoveSphere(int index, glm::vec3 speed);
 
 private:
+	float* nextPos(int index);
 	Shape* shapeArray;
 	int size = 0;
 	int capacity;
-
+	void Collide(int index1, int index2);
 	float * GetNormals(int shapeType);
 	//newly private functions check if all OK
 	int RandomInt(int min, int max);

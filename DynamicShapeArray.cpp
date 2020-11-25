@@ -84,7 +84,7 @@ float DynamicShapeArray::RandomFloat(float min, float max) {
 }
 
 void DynamicShapeArray::CreateRandomShape() {
-	int shapeType = RandomInt(2, 2);
+	int shapeType = RandomInt(1, 1);
 	int shape_size = RandomInt(1, 10);
 	float r, g, b;
 	r = RandomFloat(0.0f, 1.0f);
@@ -157,107 +157,199 @@ int DynamicShapeArray::GetIndexPointerSize(int index) {
 	return 0;
 }
 
+void DynamicShapeArray::Collide(int index1, int index2) {
+	if (shapeArray[index2].speed[0] == 0 && shapeArray[index2].speed[1] == 0 && shapeArray[index2].speed[2] == 0) {
+		return;
+	}
+
+	int shapeType2 = shapeArray[index2].shapeType;
+	int shapeType1 = shapeArray[index1].shapeType;
+	float* pos = shapeArray[index1].center;
+	float* pos1 = shapeArray[index2].center;
+	glm::vec3 speed(shapeArray[index2].speed[0], shapeArray[index2].speed[1], shapeArray[index2].speed[2]);
+	glm::vec3 Tspeed(0.0f, 0.0f, 0.0f);
+	float dx = pos[0] - pos1[0];
+	float dy = pos[1] - pos1[1];
+	float dz = pos[2] - pos1[2];
+
+	if (shapeType1 == T_SPHERE) {
+		std::cout << "We have a Collision" << std::endl;
+		glm::vec3 centerToCenter(dx, dy, dz);
+		centerToCenter = glm::normalize(centerToCenter);
+		Tspeed=glm::normalize(speed);
+		std::cout << glm::length(speed) << std::endl;
+		speed = glm::length(speed) * normalize((-centerToCenter) * glm::dot(Tspeed, centerToCenter));
+		std::cout<< glm::length(speed) << std::endl;
+		shapeArray[index2].speed[0] = speed[0];
+		shapeArray[index2].speed[1] = speed[1];
+		shapeArray[index2].speed[2] = speed[2];
+	}
+	if (shapeType1 == T_CUBE) {
+		glm::vec3 X(1.0f, 0.0f, 0.0f);
+		glm::vec3 Y(0.0f, 1.0f, 0.0f);
+		glm::vec3 Z(0.0f, 0.0f, 1.0f);
+
+		glm::vec3 centerToCenter(dx, dy, dz);
+
+		centerToCenter = glm::normalize(centerToCenter);
+		float dists[3] = { glm::dot(centerToCenter,X),  glm::dot(centerToCenter,Y),  glm::dot(centerToCenter,Z) };
+		float m = abs(dists[0]);
+		m = std::max(m, abs(dists[1]));
+		m = std::max(m, abs(dists[2]));
+		glm::vec3 M;
+		if (m == abs(dists[0])) {
+			shapeArray[index2].speed[0] = -speed[0];
+		}if (m == abs(dists[1])) {
+			shapeArray[index2].speed[1] = -speed[1];
+		}if (m == abs(dists[2])) {
+			shapeArray[index2].speed[2] = -speed[2];
+		}
+	}
+	if (shapeType1 == T_CYLINDER) {
+		glm::vec3 X(1.0f, 0.0f, 0.0f);
+		glm::vec3 Y(0.0f, 1.0f, 0.0f);
+		glm::vec3 Z(0.0f, 0.0f, 1.0f);
+
+		glm::vec3 centerToCenter(dx, dy, dz);
+		Tspeed = glm::normalize(speed);
+		centerToCenter = glm::normalize(centerToCenter);
+		glm::vec3 ctc2(centerToCenter[0], 0, centerToCenter[2]);
+		float dists[3] = { glm::dot(centerToCenter,X),  glm::dot(centerToCenter,Y),  glm::dot(centerToCenter,Z) };
+		float m = abs(dists[0]);
+		m = std::max(m, abs(dists[1]));
+		m = std::max(m, abs(dists[2]));
+		glm::vec3 M;
+		if (m == abs(dists[1])) {
+			shapeArray[index2].speed[1] = -speed[1];
+		}
+		else {
+			Tspeed = glm::length(speed) * normalize((-centerToCenter) * glm::dot(Tspeed, centerToCenter));
+			shapeArray[index2].speed[0] = Tspeed[0];
+			shapeArray[index2].speed[2] = Tspeed[2];
+		}
+	}
+}
+
 void DynamicShapeArray::CheckCollision(int index) {
 	if (index >= size || index < 2) {
 		return;
 	}
-	bool* col = shapeArray[index].collisions;
-	float * pos = shapeArray[index].center;
-	int shapeType = shapeArray[index].shapeType;
-	float dsqr,dx,dy,dz,size0 = shapeArray[index].d , size1;
-	float *pos1;
+	bool hasCollision;
+	float bigPos[] = { shapeArray[index].center[0] + shapeArray[index].speed[0],
+		shapeArray[index].center[1] + shapeArray[index].speed[1],
+		shapeArray[index].center[2] + shapeArray[index].speed[2] };
+	float nextPos1[3];
+
+	float* pos, *pos1;
+	int shapeType = shapeArray[index].shapeType, j, s;
+	float dsqr, dx, dy, dz, size0 = shapeArray[index].d, size1;
 	for (int i = 0; i < size; i++) {
-		col[i] = false;
+		hasCollision = false;
+		j = index;
+		s = i;
+		nextPos1[0] = shapeArray[i].center[0] + shapeArray[i].speed[0];
+		nextPos1[1] = shapeArray[i].center[1] + shapeArray[i].speed[1];
+		nextPos1[2] = shapeArray[i].center[2] + shapeArray[i].speed[2];
+		pos = bigPos;
+		pos1 = nextPos1;
 		if (i != index) {
-			pos1 = shapeArray[i].center;
-			size1 = shapeArray[i].d;
+			if (shapeArray[j].shapeType == T_SPHERE || (shapeArray[s].shapeType == T_CUBE && shapeArray[j].shapeType == T_CYLINDER)) {
+				j = i;
+				s = index;
+				pos1 = bigPos;
+				pos = nextPos1;
+			}
+			shapeType = shapeArray[j].shapeType;
+			size0 = shapeArray[j].d;
+			size1 = shapeArray[s].d;
 			dx = abs(pos[0] - pos1[0]);
 			dy = abs(pos[1] - pos1[1]);
 			dz = abs(pos[2] - pos1[2]);
-			if (shapeType == T_SPHERE) {
-				if (shapeArray[i].shapeType == T_SPHERE) {
+			if (shapeArray[s].shapeType == T_SPHERE) {
+				if (shapeArray[j].shapeType == T_SPHERE) {
 					dsqr = dx * dx + dy * dy + dz * dz;
-					col[i] = (dsqr <= (size0/2 + size1/2) * (size0/2 + size1/2)) && (dsqr >= size1 * size1/4);
+					//std::cout << "dsqr " << dsqr << " " << (size0 / 2 + size1 / 2) * (size0 / 2 + size1 / 2) << std::endl;
+					hasCollision = (dsqr <= (size0 / 2 + size1 / 2) * (size0 / 2 + size1 / 2)) && (dsqr >= size1 * size1 / 4);
 					//std::cout << "dsqr: " << sqrt(dsqr) << " what are you? " << (size0+size1) * (size0 + size1)/4 << std::endl;
 				}
-				else if (shapeArray[i].shapeType == T_CUBE) {
-					if (dx >= (size1 / 2 + size0 / 2)) { col[i] = false; }
-					else if (dy >= (size1 / 2 + size0 / 2)) { col[i] = false; }
-					else if (dz >= (size1 / 2 + size0 / 2)) { col[i] = false; }
-					//be completely in 
-					else if ((dx < abs((size1 / 2) - (size0 / 2)) && (dy < abs((size1 / 2) - (size0 / 2))) && (dz < abs((size1 / 2) - (size0 / 2))))) { col[i] = false; }
-					
-					else if (dx < (size1 / 2)) { col[i] = true; }
-					else if (dy < (size1 / 2)) { col[i] = true; }
-					else if (dz < (size1 / 2)) { col[i] = true; }
-					else {
-						float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
-							((dy - size1 / 2) * (dy - size1 / 2)) +
-								((dz - size1 / 2) * (dz - size1 / 2));
-						col[i] = (cornerDistance_sq < (size0 / 2 * size0 / 2));
-					}
-				}
-				else if (shapeArray[i].shapeType == T_CYLINDER) {
-					dsqr = dx * dx + dz * dz;
-					col[i] = (dsqr <= (size1/2) * (size1/2) && dy <= (size1 / 2));
-					if (dx > (size1 / 2 + size0 / 2)) { col[i] = false; }
-					else if (dy > (size1 / 2 + size0 / 2)) { col[i] = false; }
-					else if (dz > (size1 / 2 + size0 / 2)) { col[i] = false; }
-					else {
-						dsqr = dx * dx + dy * dy + dz * dz;
-						col[i] = col[i] && (dsqr <= (size0/2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2));
-					}
-				}
-			}
-			else if (shapeType == T_CUBE) {
-				if (shapeArray[i].shapeType == T_CUBE) {
-					col[i] = dx <= size1 / 2 + size0 / 2 && dy <= size1 / 2 + size0 / 2 && dz <= size1 / 2 + size0 / 2 && (dx >= abs(size1 - size0) / 2 || dy >= abs(size1 - size0) / 2 || dz >= abs(size1 - size0) / 2);
+				else if (shapeArray[j].shapeType == T_CUBE) {
 
-					/*if (i == 1) {
-						std::cout << "col[i]" << col[i] << " maka " << (dx <= size1 / 2 + size0 / 2 && dy <= size1 / 2 + size0 / 2 && dz <= size1 / 2 + size0 / 2) << " Radius 1: " << (dx >= abs(size1 - size0) / 2 && dy >= abs(size1 - size0) / 2 && dz >= abs(size1 - size0) / 2) << "current pos: " << pos1[0] << " " << pos1[1] << " " << pos1[2] << std::endl;
-					}*/
-				}
-			} else if (shapeType == T_CYLINDER) {
-				if (shapeArray[i].shapeType == T_CUBE) {
-					if (dx >= (size1 / 2 + size0 / 2)) { col[i] = false; }
-					else if (dy >= (size1 / 2 + size0 / 2)) { col[i] = false; }
-					else if (dz >= (size1 / 2 + size0 / 2)) { col[i] = false; }
-					//be completely in 
-					else if ((dx < abs((size1 / 2) - (size0 / 2)) && (dy < abs((size1 / 2) - (size0 / 2))) && (dz < abs((size1 / 2) - (size0 / 2))))) { col[i] = false; }
+					if (dx >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+					else if (dy >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+					else if (dz >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+					//be completely in
+					else if ((dx < abs((size1  - size0) / 2)) && (dy < abs((size1 - size0) / 2)) && (dz < abs((size1 - size0) / 2))) { hasCollision = false; }
 
-					else if (dx < (size1 / 2)) { col[i] = true; }
-					else if (dy < (size1 / 2)) { col[i] = true; }
-					else if (dz < (size1 / 2)) { col[i] = true; }
+					else if (dx < (size1 / 2)) { hasCollision = true; }
+					else if (dy < (size1 / 2)) { hasCollision = true; }
+					else if (dz < (size1 / 2)) { hasCollision = true; }
 					else {
 						float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
 							((dy - size1 / 2) * (dy - size1 / 2)) +
 							((dz - size1 / 2) * (dz - size1 / 2));
-						col[i] = (cornerDistance_sq < (size0 * size0 / 2));
+						hasCollision = (cornerDistance_sq < (size0 / 2 * size0 / 2));
 					}
+					//std::cout << "makaronia: " << hasCollision << " " << dx << " " << dy << " " << dz << " " << abs((size1 - size0) / 2) << std::endl;
 				}
-				else if (shapeArray[i].shapeType == T_CYLINDER) {
+				else if (shapeArray[j].shapeType == T_CYLINDER) {
 					dsqr = dx * dx + dz * dz;
-					//col[i] = (dsqr <= (size1 / 2) * (size1 / 2) + (size0 / 2) * (size0 / 2) && dy <= ((size1 / 2) + (size0 / 2)));
-					if (dsqr > (size1/2+size0/2)*(size1 / 2 + size0 / 2)) { col[i] = false;}
-					else if (dy >= (size1 / 2 + size0 / 2)) { col[i] = false; }
-					else if (dy < (size1 / 2)) {col[i] = true;}
+					hasCollision = (dsqr <= (size1 / 2) * (size1 / 2) && dy <= (size1 / 2));
+					if (dx > (size1 / 2 + size0 / 2)) { hasCollision = false; }
+					else if (dy > (size1 / 2 + size0 / 2)) { hasCollision = false; }
+					else if (dz > (size1 / 2 + size0 / 2)) { hasCollision = false; }
 					else {
 						dsqr = dx * dx + dy * dy + dz * dz;
-						col[i] = dsqr <= (SQRT_2 * size0 / 2 + SQRT_2 * size1 / 2) * (SQRT_2 * size0 + SQRT_2 * size1 / 2);
+						hasCollision = hasCollision && (dsqr <= (size0 / 2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2));
+
+					}
+					if (hasCollision) {
+						std::cout << "makaronia: " << hasCollision << " " << dx << " " << dy << " " << dz << " " << abs((size1 - size0) / 2) << std::endl;
 					}
 				}
-					
 			}
-			if (col[i]) {
-				dsqr = dx * dx + dy * dy + dz * dz;
-				if (i == 1) {
-					std::cout << "dsqr: " << sqrt(dsqr) << " Radius 1: " << size1 / 2 << " Radius 2: " << size0 / 2 << std::endl;
-					std::cout << "current pos: " << pos[0] << " " << pos[0] << " " << pos[0] << ", Shape " << size1 << " collision: " << i << std::endl;
-					std::cout << "dx: " << dx << " dy: " << dy << " dz: " << dz << std::endl;
+			else if (shapeArray[s].shapeType == T_CUBE) {
+				if (shapeArray[j].shapeType == T_CUBE) {
+					hasCollision = dx <= size1 / 2 + size0 / 2 && dy <= size1 / 2 + size0 / 2 && dz <= size1 / 2 + size0 / 2 && (dx >= abs(size1 - size0) / 2 || dy >= abs(size1 - size0) / 2 || dz >= abs(size1 - size0) / 2);
+					
 				}
 			}
+			else if (shapeArray[s].shapeType == T_CYLINDER) {
+				if (shapeArray[j].shapeType == T_CUBE) {
+					if (dx >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+					else if (dy >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+					else if (dz >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+					//be completely in 
+					else if ((dx < abs((size1 / 2) - (size0 / 2)) && (dy < abs((size1 / 2) - (size0 / 2))) && (dz < abs((size1 / 2) - (size0 / 2))))) { hasCollision = false; }
+
+					else if (dx < (size1 / 2)) { hasCollision = true; }
+					else if (dy < (size1 / 2)) { hasCollision = true; }
+					else if (dz < (size1 / 2)) { hasCollision = true; }
+					else {
+						float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
+							((dy - size1 / 2) * (dy - size1 / 2)) +
+							((dz - size1 / 2) * (dz - size1 / 2));
+						hasCollision = (cornerDistance_sq < (size0* size0 / 2));
+					}
+				}
+				else if (shapeArray[j].shapeType == T_CYLINDER) {
+					dsqr = dx * dx + dz * dz;
+					//hasCollision = (dsqr <= (size1 / 2) * (size1 / 2) + (size0 / 2) * (size0 / 2) && dy <= ((size1 / 2) + (size0 / 2)));
+					if (dsqr > (size1 / 2 + size0 / 2) * (size1 / 2 + size0 / 2)) { hasCollision = false; }
+					else if (dy >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+					else if (dy < (size1 / 2)) { hasCollision = true; }
+					else {
+						dsqr = dx * dx + dy * dy + dz * dz;
+						hasCollision = dsqr <= (SQRT_2 * size0 / 2 + SQRT_2 * size1 / 2) * (SQRT_2 * size0 + SQRT_2 * size1 / 2);
+						std::cout << " makaronia ktyphsa" << std::endl;
+					}
+				}
+
+			}
+			if (hasCollision) {
+				Collide(s, j);
+				Collide(j, s);
+			}
 		}
-		
 	}
 }
 
@@ -333,13 +425,14 @@ void DynamicShapeArray::MoveSphere(int index, glm::vec3 speed)
 	shapeArray[index].center[2] + speed[2]};
 	float upper_limit = 100.0f - shapeArray[index].d / 2;
 	float lower_limit = 0 + shapeArray[index].d / 2;
+	CheckCollision(index);
 	if (next_center[0] > upper_limit || next_center[1] > upper_limit || next_center[2] > upper_limit || next_center[0] < lower_limit || next_center[1] < lower_limit || next_center[2] < lower_limit)
 		return;
 	shapeArray[index].Model = glm::translate(glm::mat4(1.0f), speed) * shapeArray[index].Model;
 	shapeArray[index].center[0] = next_center[0];
 	shapeArray[index].center[1] = next_center[1];
 	shapeArray[index].center[2] = next_center[2];
-	std::cout << shapeArray[index].center[0] << ", " << shapeArray[index].center[1] << ", " << shapeArray[index].center[2] << "," << std::endl;
+	//std::cout << shapeArray[index].center[0] << ", " << shapeArray[index].center[1] << ", " << shapeArray[index].center[2] << "," << std::endl;
 }
 
 
@@ -434,7 +527,8 @@ void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, 
 void DynamicShapeArray::Move(int index) {
 	float * speed = shapeArray[index].speed;
 	float size = shapeArray[index].size;
-	if (speed[0] && speed[1] && speed[2]) {
+	if (speed[0] || speed[1] || speed[2]) {
+		CheckCollision(index);
 		shapeArray[index].Model = glm::translate(glm::mat4(1.0f), glm::vec3(speed[0], speed[1], speed[2])) * shapeArray[index].Model;
 		shapeArray[index].center[0] += speed[0];
 		shapeArray[index].center[1] += speed[1];
