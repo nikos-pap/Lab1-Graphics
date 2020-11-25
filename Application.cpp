@@ -1,6 +1,8 @@
 ﻿#include "DynamicShapeArray.h"
 #include "Shader.h"
 #include <glm/gtc/matrix_transform.hpp>
+#define STB_IMAGE_IMPLEMENTATION   
+#include "stb_image.h"
 
 DynamicShapeArray shapeArray;
 //camera 
@@ -18,6 +20,65 @@ float cameraSpeed = 20.0f / GLOBAL_SPEED;
 float yawSpeed = 1.0f / GLOBAL_SPEED;
 bool spaceChecker = true;
 bool joystick_space = false;
+
+unsigned int loadTexture()
+{
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	//glBindTexture(GL_TEXTURE_2D, texture);
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//generating cube map
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+
+	//Define all 6 faces
+	// load and generate the texture
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("texture.jpg", &width, &height, &nrChannels, STBI_rgb_alpha);
+	if (data)
+	{
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		//glGenerateMipmap(GL_TEXTURE_2D);
+		//std::cout << "ax koula1" << std::endl;
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		//std::cout << "ax koula11" << std::endl;
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		//std::cout << "ax koula111" << std::endl;
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
+
+
+	std::cout << "ax koula2" << std::endl;
+	stbi_image_free(data);
+	std::cout << "ax koula3" << std::endl;
+	//glBindTexture(GL_TEXTURE_2D, 0) for the objects we don't use
+
+    return texture;
+}
+
+
+
+
 
 int processCameraMovement(GLFWwindow* window) {
 	int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
@@ -137,6 +198,7 @@ int processCameraMovement(GLFWwindow* window) {
 
 int main(void) {
 	GLFWwindow* window;
+	unsigned int textureID;
 
 	if (!glfwInit()) {
 		return -1;
@@ -183,12 +245,16 @@ int main(void) {
 	//glEnable(GL_LIGHTING);
 	//glEnable(GL_LIGHT0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//for the textures
 	glDisable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
 
 	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);
 	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 0.5f);
 	shapeArray.CreateShape(35.0f, 35.0f, 35.0f, 30.0f, T_SPHERE);
-	shapeArray.SetColor(1, 1.0f, 0.0f, 0.1f, 1.0f);
+	shapeArray.SetColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
 
 	Shader shader("Shader.shader");
 	float light[3] = { 150.0f,-100000.0f,50.0f};
@@ -198,6 +264,7 @@ int main(void) {
 	int shapeArrSize;
 	float x = 1.0f;
 	float l = 1.0f;
+	textureID = loadTexture();
 
 	while (processCameraMovement(window) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
 		shader.Bind();
@@ -223,13 +290,19 @@ int main(void) {
 			shader.SetUniformMat4f("model", Model);
 			shader.SetUniform3f("u_Light", 150.0f, x, 150.0f);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			/*if (i == 1) {
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			shader.SetUniform3f("u_vPos", cameraPos.x, cameraPos.y, cameraPos.z);
+			if (i == 1) {
+
+				shader.SetUniform1i("isTexture",2);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+				glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 			}
 			else {
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			}*/
-			glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
+				shader.SetUniform1i("isTexture", 1);
+				glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
+			}
+			
 			//glBindVertexArray(0); //it works without this*/
 		}
 
