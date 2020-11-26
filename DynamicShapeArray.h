@@ -48,6 +48,7 @@ struct Shape {
 	bool* collisions;
 	float center[3];
 	float d;
+	float d2;
 /*public:
 	bool operator>(const Shape other) {
 		return center > other.center;

@@ -277,7 +277,7 @@ void DynamicShapeArray::CheckCollision(int index) {
 		pos = bigPos;
 		pos1 = nextPos1;
 		if (i != index) {
-			if (shapeArray[j].shapeType == T_SPHERE || (shapeArray[s].shapeType == T_CUBE && shapeArray[j].shapeType == T_CYLINDER)) {
+			if (shapeArray[j].shapeType == T_RING || shapeArray[j].shapeType == T_SPHERE || (shapeArray[s].shapeType == T_CUBE && shapeArray[j].shapeType == T_CYLINDER)) {
 				j = i;
 				s = index;
 				pos1 = bigPos;
@@ -370,10 +370,34 @@ void DynamicShapeArray::CheckCollision(int index) {
 						//std::cout << " makaronia ktyphsa" << std::endl;
 					}
 				}
-
 			}
+			else if (shapeArray[s].shapeType == T_RING) {
+				float size00 = shapeArray[s].d2,radi=size0-(2*size00),radB = size0;
+				
+				if (shapeArray[j].shapeType == T_CUBE) {
+					dsqr = dx * dx + dz * dz;
+					if (dsqr * SQRT_2 <= (100 * 100)- radB * radB) {
+						hasCollision = true;
+					}
+					
+				}else if (shapeArray[j].shapeType == T_CYLINDER) {
+					hasCollision = false;
+				}else if (shapeArray[j].shapeType == T_SPHERE) {
+					hasCollision = false;
+				}
+				else if (shapeArray[j].shapeType == T_RING) { 
+					hasCollision = false; 
+				}
+			}
+			
+
+
+
+
 			if (hasCollision) {
-				//std::cout << "			ponaw " << std::endl;
+				if(s == T_RING){
+					std::cout << "			ponaw " << std::endl;
+				}
 				Collide(s, j);
 				Collide(j, s);
 				#ifdef _WIN32
@@ -740,7 +764,7 @@ void DynamicShapeArray::CreateRing(float x,float y, float z, float r1, float r2)
 		ringVertices[n+ 3*vertex_size] = circle4[i];
 		ringVertices[n + 3 * vertex_size + 1] = circle4[i + 1];
 		ringVertices[n + 3 * vertex_size + 2] = circle4[i + 2];
-		std::cout << "Brika shmeia: " << ringVertices[n] << " " << ringVertices[n+1] << " " << ringVertices[n+2] << std::endl;
+		//std::cout << "Brika shmeia: " << ringVertices[n] << " " << ringVertices[n+1] << " " << ringVertices[n+2] << std::endl;
 
 		ring_normals[n] = ring_normals[n + 2] = 0.0f;
 		ring_normals[n+1] = 1.0f;
@@ -772,16 +796,17 @@ void DynamicShapeArray::CreateRing(float x,float y, float z, float r1, float r2)
 			ring_indices[pos++] = i + 1 + ((sector + 1) % 4) * vertex_num;
 			ring_indices[pos++] = i + 1 + (sector % 4) * vertex_num;
 			
-			std::cout << pos << " " << i + (sector % 4) * vertex_num << " " << i + ((sector + 1) % 4) * vertex_num << " " << i + 1 + (sector % 4) * vertex_num << std::endl;
-			std::cout  << pos << " " << i + ((sector + 1) % 4) * vertex_num << " " << i + 1 + ((sector + 1) % 4) * vertex_num << " " << i + 1 + (sector % 4) * vertex_num << std::endl;
+			//std::cout << pos << " " << i + (sector % 4) * vertex_num << " " << i + ((sector + 1) % 4) * vertex_num << " " << i + 1 + (sector % 4) * vertex_num << std::endl;
+			//std::cout  << pos << " " << i + ((sector + 1) % 4) * vertex_num << " " << i + 1 + ((sector + 1) % 4) * vertex_num << " " << i + 1 + (sector % 4) * vertex_num << std::endl;
 		}
-		std::cout << "finished sector " << sector << std::endl;
+		//std::cout << "finished sector " << sector << std::endl;
 	}
-	std::cout << "SIZE " << 2 * 4 * CIRCLE_TRIANGLE_NUM * 3 << std::endl;
-	std::cout << " " << ringVertices[34*3] << " " << ringVertices[34 * 3+1] << " " << ringVertices[34 * 3+2] << std::endl;
-	std::cout << " " << ringVertices[0] << " " << ringVertices[1] << " " << ringVertices[2] << std::endl;
+	//std::cout << "SIZE " << 2 * 4 * CIRCLE_TRIANGLE_NUM * 3 << std::endl;
+	//std::cout << " " << ringVertices[34*3] << " " << ringVertices[34 * 3+1] << " " << ringVertices[34 * 3+2] << std::endl;
+	//std::cout << " " << ringVertices[0] << " " << ringVertices[1] << " " << ringVertices[2] << std::endl;
 
 	AddArray(ringVertices, 4*vertex_size, T_RING, x, y, z, r1);
+	shapeArray[size-1].d2 = r2;
 	free(circle1);
 	free(circle2);
 	free(circle3);
