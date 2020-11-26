@@ -2,7 +2,10 @@
 #include <cstdlib>
 #include <chrono>
 #include <random>
-
+#ifdef _WIN32
+#include <Windows.h>
+#undef max
+#endif
 /*
 	Indices for cube triangle points have been numbered in the following way on the 2 faces back and front(+4)
 	1 - 3 5 - 7
@@ -84,16 +87,19 @@ float DynamicShapeArray::RandomFloat(float min, float max) {
 }
 
 void DynamicShapeArray::CreateRandomShape() {
-	int shapeType = RandomInt(1, 1);
+	int shapeType = RandomInt(0, 2);
 	int shape_size = RandomInt(1, 10);
-	float r, g, b;
+	float r, g, b, vx , vy , vz;
 	r = RandomFloat(0.0f, 1.0f);
 	g = RandomFloat(0.0f, 1.0f);
 	b = RandomFloat(0.0f, 1.0f);
+	vx = RandomFloat(0.0f, 0.9f);
+	vy = RandomFloat(0.0f, 0.9f);
+	vz = RandomFloat(0.0f, 0.9f);
 	CreateShape(0.0f, 0.0f, 0.0f, shape_size, shapeType);
 	std::cout << "r: " << r << " g: " << g << " b: " << b << ", " << shape_size << " "<< shapeType<< std::endl;
 	SetColor(size - 1,r,g,b);
-	SetSpeed(size - 1, 0.1f, 0.1f, 0.1f);
+	SetSpeed(size - 1, vx, vy, vz);
 }
 
 /*
@@ -173,13 +179,13 @@ void DynamicShapeArray::Collide(int index1, int index2) {
 	float dz = pos[2] - pos1[2];
 
 	if (shapeType1 == T_SPHERE) {
-		std::cout << "We have a Collision" << std::endl;
+		//std::cout << "We have a Collision" << std::endl;
 		glm::vec3 centerToCenter(dx, dy, dz);
 		centerToCenter = glm::normalize(centerToCenter);
 		Tspeed=glm::normalize(speed);
-		std::cout << glm::length(speed) << std::endl;
+		//std::cout << glm::length(speed) << std::endl;
 		speed = glm::length(speed) * normalize((-centerToCenter) * glm::dot(Tspeed, centerToCenter));
-		std::cout<< glm::length(speed) << std::endl;
+		//std::cout<< glm::length(speed) << std::endl;
 		shapeArray[index2].speed[0] = speed[0];
 		shapeArray[index2].speed[1] = speed[1];
 		shapeArray[index2].speed[2] = speed[2];
@@ -197,6 +203,7 @@ void DynamicShapeArray::Collide(int index1, int index2) {
 		m = std::max(m, abs(dists[1]));
 		m = std::max(m, abs(dists[2]));
 		glm::vec3 M;
+		//std::cout << "Hello geiassss" << std::endl;
 		if (m == abs(dists[0])) {
 			shapeArray[index2].speed[0] = -speed[0];
 		}if (m == abs(dists[1])) {
@@ -211,18 +218,22 @@ void DynamicShapeArray::Collide(int index1, int index2) {
 		glm::vec3 Z(0.0f, 0.0f, 1.0f);
 
 		glm::vec3 centerToCenter(dx, dy, dz);
+		float size1 = shapeArray[index1].size / 2;
+		float size2 = shapeArray[index2].size / 2;
 		Tspeed = glm::normalize(speed);
 		centerToCenter = glm::normalize(centerToCenter);
 		glm::vec3 ctc2(centerToCenter[0], 0, centerToCenter[2]);
-		float dists[3] = { glm::dot(centerToCenter,X),  glm::dot(centerToCenter,Y),  glm::dot(centerToCenter,Z) };
-		float m = abs(dists[0]);
-		m = std::max(m, abs(dists[1]));
-		m = std::max(m, abs(dists[2]));
+		float dists[2] = { cos((acos(abs(glm::dot(centerToCenter,X))) + acos(abs(glm::dot(centerToCenter,Z))))/2),  glm::dot(centerToCenter,Y) };
+		float m = abs(dists[1]);
+		m = std::max(m, abs(dists[0]));
+		//m = std::max(m, abs(dists[2]));
 		glm::vec3 M;
-		if (m == abs(dists[1])) {
+
+		if ((dists[1]>=SQRT_2/2&&dists[1]<1)|| (dists[1] <= -SQRT_2 / 2 && dists[1] > -1)) {
 			shapeArray[index2].speed[1] = -speed[1];
-		}
-		else {
+			//std::cout << "1. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+		}else if (dy < size1) {
+			//std::cout << "2. SEXSEXSEXSEXSEXSEXSEXSEX" << std::endl;
 			Tspeed = glm::length(speed) * normalize((-centerToCenter) * glm::dot(Tspeed, centerToCenter));
 			shapeArray[index2].speed[0] = Tspeed[0];
 			shapeArray[index2].speed[2] = Tspeed[2];
@@ -260,8 +271,8 @@ void DynamicShapeArray::CheckCollision(int index) {
 				pos = nextPos1;
 			}
 			shapeType = shapeArray[j].shapeType;
-			size0 = shapeArray[j].d;
-			size1 = shapeArray[s].d;
+			size0 = shapeArray[s].d;
+			size1 = shapeArray[j].d;
 			dx = abs(pos[0] - pos1[0]);
 			dy = abs(pos[1] - pos1[1]);
 			dz = abs(pos[2] - pos1[2]);
@@ -288,22 +299,25 @@ void DynamicShapeArray::CheckCollision(int index) {
 							((dy - size1 / 2) * (dy - size1 / 2)) +
 							((dz - size1 / 2) * (dz - size1 / 2));
 						hasCollision = (cornerDistance_sq < (size0 / 2 * size0 / 2));
+						//std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAmakaronia: " << hasCollision << " aaa: " << sqrt(cornerDistance_sq) << " bbb: " << dx << " " << (dx-size1/2) << " " << (dy - size1 / 2) << std::endl;
 					}
-					//std::cout << "makaronia: " << hasCollision << " " << dx << " " << dy << " " << dz << " " << abs((size1 - size0) / 2) << std::endl;
+					
 				}
 				else if (shapeArray[j].shapeType == T_CYLINDER) {
 					dsqr = dx * dx + dz * dz;
-					hasCollision = (dsqr <= (size1 / 2) * (size1 / 2) && dy <= (size1 / 2));
+					//hasCollision = (dsqr <= (((size0 / 2) + (size1 / 2)) * ((size1/2) + (size0/2))) && dy <= (size1 / 2));
 					if (dx > (size1 / 2 + size0 / 2)) { hasCollision = false; }
-					else if (dy > (size1 / 2 + size0 / 2)) { hasCollision = false; }
+					else if (dy > (size1 / 2 + size0 / 2)) {  hasCollision = false; }
 					else if (dz > (size1 / 2 + size0 / 2)) { hasCollision = false; }
+					else if ((dsqr <= (((size0 / 2) + (size1 / 2)) * ((size1 / 2) + (size0 / 2))) && dy <= (size1 / 2))) { hasCollision = true; }
 					else {
 						dsqr = dx * dx + dy * dy + dz * dz;
-						hasCollision = hasCollision && (dsqr <= (size0 / 2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2));
+						//std::cout << " skata me gala:" << dsqr <<" kai: "<< (size0 / 2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2) << std::endl;
+						hasCollision = (dsqr <= (size0 / 2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2));
 
 					}
 					if (hasCollision) {
-						std::cout << "makaronia: " << hasCollision << " " << dx << " " << dy << " " << dz << " " << abs((size1 - size0) / 2) << std::endl;
+						//std::cout << "makaronia: " << hasCollision << " " << dx << " " << dy << " " << dz << " " << abs((size1 - size0) / 2) << std::endl;
 					}
 				}
 			}
@@ -340,14 +354,20 @@ void DynamicShapeArray::CheckCollision(int index) {
 					else {
 						dsqr = dx * dx + dy * dy + dz * dz;
 						hasCollision = dsqr <= (SQRT_2 * size0 / 2 + SQRT_2 * size1 / 2) * (SQRT_2 * size0 + SQRT_2 * size1 / 2);
-						std::cout << " makaronia ktyphsa" << std::endl;
+						//std::cout << " makaronia ktyphsa" << std::endl;
 					}
 				}
 
 			}
 			if (hasCollision) {
+				//std::cout << "			ponaw " << std::endl;
 				Collide(s, j);
 				Collide(j, s);
+				#ifdef _WIN32
+				if(size<=10){
+					PlaySound(TEXT("collision.wav"), NULL, SND_FILENAME | SND_ASYNC);
+				}
+				#endif
 			}
 		}
 	}

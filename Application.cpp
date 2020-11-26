@@ -1,13 +1,18 @@
 ﻿#include "DynamicShapeArray.h"
 #include "Shader.h"
 #include <glm/gtc/matrix_transform.hpp>
+
+#ifdef _WIN32
+	#include <Windows.h>
+#endif
 #define STB_IMAGE_IMPLEMENTATION   
 #include "stb_image.h"
+#pragma comment(lib, "Winmm.lib")
 
 DynamicShapeArray shapeArray;
 //camera 
 glm::vec3 cameraPos(-200.0f, 200.0f, 200.0f);
-glm::vec3 cameraFront(1.0f, -1.0f, -1.0f);
+glm::vec3 cameraFront(2.0f, -1.2f, -1.2f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 glm::mat4 View = glm::lookAt(
 	cameraPos, // Camera is at (100,150,100), in World Space
@@ -20,6 +25,9 @@ float cameraSpeed = 20.0f / GLOBAL_SPEED;
 float yawSpeed = 1.0f / GLOBAL_SPEED;
 bool spaceChecker = true;
 bool joystick_space = false;
+bool tex = true;
+bool texChecker = true;
+
 
 unsigned int loadTexture()
 {
@@ -68,10 +76,8 @@ unsigned int loadTexture()
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
 
 
-	std::cout << "ax koula2" << std::endl;
+
 	stbi_image_free(data);
-	std::cout << "ax koula3" << std::endl;
-	//glBindTexture(GL_TEXTURE_2D, 0) for the objects we don't use
 
     return texture;
 }
@@ -117,18 +123,18 @@ int processCameraMovement(GLFWwindow* window) {
 
 		const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
 		//std::cout << name << std::endl;
-		if (abs(axes[3]) >= 0.2)//RY
-			cameraPos -= (axes[3]) * cameraFront;
-		if (abs(axes[5]) >= 0.2)//R2
-			cameraPos += (axes[5] + 1) * cameraUp;
+		if (abs(axes[5]) >= 0.2)//RY//LY//R2
+			cameraPos -= (axes[5]) * cameraFront;
+		if (abs(axes[1]) >= 0.2)//R2//LY
+			cameraPos += (axes[1] + 1) * cameraUp;
 		if (abs(axes[4]) >= 0.2)//L2
 			cameraPos -= (axes[4] + 1) * cameraUp;
-		if (abs(axes[2]) >= 0.2)//RX
-			cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[2]);
-		if (abs(axes[1]) >= 0.2)//LY
-			cameraFront -= (axes[1]/30) * cameraUp;
-		if (abs(axes[0]) >= 0.2)//LX
-			cameraFront += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[0] / 30);
+		if (abs(axes[0]) >= 0.2)//RX
+			cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[0]);
+		if (abs(axes[3]) >= 0.2)//LY//RY//L2
+			cameraFront -= (axes[3]/30) * cameraUp;
+		if (abs(axes[2]) >= 0.2)//LX//RX
+			cameraFront += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[2] / 30);
 		if (buttons[11] == GLFW_PRESS)
 			shapeArray.MoveSphere(1, glm::vec3(1.0f, 0.0f, 0.0f));
 		if (buttons[13] == GLFW_PRESS)
@@ -144,12 +150,20 @@ int processCameraMovement(GLFWwindow* window) {
 
 	}
 
+
 	if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) && spaceChecker && !joystick_space) {
 		spaceChecker = false;
 		shapeArray.CreateRandomShape();
 	}
 	else if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) && !joystick_space) {
 		spaceChecker = true;
+	}
+	if ((glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) && texChecker) {
+		texChecker = false;
+		tex = !tex;		
+	}
+	else if ((glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE)) {
+		texChecker = true;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -169,9 +183,9 @@ int processCameraMovement(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
 		cameraFront -= yawSpeed * cameraUp;
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
-		cameraFront -= glm::normalize(glm::cross(cameraFront, cameraUp)) * (yawSpeed / 2);
+		cameraFront -= glm::normalize(glm::cross(normalize(cameraFront), cameraUp)) * (yawSpeed / 2);
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-		cameraFront += glm::normalize(glm::cross(cameraFront, cameraUp)) * (yawSpeed / 2);
+		cameraFront += glm::normalize(glm::cross(normalize(cameraFront), cameraUp)) * (yawSpeed / 2);
 
 	//Sphere Controls
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
@@ -192,6 +206,7 @@ int processCameraMovement(GLFWwindow* window) {
 		(cameraPos + cameraFront), // and looks at the origin
 		cameraUp  // Head is up (set to 0,-1,0 to look upside-down)
 	);
+
 	return glfwGetKey(window, GLFW_KEY_ESCAPE);
 }
 
@@ -211,7 +226,7 @@ int main(void) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(600, 600, u8"Συγκρουόμενα Φούντο γαμιέσαι", NULL, NULL);
+	window = glfwCreateWindow(600, 600, u8"Συγκρουόμενα", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		return -1;
@@ -263,6 +278,10 @@ int main(void) {
 	float x = 1.0f;
 	float l = 1.0f;
 	textureID = loadTexture();
+#ifdef _WIN32
+	mciSendString("open \"Elevator Music.mp3\" type mpegvideo alias mp3", NULL, 0, NULL);
+	mciSendString("play mp3 repeat", NULL, 0, NULL);
+#endif
 
 	while (processCameraMovement(window) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
 		shader.Bind();
@@ -271,7 +290,7 @@ int main(void) {
 		x += l;
 		if (x == 150.0f || x == 0.0f) {
 			l = (-1.0f)*l;
-			std::cout << "change" << std::endl;
+			//std::cout << "change" << std::endl;
 		}
 		MVP = Projection * View * Model;
 
@@ -291,7 +310,7 @@ int main(void) {
 			shader.SetUniform3f("u_Light", 150.0f, x, 150.0f);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			shader.SetUniform3f("u_vPos", cameraPos.x, cameraPos.y, cameraPos.z);
-			if (i == 1) {
+			if (i == 1&&tex) {
 
 				shader.SetUniform1i("isTexture",2);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
