@@ -21,6 +21,7 @@
 #define CIRCLE_TRIANGLE_NUM 34
 
 #define GLOBAL_SPEED 60
+#define MAX_SPEEDUP 100
 //this is for a new implementation I thought subject to change
 /*
 struct Original {
@@ -87,7 +88,8 @@ public:
 	void GetCubeNormals();//needs a fix for sure we should not always calculate this
 	void Move(int index);
 	float * GetSpeed(int index); //not used fix, delete or use it
-	float * GetShape(int index); //not used in the new implementation consider removing
+	void UpdateSpeed(bool up); //Used to update the speed to speed up or slow down
+	int GetShape(int index); //not used in the new implementation consider removing
 	int GetSize(int index); //not used in the new implementation consider removing
 	unsigned int* GetIndexPointer(int shapeType);//not used in the new implementation consider removing
 	unsigned int GetVAOID(int index); //not used in the new implementation consider removing
@@ -95,6 +97,7 @@ public:
 	
 	//Setters
 	void SetColor(int id, float r_value, float g_value, float b_value, float alpha_value = 1.0f);
+	void SetRandomColor(int index, float alpha_value);
 	
 	void SetSpeed(int id, float ux, float uy, float uz);//not used fix, delete or use it
 	void SetVAOID(int index, int id); //not used in the new implementation consider removing

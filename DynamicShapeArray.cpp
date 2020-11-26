@@ -26,6 +26,10 @@ float cube_normals[] = {
 		sqrt(2.0f),sqrt(2.0f),sqrt(2.0f)
 };
 
+float globalSpeed = 0.5f / GLOBAL_SPEED;
+int speedUP = 50;
+
+
 float sphere_normals[2109];
 float cylinder_normals[216];
 float ring_normals[4*(CIRCLE_VERTEX_NUM - 1) * 3];
@@ -288,6 +292,16 @@ void DynamicShapeArray::Collide(int index1, int index2) {
 	}
 }
 
+void DynamicShapeArray::UpdateSpeed(bool up) {
+
+	if (speedUP < MAX_SPEEDUP&&up) {
+		speedUP++;
+	}
+	else if(speedUP > 0&&!up) {
+		speedUP--;
+	}
+}
+
 void DynamicShapeArray::CheckCollision(int index) {
 	if (index >= size || index < 2) {
 		return;
@@ -416,13 +430,13 @@ void DynamicShapeArray::CheckCollision(int index) {
 					else if ((dx < abs((size1 / 2) - (size0)) && (dy < abs((size1 / 2) - (size0))) && (dz < abs((size1 / 2) - (size0))))) { hasCollision = false; }
 
 					else if (dx < (size1 / 2)) { hasCollision = true; }
-					else if (dy < (size1 / 2)) { hasCollision = true; }
+					else if (dy < (size1 / 2)+size00) { hasCollision = true; }
 					else if (dz < (size1 / 2)) { hasCollision = true; }
 					else {
 						float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
 							((dy - size1 / 2) * (dy - size1 / 2)) +
 							((dz - size1 / 2) * (dz - size1 / 2));
-						hasCollision = (cornerDistance_sq < (size0* size0 / 2));
+						hasCollision = true;//(cornerDistance_sq < (size0* size0 / 2));
 					}
 					
 				}else if (shapeArray[j].shapeType == T_CYLINDER) {
@@ -522,6 +536,12 @@ void DynamicShapeArray::SetColor(int index, float r_value, float g_value, float 
 		shapeArray[index].color[2] = b_value;
 		shapeArray[index].color[3] = alpha_value;
 	}
+}
+void DynamicShapeArray::SetRandomColor(int index, float alpha_value) {
+	float r = RandomFloat(0.0, 1.0);
+	float g = RandomFloat(0.0, 1.0);
+	float b = RandomFloat(0.0, 1.0);
+	SetColor(index, r, g, b, alpha_value);
 }
 
 void DynamicShapeArray::SetSpeed(int index, float ux, float uy, float uz)
@@ -638,10 +658,10 @@ void DynamicShapeArray::Move(int index) {
 	float size = shapeArray[index].size;
 	if (speed[0] || speed[1] || speed[2]) {
 		CheckCollision(index);
-		shapeArray[index].Model = glm::translate(glm::mat4(1.0f), glm::vec3(speed[0], speed[1], speed[2])) * shapeArray[index].Model;
-		shapeArray[index].center[0] += speed[0];
-		shapeArray[index].center[1] += speed[1];
-		shapeArray[index].center[2] += speed[2];
+		shapeArray[index].Model = glm::translate(glm::mat4(1.0f), glm::vec3(speed[0] * (speedUP * globalSpeed), speed[1] * (speedUP * globalSpeed), speed[2] * (speedUP * globalSpeed))) * shapeArray[index].Model;
+		shapeArray[index].center[0] += speed[0]*( speedUP * globalSpeed);
+		shapeArray[index].center[1] += speed[1]*( speedUP * globalSpeed);
+		shapeArray[index].center[2] += speed[2]*( speedUP * globalSpeed);
 	}
 }
 

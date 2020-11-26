@@ -123,17 +123,17 @@ int processCameraMovement(GLFWwindow* window) {
 
 		const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
 		//std::cout << name << std::endl;
-		if (abs(axes[5]) >= 0.2)//RY//LY//R2
-			cameraPos -= (axes[5]) * cameraFront;
-		if (abs(axes[1]) >= 0.2)//R2//LY
-			cameraPos += (axes[1] + 1) * cameraUp;
-		if (abs(axes[4]) >= 0.2)//L2
-			cameraPos -= (axes[4] + 1) * cameraUp;
-		if (abs(axes[0]) >= 0.2)//RX
+		if (axes[5] >= -1.0)//RY//LY//R2
+			cameraPos += (axes[5]+1) * cameraFront;
+		if (abs(axes[1]) >= 0.5)//R2//LY
+			cameraPos -= (axes[1]) * cameraUp;
+		if (axes[4] >= -1.0)//L2
+			cameraPos -= (axes[4] + 1) * cameraFront;
+		if (abs(axes[0]) >= 0.5)//RX
 			cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[0]);
-		if (abs(axes[3]) >= 0.2)//LY//RY//L2
+		if (abs(axes[3]) >= -1.0)//LY//RY//L2
 			cameraFront -= (axes[3]/30) * cameraUp;
-		if (abs(axes[2]) >= 0.2)//LX//RX
+		if (abs(axes[2]) >= 0.5)//LX//RX
 			cameraFront += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[2] / 30);
 		if (buttons[11] == GLFW_PRESS)
 			shapeArray.MoveSphere(1, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -164,6 +164,12 @@ int processCameraMovement(GLFWwindow* window) {
 	}
 	else if ((glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE)) {
 		texChecker = true;
+	}
+	if((glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS) ) {
+		shapeArray.UpdateSpeed(true);
+	}
+	if ((glfwGetKey(window, GLFW_KEY_COMMA ) == GLFW_PRESS)) {
+		shapeArray.UpdateSpeed(false);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -309,11 +315,7 @@ int main(void) {
 			shader.SetUniform3f("u_Light", 150.0f, x, 150.0f);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			shader.SetUniform3f("u_vPos", cameraPos.x, cameraPos.y, cameraPos.z);
-			if (i == 2) {
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			}
 			if (i == 1&&tex) {
-
 				shader.SetUniform1i("isTexture",2);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 				glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
