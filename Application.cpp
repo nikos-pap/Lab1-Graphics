@@ -300,7 +300,6 @@ int main(void) {
 			float* color = shapeArray.GetColor(i);
 			ib_size = shapeArray.GetIndexPointerSize(i);
 			shapeArray.BindShape(i);
-			shapeArray.CheckCollision(2);
 			if (i > 1) {
 				shapeArray.Move(i);
 			}
