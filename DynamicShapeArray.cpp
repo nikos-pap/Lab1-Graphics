@@ -376,7 +376,7 @@ void DynamicShapeArray::CheckCollision(int index) {
 				
 				if (shapeArray[j].shapeType == T_CUBE) {
 					dsqr = dx * dx + dz * dz;
-					if (dsqr * SQRT_2 <= (100 * 100)- radB * radB) {
+					if (dsqr * SQRT_2 >= (100 * 100) - radB * radB) {
 						hasCollision = true;
 					}
 					
