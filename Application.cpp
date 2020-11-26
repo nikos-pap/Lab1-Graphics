@@ -270,7 +270,9 @@ int main(void) {
 	shapeArray.SetColor(0, 0.0f, 0.0f, 1.0f, 0.5f);
 	shapeArray.CreateShape(35.0f, 35.0f, 35.0f, 30.0f, T_SPHERE);
 	shapeArray.SetColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
-
+	//shapeArray.CreateRing(100.0f, 100.0f, 100.0f, 15.0f, 4.0f);
+	//shapeArray.SetColor(2, 1.0f, 0.0f, 0.0f, 1.0f);
+	//shapeArray.SetSpeed(2, 1.0f, 1.0f, 1.0f);
 	Shader shader("Shader.shader");
 	shader.SetUniformMat4f("model", Model);
 	unsigned int ib_size;
@@ -310,6 +312,9 @@ int main(void) {
 			shader.SetUniform3f("u_Light", 150.0f, x, 150.0f);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			shader.SetUniform3f("u_vPos", cameraPos.x, cameraPos.y, cameraPos.z);
+			/*if (i == 2) {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}*/
 			if (i == 1&&tex) {
 
 				shader.SetUniform1i("isTexture",2);

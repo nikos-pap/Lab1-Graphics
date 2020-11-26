@@ -43,7 +43,7 @@ void main() {
 	vec3 ambient = vec3(0.2, 0.2, 0.16);
 	//float distance = length(u_Light - vec3(100, 57, 93));//Position_worldspace);
 
-
+	/**/
 	//diffuse lighting
 	vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(u_Light - FragPos);

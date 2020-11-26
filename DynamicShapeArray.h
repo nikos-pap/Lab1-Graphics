@@ -12,6 +12,9 @@
 #define T_CUBE 0
 #define T_SPHERE 1
 #define T_CYLINDER 2
+#define T_RING 3
+
+#define CIRCLE_VERTEX_NUM (CIRCLE_TRIANGLE_NUM+2)
 
 #define SPHERE_SECTOR_NUM 36
 #define SPHERE_STACK_NUM 18
@@ -97,6 +100,7 @@ public:
 	void SetBufferID(int index, int id);//not used in the new implementation consider removing
 	void SetIBOID(int index, int id); //not used in the new implementation consider removing
 	void MoveSphere(int index, glm::vec3 speed);
+	void CreateRing(float x0, float y0, float z0, float r1, float r2);
 
 private:
 	float* nextPos(int index);

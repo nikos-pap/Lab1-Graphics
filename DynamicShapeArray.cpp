@@ -28,6 +28,8 @@ float cube_normals[] = {
 
 float sphere_normals[2109];
 float cylinder_normals[216];
+float ring_normals[(CIRCLE_VERTEX_NUM - 1) * 3];
+
 bool firstCylinder = true;
 
 unsigned int cube_indices[] = {
@@ -46,7 +48,8 @@ unsigned int cube_indices[] = {
 };
 
 unsigned int cylinder_indices[CIRCLE_TRIANGLE_NUM * 3 * 4];
-unsigned int * sphere_indices;
+unsigned int sphere_indices[2 * 3 * (SPHERE_STACK_NUM - 1) * SPHERE_SECTOR_NUM];
+unsigned int  ring_indices[2 * 4 * CIRCLE_TRIANGLE_NUM * 3];
 
 /*
 Simple Constructor
@@ -87,7 +90,7 @@ float DynamicShapeArray::RandomFloat(float min, float max) {
 }
 
 void DynamicShapeArray::CreateRandomShape() {
-	int shapeType = RandomInt(0, 2);
+	int shapeType = RandomInt(0, 3);
 	int shape_size = RandomInt(1, 10);
 	float r, g, b, vx , vy , vz;
 	r = RandomFloat(0.0f, 1.0f);
@@ -96,7 +99,15 @@ void DynamicShapeArray::CreateRandomShape() {
 	vx = RandomFloat(0.0f, 0.9f);
 	vy = RandomFloat(0.0f, 0.9f);
 	vz = RandomFloat(0.0f, 0.9f);
-	CreateShape(0.0f, 0.0f, 0.0f, shape_size, shapeType);
+	if (shapeType == T_RING) {
+		float r1 = 0.5* shape_size;
+		float r2 = 0.5*RandomInt(1, 10);
+		CreateRing(r1,2*r2, r1,r1,r2);
+	}
+	else {
+		CreateShape(0.0f, 0.0f, 0.0f, shape_size, shapeType);
+	}
+	
 	std::cout << "r: " << r << " g: " << g << " b: " << b << ", " << shape_size << " "<< shapeType<< std::endl;
 	SetColor(size - 1,r,g,b);
 	SetSpeed(size - 1, vx, vy, vz);
@@ -159,6 +170,8 @@ int DynamicShapeArray::GetIndexPointerSize(int index) {
 		return CIRCLE_TRIANGLE_NUM * 3 * 4;
 	case T_SPHERE:
 		return 2 * 3 * (SPHERE_STACK_NUM - 1) * SPHERE_SECTOR_NUM;
+	case T_RING:
+		return 2 * 4 * CIRCLE_TRIANGLE_NUM * 3;
 	}
 	return 0;
 }
@@ -409,7 +422,9 @@ unsigned int* DynamicShapeArray::GetIndexPointer(int index) {
         return &cylinder_indices[0];
     case T_SPHERE:
         return &sphere_indices[0];
-    }
+	case T_RING:
+		return &ring_indices[0];
+	}
 	return nullptr;
 }
 
@@ -480,15 +495,7 @@ void DynamicShapeArray::AddArray(float * element, int elementSize, int shapeType
 		shapeArray[index].center[1] = y0;
 		shapeArray[index].center[2] = z0;
 		shapeArray[index].d = d;
-		if (size > 2){
-			shapeArray[index].collisions = (bool*)malloc((size) * sizeof(bool));
-		}
-		else {
-			shapeArray[index].collisions = nullptr;
-		}
-		for (int i = 2; i < (size-1); i++) {
-			shapeArray[i].collisions = (bool*)realloc(shapeArray[i].collisions,(size) * sizeof(bool));
-		}
+
 		createBuffer(index);
 	} else {
 		std::cout << "not ok" << std::endl;
@@ -522,6 +529,8 @@ void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, 
 		cylinder_pos[i] = circle1[i];
 		cylinder_pos[i + 108] = circle2[i];
 	}
+	free(circle1);
+	free(circle2);
 
 	if (firstCylinder) {
 		cylinder_normals[0] = cylinder_normals[2] = cylinder_normals[108] = cylinder_normals[110] = 0;
@@ -565,7 +574,7 @@ float* DynamicShapeArray::CreateCircle(float x, float y, float z, float radius) 
 	int num_of_vertices = num_of_sides + 2;
 	int n = 3 * num_of_vertices;
 	float twicePi = 2.0f * PI;
-	float * vertices = (float *) malloc(sizeof(float) * n);
+	float * vertices = (float *) malloc(sizeof(float) * (CIRCLE_TRIANGLE_NUM+2)*3);
 	if (vertices != nullptr) {
 		vertices[0] = x;
 		vertices[1] = y;
@@ -595,17 +604,12 @@ void DynamicShapeArray::CreateSphere(float x0, float y0, float z0, float radius)
 	float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
 	//float s, t;                                    // vertex texCoord
 	std::cout << x0 << ", " << y0 << ", " << z0 << "," << std::endl;
-	int size = (SPHERE_SECTOR_NUM + 1) * (SPHERE_STACK_NUM + 1) * 3;
 	float sectorStep = 2 * PI / SPHERE_SECTOR_NUM;
 	float stackStep = PI / SPHERE_STACK_NUM;
 	float sectorAngle, stackAngle;
-	float* points;
+	float points[(SPHERE_SECTOR_NUM + 1) * (SPHERE_STACK_NUM + 1) * 3];
 
-	points = (float*)malloc(size * sizeof(float));
-    if (points == nullptr) {
-        std::cout << "Failed to allocate memory for points" << std::endl;
-        return;
-    }
+	//points = (float*)malloc(size * sizeof(float));
 	for (int i = 0,n=0; i <= SPHERE_STACK_NUM; ++i)
 	{
 		stackAngle = PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
@@ -637,7 +641,7 @@ void DynamicShapeArray::CreateSphere(float x0, float y0, float z0, float radius)
 			n += 3;
 		}
 	} 
-	AddArray(points, size, T_SPHERE, x0, y0, z0, 2*radius);
+	AddArray(points, (SPHERE_SECTOR_NUM + 1) * (SPHERE_STACK_NUM + 1) * 3, T_SPHERE, x0, y0, z0, 2*radius);
 }
 
 float* DynamicShapeArray::GetNormals(int shapeType) {
@@ -649,6 +653,9 @@ float* DynamicShapeArray::GetNormals(int shapeType) {
 		return sphere_normals;
 	case T_CYLINDER:
 		return cylinder_normals;
+	case T_RING:
+		//return cube_normals;
+		return ring_normals;
 	}
 	return nullptr;
 }
@@ -658,7 +665,7 @@ void DynamicShapeArray::createBuffer(int index) {
 	float * shape = shapeArray[index].data;
 	int shape_size = shapeArray[index].size;
 	int index_pointer_size = GetIndexPointerSize(index);
-	int index_pointer_size2 = GetIndexPointerSize(index);
+	int index_pointer_size2;
 	float* normals = GetNormals(shapeArray[index].shapeType);
 	if (shapeArray[index].shapeType == T_CUBE) {
 		index_pointer_size2 = 24;
@@ -668,6 +675,10 @@ void DynamicShapeArray::createBuffer(int index) {
 	}
 	else if (shapeArray[index].shapeType == T_CYLINDER) {
 		index_pointer_size2 = 216;
+	}
+	else if (shapeArray[index].shapeType == T_RING) {
+		index_pointer_size2 = 4*(CIRCLE_VERTEX_NUM-1) * 3;
+		//index_pointer_size2 = 24;
 	}
 	unsigned int * index_array = GetIndexPointer(index);
 
@@ -704,15 +715,84 @@ void DynamicShapeArray::createBuffer(int index) {
 	std::cout << "buffer created id's are:" << vao << ", " << buffer_id << ", " << ibo << std::endl;
 }
 
+void DynamicShapeArray::CreateRing(float x,float y, float z, float r1, float r2) {
+	float * circle1 = CreateCircle(x, y+r2, z, abs(r1-r2));
+	float* circle2 = CreateCircle(x, y, z, abs(r1 - 2*r2));
+	float* circle3 = CreateCircle(x, y-r2, z, abs(r1 - r2));
+	float* circle4 = CreateCircle(x, y, z, r1);
+	int vertex_num = (CIRCLE_VERTEX_NUM -1);
+	int vertex_size = (CIRCLE_VERTEX_NUM - 1) * 3;
+	float ringVertices[(CIRCLE_VERTEX_NUM - 1)*4 * 3];
+
+	for (int i = 3,n=0; n < vertex_size; i+=3) {
+		ringVertices[n] = circle1[i];
+		ringVertices[n+1] = circle1[i+1];
+		ringVertices[n+2] = circle1[i+2];
+		
+		ringVertices[n + vertex_size] = circle2[i];
+		ringVertices[n + vertex_size + 1] = circle2[i + 1];
+		ringVertices[n + vertex_size + 2] = circle2[i + 2];
+		
+		ringVertices[n+ 2*vertex_size] = circle3[i];
+		ringVertices[n + 2 * vertex_size + 1] = circle3[i + 1];
+		ringVertices[n + 2 * vertex_size + 2] = circle3[i + 2];
+		
+		ringVertices[n+ 3*vertex_size] = circle4[i];
+		ringVertices[n + 3 * vertex_size + 1] = circle4[i + 1];
+		ringVertices[n + 3 * vertex_size + 2] = circle4[i + 2];
+		std::cout << "Brika shmeia: " << ringVertices[n] << " " << ringVertices[n+1] << " " << ringVertices[n+2] << std::endl;
+
+		ring_normals[n] = ring_normals[n + 2] = 0.0f;
+		ring_normals[n+1] = 1.0f;
+		//std::cout << cos(PI * i / (34 * 3)) << std::endl;
+		ring_normals[n + vertex_size] = -cos(2*PI * i / (34*3));
+		ring_normals[n + vertex_size + 1] = 0.0f;
+		ring_normals[n + vertex_size+2] = -sin(2*PI*i/ (34 * 3));
+		
+		ring_normals[n + 2 * vertex_size] = 0.0f;
+		ring_normals[n + 2 * vertex_size + 1] = -1.0f;
+		ring_normals[n + 2 * vertex_size + 2] = 0.0f;
+		
+		ring_normals[n + 3 * vertex_size] = cos(2*PI * i / (34 * 3));
+		ring_normals[n + 3 * vertex_size + 1] = 0.0f;
+		ring_normals[n + 3 * vertex_size + 2] = sin(2*PI * i / (34 * 3));
+
+		n +=3;
+	}
+	/*
+		1/\4
+		2\/3
+	*/
+	for (int sector = 0,pos = 0; sector < 4; sector++) {
+		for (int i = 0; i < CIRCLE_TRIANGLE_NUM; i++) {
+			ring_indices[pos++] = i + (sector%4)*vertex_num;
+			ring_indices[pos++] = i + ((sector+1) % 4) * vertex_num;
+			ring_indices[pos++] = i + 1 + (sector % 4) * vertex_num;
+			ring_indices[pos++] = i + ((sector + 1) % 4) * vertex_num;
+			ring_indices[pos++] = i + 1 + ((sector + 1) % 4) * vertex_num;
+			ring_indices[pos++] = i + 1 + (sector % 4) * vertex_num;
+			
+			std::cout << pos << " " << i + (sector % 4) * vertex_num << " " << i + ((sector + 1) % 4) * vertex_num << " " << i + 1 + (sector % 4) * vertex_num << std::endl;
+			std::cout  << pos << " " << i + ((sector + 1) % 4) * vertex_num << " " << i + 1 + ((sector + 1) % 4) * vertex_num << " " << i + 1 + (sector % 4) * vertex_num << std::endl;
+		}
+		std::cout << "finished sector " << sector << std::endl;
+	}
+	std::cout << "SIZE " << 2 * 4 * CIRCLE_TRIANGLE_NUM * 3 << std::endl;
+	std::cout << " " << ringVertices[34*3] << " " << ringVertices[34 * 3+1] << " " << ringVertices[34 * 3+2] << std::endl;
+	std::cout << " " << ringVertices[0] << " " << ringVertices[1] << " " << ringVertices[2] << std::endl;
+
+	AddArray(ringVertices, 4*vertex_size, T_RING, x, y, z, r1);
+	free(circle1);
+	free(circle2);
+	free(circle3);
+	free(circle4);
+}/**/
+
 //Initialize Index Arrays
 //Cylinder
 void DynamicShapeArray::InitCylinderIndices() {
 	int offset = CIRCLE_TRIANGLE_NUM + 2;
 
-	if (cylinder_indices == nullptr) {
-		std::cout << "Failed to allocate memory for cylinder_indices" << std::endl;
-		exit(-1);
-	}
 	AddCircleIndices(cylinder_indices, 0);
 	AddCircleIndices(cylinder_indices, CIRCLE_TRIANGLE_NUM * 3, offset);
 
@@ -737,11 +817,7 @@ void DynamicShapeArray::AddCircleIndices(unsigned int * indices, int index, int 
 //Sphere
 void DynamicShapeArray::InitSphereIndices() {
 	unsigned int k1, k2;
-    sphere_indices = (unsigned int *)malloc(2 * 3 * (SPHERE_STACK_NUM-1) * SPHERE_SECTOR_NUM *sizeof(unsigned int));
-	if (sphere_indices == nullptr) {
-		std::cout << "Failed to allocate memory for sphere_indices" << std::endl;
-		exit(-1);
-	}
+
 	for (int i = 0, n = 0; i < SPHERE_STACK_NUM; ++i)
 	{
 		k1 = i * (SPHERE_SECTOR_NUM + 1);     // beginning of current stack
