@@ -1,8 +1,16 @@
 Dependencies\Code
-Add GLEW include folder and GLFW include folders
-Add the whole glm folder 
+We need to copy the following folders to this folder:
+
+GLFW\include\GLFW\
+glm\glm\
+glew\include\GL\
 
 Dependencies\Libraries
+We need to copy the following files to this folder:
+GLFW\lib-vc2019\glfw3.lib
+glew\lib\Release\x64\glew32s.lib
+
+Properties
 C	preprocessor -> GLEW_STATIC
 C	general -> $(SolutionDir)Dependencies\Code
 Linker	general -> $(SolutionDir)Dependencies\Libraries

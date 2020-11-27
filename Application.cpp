@@ -10,8 +10,8 @@
 
 DynamicShapeArray shapeArray;
 //camera 
-glm::vec3 cameraPos(-200.0f, 200.0f, 200.0f);
-glm::vec3 cameraFront(2.0f, -1.2f, -1.2f);
+glm::vec3 cameraPos(-100.0f, 150.0f, 150.0f);
+glm::vec3 cameraFront(2.0f, -1.5f, -1.5f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 glm::mat4 View = glm::lookAt(
 	cameraPos, // camera position
