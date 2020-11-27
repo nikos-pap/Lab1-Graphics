@@ -30,7 +30,7 @@ float cube_normals[] = {
 
 float sphere_normals[2109];
 float cylinder_normals[216];
-float ring_normals[4*(CIRCLE_VERTEX_NUM - 1) * 3];
+float ring_normals[8*(CIRCLE_VERTEX_NUM - 1) * 3];
 
 //indice arrays
 unsigned int cube_indices[] = {
@@ -50,7 +50,7 @@ unsigned int cube_indices[] = {
 
 unsigned int cylinder_indices[CIRCLE_TRIANGLE_NUM * 3 * 4];
 unsigned int sphere_indices[2 * 3 * (SPHERE_STACK_NUM - 1) * SPHERE_SECTOR_NUM];
-unsigned int  ring_indices[2 * 4 * CIRCLE_TRIANGLE_NUM * 3];
+unsigned int  ring_indices[2 * 8 * CIRCLE_TRIANGLE_NUM * 3];
 
 
 float globalSpeed = 0.5f / GLOBAL_SPEED;
@@ -88,7 +88,7 @@ DynamicShapeArray::~DynamicShapeArray() {
 -generates random shapes and adds them to the ShapeArray
 */
 void DynamicShapeArray::CreateRandomShape() {
-	int shapeType = RandomInt(2, 3);
+	int shapeType = RandomInt(3, 3);
 	int shape_size = RandomInt(1, 10);
 	float r, g, b, vx , vy , vz;
 	r = RandomFloat(0.0f, 1.0f);
@@ -99,8 +99,8 @@ void DynamicShapeArray::CreateRandomShape() {
 	vz = RandomFloat(0.0f, 0.9f);
 	if (shapeType == T_RING) {
 		float r1 = 0.5* shape_size;
-		float r2 = 0.5*RandomInt(1, 10);
-		CreateRing(r1,2*r2, r1,r1,r2);
+		float r2 = r1/(float)RandomInt(3, 10);
+		CreateRing(r+5,2*r2+5, r1+5,r1,r2);
 	}
 	else {
 		CreateShape(0.0f, 0.0f, 0.0f, shape_size, shapeType);
@@ -224,7 +224,7 @@ int DynamicShapeArray::GetIndexPointerSize(int index) {
 	case T_SPHERE:
 		return 2 * 3 * (SPHERE_STACK_NUM - 1) * SPHERE_SECTOR_NUM;
 	case T_RING:
-		return 2 * 4 * CIRCLE_TRIANGLE_NUM * 3;
+		return 2 * 8 * CIRCLE_TRIANGLE_NUM * 3;
 	}
 	return 0;
 }
@@ -299,9 +299,7 @@ void DynamicShapeArray::CheckCollision(int index) {
 			if (shapeArray[s].shapeType == T_SPHERE) {
 				if (shapeArray[j].shapeType == T_SPHERE) {
 					dsqr = dx * dx + dy * dy + dz * dz;
-					//std::cout << "dsqr " << dsqr << " " << (size0 / 2 + size1 / 2) * (size0 / 2 + size1 / 2) << std::endl;
 					hasCollision = (dsqr <= (size0 / 2 + size1 / 2) * (size0 / 2 + size1 / 2)) && (dsqr >= size1 * size1 / 4);
-					//std::cout << "dsqr: " << sqrt(dsqr) << " what are you? " << (size0+size1) * (size0 + size1)/4 << std::endl;
 				}
 				else if (shapeArray[j].shapeType == T_CUBE) {
 
@@ -319,25 +317,19 @@ void DynamicShapeArray::CheckCollision(int index) {
 							((dy - size1 / 2) * (dy - size1 / 2)) +
 							((dz - size1 / 2) * (dz - size1 / 2));
 						hasCollision = (cornerDistance_sq < (size0 / 2 * size0 / 2));
-						//std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAmakaronia: " << hasCollision << " aaa: " << sqrt(cornerDistance_sq) << " bbb: " << dx << " " << (dx-size1/2) << " " << (dy - size1 / 2) << std::endl;
 					}
 
 				}
 				else if (shapeArray[j].shapeType == T_CYLINDER) {
 					dsqr = dx * dx + dz * dz;
-					//hasCollision = (dsqr <= (((size0 / 2) + (size1 / 2)) * ((size1/2) + (size0/2))) && dy <= (size1 / 2));
+
 					if (dx > (size1 / 2 + size0 / 2)) { hasCollision = false; }
 					else if (dy > (size1 / 2 + size0 / 2)) { hasCollision = false; }
 					else if (dz > (size1 / 2 + size0 / 2)) { hasCollision = false; }
 					else if ((dsqr <= (((size0 / 2) + (size1 / 2)) * ((size1 / 2) + (size0 / 2))) && dy <= (size1 / 2))) { hasCollision = true; }
 					else {
 						dsqr = dx * dx + dy * dy + dz * dz;
-						//std::cout << " skata me gala:" << dsqr <<" kai: "<< (size0 / 2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2) << std::endl;
 						hasCollision = (dsqr <= (size0 / 2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2));
-
-					}
-					if (hasCollision) {
-						//std::cout << "makaronia: " << hasCollision << " " << dx << " " << dy << " " << dz << " " << abs((size1 - size0) / 2) << std::endl;
 					}
 				}
 			}
@@ -367,14 +359,12 @@ void DynamicShapeArray::CheckCollision(int index) {
 				}
 				else if (shapeArray[j].shapeType == T_CYLINDER) {
 					dsqr = dx * dx + dz * dz;
-					//hasCollision = (dsqr <= (size1 / 2) * (size1 / 2) + (size0 / 2) * (size0 / 2) && dy <= ((size1 / 2) + (size0 / 2)));
 					if (dsqr > (size1 / 2 + size0 / 2) * (size1 / 2 + size0 / 2)) { hasCollision = false; }
 					else if (dy >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
 					else if (dy < (size1 / 2)) { hasCollision = true; }
 					else {
 						dsqr = dx * dx + dy * dy + dz * dz;
 						hasCollision = dsqr <= (SQRT_2 * size0 / 2 + SQRT_2 * size1 / 2) * (SQRT_2 * size0 + SQRT_2 * size1 / 2);
-						//std::cout << " makaronia ktyphsa" << std::endl;
 					}
 				}
 			}
@@ -395,7 +385,7 @@ void DynamicShapeArray::CheckCollision(int index) {
 						float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
 							((dy - size1 / 2) * (dy - size1 / 2)) +
 							((dz - size1 / 2) * (dz - size1 / 2));
-						hasCollision = true;//(cornerDistance_sq < (size0* size0 / 2));
+						hasCollision = true;
 					}
 
 				}
@@ -404,16 +394,14 @@ void DynamicShapeArray::CheckCollision(int index) {
 				}
 				else if (shapeArray[j].shapeType == T_SPHERE) {
 					dsqr = dx * dx + dz * dz;
-					//hasCollision = (dsqr <= (((size0 / 2) + (size1 / 2)) * ((size1/2) + (size0/2))) && dy <= (size1 / 2));
+
 					if (dx > (size1 / 2 + size0)) { hasCollision = false; }
 					else if (dy > (size1 / 2 + size0)) { hasCollision = false; }
 					else if (dz > (size1 / 2 + size0)) { hasCollision = false; }
 					else if ((dsqr <= (((size0)+(size1 / 2)) * ((size1 / 2) + (size0))) && dy <= (size1 / 2))) { hasCollision = true; }
 					else {
 						dsqr = dx * dx + dy * dy + dz * dz;
-						//std::cout << " skata me gala:" << dsqr <<" kai: "<< (size0 / 2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2) << std::endl;
 						hasCollision = (dsqr <= (size0 / 2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2));
-
 					}
 				}
 				else if (shapeArray[j].shapeType == T_RING) {
@@ -421,14 +409,7 @@ void DynamicShapeArray::CheckCollision(int index) {
 				}
 			}
 
-
-
-
-
 			if (hasCollision) {
-				if (shapeArray[s].shapeType == T_RING) {
-					std::cout << "			ponaw ::" << std::endl;
-				}
 				Collide(s, j);
 				Collide(j, s);
 #ifdef _WIN32
@@ -638,11 +619,12 @@ void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, 
 	free(circle2);
 
 	if (firstCylinder) {
+
 		cylinder_normals[0] = cylinder_normals[2] = cylinder_normals[108] = cylinder_normals[110] = 0;
 		cylinder_normals[1] = -34 * cos((2 * PI) / 34);
 		cylinder_normals[109] = 34 * cos((2 * PI) / 34);
+
 		for (int i = 1, n = 1; i < 36; i++) {
-			//std::cout << "normal: " << N.x << " , " << N.y << " , " << N.z << std::endl;
 			cylinder_normals[3 * i] = cos(2 * PI * n / 34) + cos(2 * PI * (n + 1) / 34) + cos(PI * (2 * n + 1) / 34);
 			cylinder_normals[3 * i + 1] = -2 * sin((2 * PI) / 34);
 			cylinder_normals[3 * i + 2] = sin(2 * PI * n / 34) + sin(2 * PI * (n + 1) / 34) + sin(PI * (2 * n + 1) / 34);
@@ -655,7 +637,6 @@ void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, 
 	}
 
 	AddShape(cylinder_pos, 216, T_CYLINDER, x, y + height / 2, z, 2 * radius);
-
 }
 
 //Ring
@@ -664,68 +645,114 @@ void DynamicShapeArray::CreateRing(float x,float y, float z, float r1, float r2)
 	float* circle2 = CreateCircle(x, y, z, abs(r1 - 2*r2));
 	float* circle3 = CreateCircle(x, y-r2, z, abs(r1 - r2));
 	float* circle4 = CreateCircle(x, y, z, r1);
+
+	float* circle1b = CreateCircle(x, y + /*SQRT_2 */ r2 / 2, z, abs(r1 - 3 *r2 / 2));
+	float* circle2b = CreateCircle(x, y - /*SQRT_2 */ r2 / 2, z, abs(r1 - 3*r2 / 2));
+
+	float* circle3b = CreateCircle(x, y - SQRT_2 * r2 / 2, z, abs(r1 - r2 / 2));
+	float* circle4b = CreateCircle(x, y + SQRT_2 * r2 / 2, z, abs(r1 - r2 / 2));
+
 	int vertex_num = (CIRCLE_VERTEX_NUM -1);
 	int vertex_size = (CIRCLE_VERTEX_NUM - 1) * 3;
-	float ringVertices[(CIRCLE_VERTEX_NUM - 1)*4 * 3];
+	float ringVertices[(CIRCLE_VERTEX_NUM - 1)*8 * 3];
 
 	for (int i = 3,n=0; n < vertex_size; i+=3) {
 		ringVertices[n] = circle1[i];
 		ringVertices[n+1] = circle1[i+1];
 		ringVertices[n+2] = circle1[i+2];
+
+		ringVertices[n + vertex_size] = circle1b[i];
+		ringVertices[n + vertex_size + 1] = circle1b[i + 1];
+		ringVertices[n + vertex_size + 2] = circle1b[i + 2];
 		
-		ringVertices[n + vertex_size] = circle2[i];
-		ringVertices[n + vertex_size + 1] = circle2[i + 1];
-		ringVertices[n + vertex_size + 2] = circle2[i + 2];
+		ringVertices[n + 2 * vertex_size] = circle2[i];
+		ringVertices[n + 2 * vertex_size + 1] = circle2[i + 1];
+		ringVertices[n + 2 * vertex_size + 2] = circle2[i + 2];
+
+		ringVertices[n + 3 * vertex_size] = circle2b[i];
+		ringVertices[n + 3 * vertex_size + 1] = circle2b[i + 1];
+		ringVertices[n + 3 * vertex_size + 2] = circle2b[i + 2];
 		
-		ringVertices[n+ 2*vertex_size] = circle3[i];
-		ringVertices[n + 2 * vertex_size + 1] = circle3[i + 1];
-		ringVertices[n + 2 * vertex_size + 2] = circle3[i + 2];
+		ringVertices[n + 4 * vertex_size] = circle3[i];
+		ringVertices[n + 4 * vertex_size + 1] = circle3[i + 1];
+		ringVertices[n + 4 * vertex_size + 2] = circle3[i + 2];
 		
-		ringVertices[n+ 3*vertex_size] = circle4[i];
-		ringVertices[n + 3 * vertex_size + 1] = circle4[i + 1];
-		ringVertices[n + 3 * vertex_size + 2] = circle4[i + 2];
+		ringVertices[n + 5 * vertex_size] = circle3b[i];
+		ringVertices[n + 5 * vertex_size + 1] = circle3b[i + 1];
+		ringVertices[n + 5 * vertex_size + 2] = circle3b[i + 2];
+
+		ringVertices[n + 6 * vertex_size] = circle4[i];
+		ringVertices[n + 6 * vertex_size + 1] = circle4[i + 1];
+		ringVertices[n + 6 * vertex_size + 2] = circle4[i + 2];
+
+		ringVertices[n + 7 * vertex_size] = circle4b[i];
+		ringVertices[n + 7 * vertex_size + 1] = circle4b[i + 1];
+		ringVertices[n + 7 * vertex_size + 2] = circle4b[i + 2];
 
 		if (firstRing) {
 			ring_normals[n] = ring_normals[n + 2] = 0.0f;
 			ring_normals[n + 1] = 1.0f;
+
 			ring_normals[n + vertex_size] = -cos(2 * PI * i / (34 * 3));
-			ring_normals[n + vertex_size + 1] = 0.0f;
+			ring_normals[n + vertex_size + 1] = SQRT_2/2;
 			ring_normals[n + vertex_size + 2] = -sin(2 * PI * i / (34 * 3));
 
-			ring_normals[n + 2 * vertex_size] = 0.0f;
-			ring_normals[n + 2 * vertex_size + 1] = -1.0f;
-			ring_normals[n + 2 * vertex_size + 2] = 0.0f;
+			ring_normals[n + 2 * vertex_size] = -cos(2 * PI * i / (34 * 3));
+			ring_normals[n + 2 * vertex_size + 1] = 0.0f;
+			ring_normals[n + 2 * vertex_size + 2] = -sin(2 * PI * i / (34 * 3));
 
-			ring_normals[n + 3 * vertex_size] = cos(2 * PI * i / (34 * 3));
-			ring_normals[n + 3 * vertex_size + 1] = 0.0f;
-			ring_normals[n + 3 * vertex_size + 2] = sin(2 * PI * i / (34 * 3));
+			ring_normals[n + 3 * vertex_size] = -cos(2 * PI * i / (34 * 3));
+			ring_normals[n + 3 * vertex_size + 1] = -SQRT_2 / 2;
+			ring_normals[n + 3 * vertex_size + 2] = -sin(2 * PI * i / (34 * 3));
+
+			ring_normals[n + 4 * vertex_size] = 0.0f;
+			ring_normals[n + 4 * vertex_size + 1] = -1.0f;
+			ring_normals[n + 4 * vertex_size + 2] = 0.0f;
+
+			ring_normals[n + 5 * vertex_size] = cos(2 * PI * i / (34 * 3));
+			ring_normals[n + 5 * vertex_size + 1] = -SQRT_2 / 2;
+			ring_normals[n + 5 * vertex_size + 2] = sin(2 * PI * i / (34 * 3));
+
+			ring_normals[n + 6 * vertex_size] = cos(2 * PI * i / (34 * 3));
+			ring_normals[n + 6 * vertex_size + 1] = 0.0f;
+			ring_normals[n + 6 * vertex_size + 2] = sin(2 * PI * i / (34 * 3));
+
+			ring_normals[n + 7 * vertex_size] = cos(2 * PI * i / (34 * 3));
+			ring_normals[n + 7 * vertex_size + 1] = SQRT_2 / 2;
+			ring_normals[n + 7 * vertex_size + 2] = sin(2 * PI * i / (34 * 3));
 		}
 		n +=3;
 	}
 	/*
-		1/\6
-		2||5
-		3\/4
+		1/\8
+		2||7
+		3||6
+		4\/5
 	*/
 	if (firstRing) {
-		for (int sector = 0, pos = 0; sector < 4; sector++) {
+		int sector_num = 8;
+		for (int sector = 0, pos = 0; sector < sector_num; sector++) {
 			for (int i = 0; i < CIRCLE_TRIANGLE_NUM; i++) {
-				ring_indices[pos++] = i + (sector % 4) * vertex_num;
-				ring_indices[pos++] = i + ((sector + 1) % 4) * vertex_num;
-				ring_indices[pos++] = i + 1 + (sector % 4) * vertex_num;
-				ring_indices[pos++] = i + ((sector + 1) % 4) * vertex_num;
-				ring_indices[pos++] = i + 1 + ((sector + 1) % 4) * vertex_num;
-				ring_indices[pos++] = i + 1 + (sector % 4) * vertex_num;
+				ring_indices[pos++] = i + (sector % sector_num) * vertex_num;
+				ring_indices[pos++] = i + ((sector + 1) % sector_num) * vertex_num;
+				ring_indices[pos++] = i + 1 + (sector % sector_num) * vertex_num;
+				ring_indices[pos++] = i + ((sector + 1) % sector_num) * vertex_num;
+				ring_indices[pos++] = i + 1 + ((sector + 1) % sector_num) * vertex_num;
+				ring_indices[pos++] = i + 1 + (sector % sector_num) * vertex_num;
 			}
 		}
 	}
 	firstRing = false;
-	AddShape(ringVertices, 4*vertex_size, T_RING, x, y, z, r1);
+	AddShape(ringVertices, 8*vertex_size, T_RING, x, y, z, r1);
 	shapeArray[size-1].d2 = r2;
 	free(circle1);
 	free(circle2);
 	free(circle3);
 	free(circle4);
+	free(circle1b);
+	free(circle2b);
+	free(circle3b);
+	free(circle4b);
 }
 
 //Circle helps with Cylinder and Ring
@@ -775,12 +802,12 @@ void DynamicShapeArray::createBuffer(int index) {
 		normal_pointer_size = 216;
 	}
 	else if (shapeArray[index].shapeType == T_RING) {
-		normal_pointer_size = 4*(CIRCLE_VERTEX_NUM-1) * 3;
+		normal_pointer_size = 8 * (CIRCLE_VERTEX_NUM-1) * 3;
 	}
 	unsigned int * index_array = GetIndexPointer(index);
 
-	unsigned int vao;
 	//create and bind the vao
+	unsigned int vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	
@@ -894,7 +921,6 @@ float* DynamicShapeArray::GetNormals(int shapeType) {
 	case T_CYLINDER:
 		return cylinder_normals;
 	case T_RING:
-		//return cube_normals;
 		return ring_normals;
 	}
 	return nullptr;
