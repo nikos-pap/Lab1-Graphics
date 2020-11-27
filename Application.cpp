@@ -7,7 +7,6 @@
 #endif
 #define STB_IMAGE_IMPLEMENTATION   
 #include "stb_image.h"
-//#pragma comment(lib, "Winmm.lib")
 
 DynamicShapeArray shapeArray;
 //camera 
