@@ -3,9 +3,7 @@ Add GLEW include folder and GLFW include folders
 Add the whole glm folder 
 
 Dependencies\Libraries
-Add glew32s.lib and glfw3.lib
-
 C	preprocessor -> GLEW_STATIC
 C	general -> $(SolutionDir)Dependencies\Code
 Linker	general -> $(SolutionDir)Dependencies\Libraries
-Linker	input -> glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib
+Linker	input -> glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib;Winmm.lib
