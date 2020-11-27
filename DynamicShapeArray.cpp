@@ -88,7 +88,7 @@ DynamicShapeArray::~DynamicShapeArray() {
 -generates random shapes and adds them to the ShapeArray
 */
 void DynamicShapeArray::CreateRandomShape() {
-	int shapeType = RandomInt(3, 3);
+	int shapeType = RandomInt(0, 3);
 	int shape_size = RandomInt(1, 10);
 	float r, g, b, vx , vy , vz;
 	r = RandomFloat(0.0f, 1.0f);
