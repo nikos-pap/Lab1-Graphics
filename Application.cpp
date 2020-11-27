@@ -7,7 +7,7 @@
 #endif
 #define STB_IMAGE_IMPLEMENTATION   
 #include "stb_image.h"
-#pragma comment(lib, "Winmm.lib")
+//#pragma comment(lib, "Winmm.lib")
 
 DynamicShapeArray shapeArray;
 //camera 
@@ -15,30 +15,32 @@ glm::vec3 cameraPos(-200.0f, 200.0f, 200.0f);
 glm::vec3 cameraFront(2.0f, -1.2f, -1.2f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 glm::mat4 View = glm::lookAt(
-	cameraPos, // Camera is at (100,150,100), in World Space
-	(cameraPos + cameraFront), // and looks at the origin
-	cameraUp  // Head is up (set to 0,-1,0 to look upside-down)
+	cameraPos, // camera position
+	(cameraPos + cameraFront), // pos that camera looks at
+	cameraUp  // up direction
 );
 
 //speeds
 float cameraSpeed = 20.0f / GLOBAL_SPEED;
 float yawSpeed = 1.0f / GLOBAL_SPEED;
-bool spaceChecker = true;
+
+//flags
 bool joystick_space = false;
-bool tex = true;
+bool joystick_tex = false;
+bool joystick_mute = false;
+
+bool spaceChecker = true;
 bool texChecker = true;
+bool muteChecker = true;
+
+bool tex = true;
 
 
+//loads texture from file
 unsigned int loadTexture()
 {
 	unsigned int texture;
 	glGenTextures(1, &texture);
-	//glBindTexture(GL_TEXTURE_2D, texture);
-	// set the texture wrapping/filtering options (on the currently bound texture object)
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	//generating cube map
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
@@ -49,9 +51,6 @@ unsigned int loadTexture()
 	unsigned char* data = stbi_load("texture.jpg", &width, &height, &nrChannels, STBI_rgb_alpha);
 	if (data)
 	{
-		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		//glGenerateMipmap(GL_TEXTURE_2D);
-		//std::cout << "ax koula1" << std::endl;
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -59,9 +58,7 @@ unsigned int loadTexture()
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		//std::cout << "ax koula11" << std::endl;
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-		//std::cout << "ax koula111" << std::endl;
 	}
 	else
 	{
@@ -83,25 +80,13 @@ unsigned int loadTexture()
 }
 
 
-
-
-
+//process inputs
 int processCameraMovement(GLFWwindow* window) {
 	int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
 	if (1 == present)
 	{
 		int axesCount;
 		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
-		//std::cout << count << std::endl;
-
-		/*
-		std::cout << "Left Stick X Axis: " << axes[0] << std::endl; // tested with PS4 controller connected via micro USB cable
-		std::cout << "Left Stick Y Axis: " << axes[1] << std::endl; // tested with PS4 controller connected via micro USB cable
-		std::cout << "Right Stick X Axis: " << axes[2] << std::endl; // tested with PS4 controller connected via micro USB cable
-		std::cout << "Right Stick Y Axis: " << axes[3] << std::endl; // tested with PS4 controller connected via micro USB cable
-		std::cout << "Left Trigger/L2: " << axes[4] << std::endl; // tested with PS4 controller connected via micro USB cable
-		std::cout << "Right Trigger/R2: " << axes[5] << std::endl; // tested with PS4 controller connected via micro USB cable
-		/**/
 
 		int buttonCount;
 		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
@@ -122,32 +107,55 @@ int processCameraMovement(GLFWwindow* window) {
 		}
 
 		const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
-		//std::cout << name << std::endl;
-		if (abs(axes[5]) >= 0.2)//RY//LY//R2
-			cameraPos -= (axes[5]) * cameraFront;
-		if (abs(axes[1]) >= 0.2)//R2//LY
-			cameraPos += (axes[1] + 1) * cameraUp;
-		if (abs(axes[4]) >= 0.2)//L2
-			cameraPos -= (axes[4] + 1) * cameraUp;
+
+		if (axes[5] >= -1.0)//R2
+			cameraPos += (axes[5] + 1) * cameraFront;
+		if (abs(axes[1]) >= 0.2)//LY
+			cameraPos -= (axes[1]) * cameraUp;
+		if (axes[4] >= -1.0)//L2
+			cameraPos -= (axes[4] + 1) * cameraFront;
 		if (abs(axes[0]) >= 0.2)//RX
 			cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[0]);
-		if (abs(axes[3]) >= 0.2)//LY//RY//L2
-			cameraFront -= (axes[3]/30) * cameraUp;
-		if (abs(axes[2]) >= 0.2)//LX//RX
+		if (abs(axes[3]) >= 0.2)//RY
+			cameraFront -= (axes[3] / 30) * cameraUp;
+		if (abs(axes[2]) >= 0.2)//RX
 			cameraFront += glm::normalize(glm::cross(cameraFront, cameraUp)) * (axes[2] / 30);
-		if (buttons[11] == GLFW_PRESS)
+		if (buttons[11] == GLFW_PRESS)//right arrow
 			shapeArray.MoveSphere(1, glm::vec3(1.0f, 0.0f, 0.0f));
-		if (buttons[13] == GLFW_PRESS)
+		if (buttons[13] == GLFW_PRESS)//left arrow
 			shapeArray.MoveSphere(1, glm::vec3(-1.0f, 0.0f, 0.0f));
-		if (buttons[10] == GLFW_PRESS)
+		if (buttons[10] == GLFW_PRESS)//up arrow
 			shapeArray.MoveSphere(1, glm::vec3(0.0f, 1.0f, 0.0f));
-		if (buttons[12] == GLFW_PRESS)
+		if (buttons[12] == GLFW_PRESS)//down arrow
 			shapeArray.MoveSphere(1, glm::vec3(0.0f, -1.0f, 0.0f));
-		if (buttons[4] == GLFW_PRESS)
+		if (buttons[4] == GLFW_PRESS)//L1 arrow
 			shapeArray.MoveSphere(1, glm::vec3(0.0f, 0.0f, 1.0f));
-		if (buttons[5] == GLFW_PRESS)
+		if (buttons[5] == GLFW_PRESS)//R1 arrow
 			shapeArray.MoveSphere(1, glm::vec3(0.0f, 0.0f, -1.0f));
+		if (buttons[6] == GLFW_PRESS)//Select
+			shapeArray.SpeedUP(false);
+		if (buttons[7] == GLFW_PRESS)//Start
+			shapeArray.SpeedUP(true);
+		if (buttons[2] == GLFW_PRESS && texChecker) {//X
+			texChecker = false;
+			joystick_tex = true;
+			tex = !tex;
+		}
+		else if (buttons[2] == GLFW_RELEASE) {
+			joystick_tex = false;
+			texChecker = true;
+		}
 
+		//stop bounce sound
+		if (buttons[3] == GLFW_PRESS && muteChecker) {
+			muteChecker = false;
+			soundsEnabled = !soundsEnabled;
+			joystick_mute = true;
+		}
+		else if (buttons[3] == GLFW_RELEASE && joystick_mute) {
+			muteChecker = true;
+			joystick_mute = false;
+		}
 	}
 
 
@@ -158,14 +166,15 @@ int processCameraMovement(GLFWwindow* window) {
 	else if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) && !joystick_space) {
 		spaceChecker = true;
 	}
-	if ((glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) && texChecker) {
+	if ((glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) && texChecker && !joystick_tex) {
 		texChecker = false;
 		tex = !tex;		
 	}
-	else if ((glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE)) {
+	else if ((glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE) && !joystick_tex) {
 		texChecker = true;
 	}
 
+	//move camera
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		cameraPos += cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -178,6 +187,8 @@ int processCameraMovement(GLFWwindow* window) {
 		cameraPos += cameraUp * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 		cameraPos -= cameraUp * cameraSpeed;
+
+	//camera controls
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
 		cameraFront += yawSpeed * cameraUp;
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
@@ -201,11 +212,24 @@ int processCameraMovement(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_KP_ADD) == GLFW_PRESS)
 		shapeArray.MoveSphere(1, glm::vec3(0.0f, 0.0f, 1.0f));
 
-	View = glm::lookAt(
-		cameraPos, // Camera is at (100,150,100), in World Space
-		(cameraPos + cameraFront), // and looks at the origin
-		cameraUp  // Head is up (set to 0,-1,0 to look upside-down)
-	);
+	//speed UP/DOWN
+	if ((glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)) {
+		shapeArray.SpeedUP(true);
+	}
+	if ((glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)) {
+		shapeArray.SpeedUP(false);
+	}
+
+	//stop bounce sound
+	if ((glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) && muteChecker && !joystick_mute) {
+		muteChecker = false;
+		soundsEnabled = !soundsEnabled;
+	}
+	else if ((glfwGetKey(window, GLFW_KEY_M) == GLFW_RELEASE) && !joystick_mute) {
+		muteChecker = true;
+	}
+
+	View = glm::lookAt( cameraPos, (cameraPos + cameraFront), cameraUp );
 
 	return glfwGetKey(window, GLFW_KEY_ESCAPE);
 }
@@ -241,7 +265,7 @@ int main(void) {
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 	std::cout << glGetString(GL_VERSION) << std::endl;
-	glm::mat4 Projection = glm::perspective(glm::radians(40.0f),1.0f,0.001f,1000.0f); //ortho coords: -200.0f, 200.0f, -200.0f, 150.0f, 250.0f, 0.0f
+	glm::mat4 Projection = glm::perspective(glm::radians(40.0f),1.0f,0.001f,1000.0f);
 
 
 
@@ -249,25 +273,21 @@ int main(void) {
 	glm::mat4 Model = glm::mat4(1.0f);
 
 	//ModelViewProjection Matrix
-	glm::mat4 MVP;// = Projection * View * Model;
+	glm::mat4 MVP;// Projection * View * Model;
 
-	//glfwSwapInterval(1);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
 	glEnable(GL_NORMALIZE);
-	//glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
-	//glEnable(GL_LIGHTING);
-	//glEnable(GL_LIGHT0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//for the textures
 	glDisable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-
+	
+	//Create the first 2 shapes
 	shapeArray.CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);
-	shapeArray.SetRandomColor(0, 0.5f);
+	shapeArray.SetRandomColor(0, 0.5f);//give random color to cube
 	shapeArray.CreateShape(35.0f, 35.0f, 35.0f, 30.0f, T_SPHERE);
 	shapeArray.SetColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -284,6 +304,12 @@ int main(void) {
 #endif
 
 	while (processCameraMovement(window) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
+#ifdef _WIN32
+		if(soundsEnabled)
+			mciSendString("resume mp3 ", NULL, 0, NULL);
+		else
+			mciSendString("pause mp3 ", NULL, 0, NULL);
+#endif
 		shader.Bind();
 		shapeArrSize = shapeArray.GetSize();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -309,9 +335,7 @@ int main(void) {
 			shader.SetUniform3f("u_Light", 150.0f, x, 150.0f);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			shader.SetUniform3f("u_vPos", cameraPos.x, cameraPos.y, cameraPos.z);
-			if (i == 2) {
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			}
+
 			if (i == 1&&tex) {
 
 				shader.SetUniform1i("isTexture",2);
@@ -323,8 +347,6 @@ int main(void) {
 				shader.SetUniform1i("isTexture", 1);
 				glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
 			}
-			
-			//glBindVertexArray(0); //it works without this*/
 		}
 
 		/* Swap front and back buffers */

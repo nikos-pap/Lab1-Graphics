@@ -21,20 +21,10 @@
 #define CIRCLE_TRIANGLE_NUM 34
 
 #define GLOBAL_SPEED 60
-//this is for a new implementation I thought subject to change
-/*
-struct Original {
-	unsigned int* shape_indices;
-	unsigned int* vertex_array;
-	
-	unsigned int vao_id;
-	unsigned int ib_id;
-	unsigned int vb_id;
-	
-	int index_size;
-	int vertex_size;
-};*/
+#define MAX_SPEEDUP 100
 
+
+extern bool soundsEnabled;
 struct Shape {
 	float * data;
 	int size;
@@ -45,18 +35,9 @@ struct Shape {
 	unsigned int vb_id = 0;
 	unsigned int ib_id = 0;
 	glm::mat4 Model;
-	bool* collisions;
 	float center[3];
 	float d;
 	float d2;
-/*public:
-	bool operator>(const Shape other) {
-		return center > other.center;
-	}
-
-	bool operator<(const Shape other) {
-		return center < other.center;
-	}*/
 };
 
 class DynamicShapeArray
@@ -72,7 +53,6 @@ public:
 	//Binds VAO and ib of the shape at the index
 	void BindShape(int index);
 
-	void CheckCollision(int index);
 	//Getters
 	//Returns the color of the shape to pass into the shader
 	float * GetColor(int index);
@@ -80,46 +60,35 @@ public:
 	//Returns the size of the ShapeArray
 	inline int GetSize() { return size; };
 	glm::mat4 GetModel(int index);
-	//Returns the size of the ib to use when drawing
-	int GetIndexPointerSize(int shapeType);
+	int GetIndexPointerSize(int shapeType);//Returns the size of the ib to use when drawing
 
-	//Returns the Normals of the Cube might replace it with a function that works for every shape
-	void GetCubeNormals();//needs a fix for sure we should not always calculate this
+	//movement
+	void SpeedUP(bool up);
 	void Move(int index);
-	float * GetSpeed(int index); //not used fix, delete or use it
-	float * GetShape(int index); //not used in the new implementation consider removing
-	int GetSize(int index); //not used in the new implementation consider removing
-	unsigned int* GetIndexPointer(int shapeType);//not used in the new implementation consider removing
-	unsigned int GetVAOID(int index); //not used in the new implementation consider removing
-	unsigned int GetIBOID(int index); //not used in the new implementation consider removing
+	void MoveSphere(int index, glm::vec3 speed);
 	
 	//Setters
 	void SetColor(int id, float r_value, float g_value, float b_value, float alpha_value = 1.0f);
-	
-	void SetSpeed(int id, float ux, float uy, float uz);//not used fix, delete or use it
-	void SetVAOID(int index, int id); //not used in the new implementation consider removing
-	void SetBufferID(int index, int id);//not used in the new implementation consider removing
-	void SetIBOID(int index, int id); //not used in the new implementation consider removing
-	void MoveSphere(int index, glm::vec3 speed);
-	void CreateRing(float x0, float y0, float z0, float r1, float r2);
+	void SetRandomColor(int index, float alpha_value = 1.0f);
 
 private:
-	float* nextPos(int index);
 	Shape* shapeArray;
 	int size = 0;
 	int capacity;
+	
+	void CheckCollision(int index);
 	void Collide(int index1, int index2);
+	
 	float * GetNormals(int shapeType);
-	//newly private functions check if all OK
-	int RandomInt(int min, int max);
-	float RandomFloat(float min, float max);
-	void AddArray(float* element, int size, int shapeType, float x0, float y0, float z0, float d);
+	
+	//functions that create shapes
 	void CreateCube(float x0, float y0, float z0, float size);
 	void CreateCylinder(float x, float y, float z, float radius, float height);
 	float* CreateCircle(float x, float y, float z, float radius);
 	void CreateSphere(float x0, float y0, float z0, float radius);
+	void CreateRing(float x0, float y0, float z0, float r1, float r2);
+	
 	void createBuffer(int index);
-	//-----------------------------------------
 
 	//functions that initialize index arrays they run when shapeArray is initialized
 	void InitCylinderIndices();
@@ -129,6 +98,11 @@ private:
 	//Extends the Array used when Array size reaches its capacity
 	void Extend();
 
-	int GetShapeType(int index);//not used fix or consider removing
-	void printData(int index);//not used fix or consider removing
+	//assisting function
+	unsigned int* GetIndexPointer(int index);
+	void AddArray(float* element, int size, int shapeType, float x0, float y0, float z0, float d);//helps with shape creation
+	
+	//Random functions
+	int RandomInt(int min, int max);
+	float RandomFloat(float min, float max);
 };
