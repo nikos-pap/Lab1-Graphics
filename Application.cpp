@@ -140,7 +140,7 @@ int processCameraMovement(GLFWwindow* window) {
 			joystick_tex = true;
 			tex = !tex;
 		}
-		else if (buttons[2] == GLFW_RELEASE) {
+		else if (buttons[2] == GLFW_RELEASE && joystick_tex) {
 			joystick_tex = false;
 			texChecker = true;
 		}
