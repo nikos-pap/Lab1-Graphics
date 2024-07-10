@@ -6,6 +6,7 @@
 #include <Windows.h>
 #undef max
 #endif
+#include <iostream>
 
 
 //Normals
@@ -80,9 +81,6 @@ DynamicShapeArray::DynamicShapeArray() {
 */
 //remember to free the rest
 DynamicShapeArray::~DynamicShapeArray() {
-	for (int i = 0; i < size; i++) {
-		free(shapeArray[i].data);
-	}
 	free(shapeArray);
 }
 
@@ -106,7 +104,7 @@ void DynamicShapeArray::CreateRandomShape() {
 		CreateRing(r+5,2*r2+5, r1+5,r1,r2);
 	}
 	else {
-		CreateShape(5.0f, 5.0f, 5.0f, shape_size, shapeType);
+		CreateShape(0.0f, 0.0f, 0.0f, shape_size, shapeType);
 	}
 	std::cout << "Spawned new shape: " << shapeType << std::endl;
 	std::cout << "r: " << r << " g: " << g << " b: " << b << ", size: " << shape_size << std::endl;
@@ -286,141 +284,141 @@ void DynamicShapeArray::CheckCollision(int index) {
 		nextPos1[2] = shapeArray[i].center[2] + shapeArray[i].speed[2];
 		pos = bigPos;
 		pos1 = nextPos1;
-		if (i != index) {
-			if (shapeArray[j].shapeType == T_RING || shapeArray[j].shapeType == T_SPHERE || (shapeArray[s].shapeType == T_CUBE && shapeArray[j].shapeType == T_CYLINDER)) {
-				j = i;
-				s = index;
-				pos1 = bigPos;
-				pos = nextPos1;
+		if (i == index)
+			continue;
+		if (shapeArray[j].shapeType == T_RING || shapeArray[j].shapeType == T_SPHERE || (shapeArray[s].shapeType == T_CUBE && shapeArray[j].shapeType == T_CYLINDER)) {
+			j = i;
+			s = index;
+			pos1 = bigPos;
+			pos = nextPos1;
+		}
+		shapeType = shapeArray[j].shapeType;
+		size0 = shapeArray[s].d;
+		size1 = shapeArray[j].d;
+		dx = abs(pos[0] - pos1[0]);
+		dy = abs(pos[1] - pos1[1]);
+		dz = abs(pos[2] - pos1[2]);
+		if (shapeArray[s].shapeType == T_SPHERE) {
+			if (shapeArray[j].shapeType == T_SPHERE) {
+				dsqr = dx * dx + dy * dy + dz * dz;
+				hasCollision = (dsqr <= (size0 / 2 + size1 / 2) * (size0 / 2 + size1 / 2)) && (dsqr >= size1 * size1 / 4);
 			}
-			shapeType = shapeArray[j].shapeType;
-			size0 = shapeArray[s].d;
-			size1 = shapeArray[j].d;
-			dx = abs(pos[0] - pos1[0]);
-			dy = abs(pos[1] - pos1[1]);
-			dz = abs(pos[2] - pos1[2]);
-			if (shapeArray[s].shapeType == T_SPHERE) {
-				if (shapeArray[j].shapeType == T_SPHERE) {
+			else if (shapeArray[j].shapeType == T_CUBE) {
+
+				if (dx >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+				else if (dy >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+				else if (dz >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+				//be completely in
+				else if ((dx < abs((size1 - size0) / 2)) && (dy < abs((size1 - size0) / 2)) && (dz < abs((size1 - size0) / 2))) { hasCollision = false; }
+
+				else if (dx < (size1 / 2)) { hasCollision = true; }
+				else if (dy < (size1 / 2)) { hasCollision = true; }
+				else if (dz < (size1 / 2)) { hasCollision = true; }
+				else {
+					float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
+						((dy - size1 / 2) * (dy - size1 / 2)) +
+						((dz - size1 / 2) * (dz - size1 / 2));
+					hasCollision = (cornerDistance_sq < (size0 / 2 * size0 / 2));
+				}
+
+			}
+			else if (shapeArray[j].shapeType == T_CYLINDER) {
+				dsqr = dx * dx + dz * dz;
+
+				if (dx > (size1 / 2 + size0 / 2)) { hasCollision = false; }
+				else if (dy > (size1 / 2 + size0 / 2)) { hasCollision = false; }
+				else if (dz > (size1 / 2 + size0 / 2)) { hasCollision = false; }
+				else if ((dsqr <= (((size0 / 2) + (size1 / 2)) * ((size1 / 2) + (size0 / 2))) && dy <= (size1 / 2))) { hasCollision = true; }
+				else {
 					dsqr = dx * dx + dy * dy + dz * dz;
-					hasCollision = (dsqr <= (size0 / 2 + size1 / 2) * (size0 / 2 + size1 / 2)) && (dsqr >= size1 * size1 / 4);
-				}
-				else if (shapeArray[j].shapeType == T_CUBE) {
-
-					if (dx >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
-					else if (dy >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
-					else if (dz >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
-					//be completely in
-					else if ((dx < abs((size1 - size0) / 2)) && (dy < abs((size1 - size0) / 2)) && (dz < abs((size1 - size0) / 2))) { hasCollision = false; }
-
-					else if (dx < (size1 / 2)) { hasCollision = true; }
-					else if (dy < (size1 / 2)) { hasCollision = true; }
-					else if (dz < (size1 / 2)) { hasCollision = true; }
-					else {
-						float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
-							((dy - size1 / 2) * (dy - size1 / 2)) +
-							((dz - size1 / 2) * (dz - size1 / 2));
-						hasCollision = (cornerDistance_sq < (size0 / 2 * size0 / 2));
-					}
-
-				}
-				else if (shapeArray[j].shapeType == T_CYLINDER) {
-					dsqr = dx * dx + dz * dz;
-
-					if (dx > (size1 / 2 + size0 / 2)) { hasCollision = false; }
-					else if (dy > (size1 / 2 + size0 / 2)) { hasCollision = false; }
-					else if (dz > (size1 / 2 + size0 / 2)) { hasCollision = false; }
-					else if ((dsqr <= (((size0 / 2) + (size1 / 2)) * ((size1 / 2) + (size0 / 2))) && dy <= (size1 / 2))) { hasCollision = true; }
-					else {
-						dsqr = dx * dx + dy * dy + dz * dz;
-						hasCollision = (dsqr <= (size0 / 2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2));
-					}
+					hasCollision = (dsqr <= (size0 / 2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2));
 				}
 			}
-			else if (shapeArray[s].shapeType == T_CUBE) {
-				if (shapeArray[j].shapeType == T_CUBE) {
-					hasCollision = dx <= size1 / 2 + size0 / 2 && dy <= size1 / 2 + size0 / 2 && dz <= size1 / 2 + size0 / 2 && (dx >= abs(size1 - size0) / 2 || dy >= abs(size1 - size0) / 2 || dz >= abs(size1 - size0) / 2);
+		}
+		else if (shapeArray[s].shapeType == T_CUBE) {
+			if (shapeArray[j].shapeType == T_CUBE) {
+				hasCollision = dx <= size1 / 2 + size0 / 2 && dy <= size1 / 2 + size0 / 2 && dz <= size1 / 2 + size0 / 2 && (dx >= abs(size1 - size0) / 2 || dy >= abs(size1 - size0) / 2 || dz >= abs(size1 - size0) / 2);
 
+			}
+		}
+		else if (shapeArray[s].shapeType == T_CYLINDER) {
+			if (shapeArray[j].shapeType == T_CUBE) {
+				if (dx >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+				else if (dy >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+				else if (dz >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+				//be completely in 
+				else if ((dx < abs((size1 / 2) - (size0 / 2)) && (dy < abs((size1 / 2) - (size0 / 2))) && (dz < abs((size1 / 2) - (size0 / 2))))) { hasCollision = false; }
+
+				else if (dx < (size1 / 2)) { hasCollision = true; }
+				else if (dy < (size1 / 2)) { hasCollision = true; }
+				else if (dz < (size1 / 2)) { hasCollision = true; }
+				else {
+					float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
+						((dy - size1 / 2) * (dy - size1 / 2)) +
+						((dz - size1 / 2) * (dz - size1 / 2));
+					hasCollision = (cornerDistance_sq < (size0* size0 / 2));
 				}
 			}
-			else if (shapeArray[s].shapeType == T_CYLINDER) {
-				if (shapeArray[j].shapeType == T_CUBE) {
-					if (dx >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
-					else if (dy >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
-					else if (dz >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
-					//be completely in 
-					else if ((dx < abs((size1 / 2) - (size0 / 2)) && (dy < abs((size1 / 2) - (size0 / 2))) && (dz < abs((size1 / 2) - (size0 / 2))))) { hasCollision = false; }
-
-					else if (dx < (size1 / 2)) { hasCollision = true; }
-					else if (dy < (size1 / 2)) { hasCollision = true; }
-					else if (dz < (size1 / 2)) { hasCollision = true; }
-					else {
-						float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
-							((dy - size1 / 2) * (dy - size1 / 2)) +
-							((dz - size1 / 2) * (dz - size1 / 2));
-						hasCollision = (cornerDistance_sq < (size0* size0 / 2));
-					}
-				}
-				else if (shapeArray[j].shapeType == T_CYLINDER) {
-					dsqr = dx * dx + dz * dz;
-					if (dsqr > (size1 / 2 + size0 / 2) * (size1 / 2 + size0 / 2)) { hasCollision = false; }
-					else if (dy >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
-					else if (dy < (size1 / 2)) { hasCollision = true; }
-					else {
-						dsqr = dx * dx + dy * dy + dz * dz;
-						hasCollision = dsqr <= (SQRT_2 * size0 / 2 + SQRT_2 * size1 / 2) * (SQRT_2 * size0 + SQRT_2 * size1 / 2);
-					}
+			else if (shapeArray[j].shapeType == T_CYLINDER) {
+				dsqr = dx * dx + dz * dz;
+				if (dsqr > (size1 / 2 + size0 / 2) * (size1 / 2 + size0 / 2)) { hasCollision = false; }
+				else if (dy >= (size1 / 2 + size0 / 2)) { hasCollision = false; }
+				else if (dy < (size1 / 2)) { hasCollision = true; }
+				else {
+					dsqr = dx * dx + dy * dy + dz * dz;
+					hasCollision = dsqr <= (SQRT_2 * size0 / 2 + SQRT_2 * size1 / 2) * (SQRT_2 * size0 + SQRT_2 * size1 / 2);
 				}
 			}
-			else if (shapeArray[s].shapeType == T_RING) {
-				float size00 = shapeArray[s].d2, radi = size0 - (2 * size00), radB = size0;
+		}
+		else if (shapeArray[s].shapeType == T_RING) {
+			float size00 = shapeArray[s].d2, radi = size0 - (2 * size00), radB = size0;
 
-				if (shapeArray[j].shapeType == T_CUBE) {
-					if (dx >= (size1 / 2 + size0)) { hasCollision = false; }
-					else if (dy >= (size1 / 2 + size0)) { hasCollision = false; }
-					else if (dz >= (size1 / 2 + size0)) { hasCollision = false; }
-					//be completely in 
-					else if ((dx < abs((size1 / 2) - (size0)) && (dy < abs((size1 / 2) - (size0))) && (dz < abs((size1 / 2) - (size0))))) { hasCollision = false; }
+			if (shapeArray[j].shapeType == T_CUBE) {
+				if (dx >= (size1 / 2 + size0)) { hasCollision = false; }
+				else if (dy >= (size1 / 2 + size0)) { hasCollision = false; }
+				else if (dz >= (size1 / 2 + size0)) { hasCollision = false; }
+				//be completely in 
+				else if ((dx < abs((size1 / 2) - (size0)) && (dy < abs((size1 / 2) - (size0))) && (dz < abs((size1 / 2) - (size0))))) { hasCollision = false; }
 
-					else if (dx < (size1 / 2)) { hasCollision = true; }
-					else if (dy < (size1 / 2) + size00) { hasCollision = true; }
-					else if (dz < (size1 / 2)) { hasCollision = true; }
-					else {
-						float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
-							((dy - size1 / 2) * (dy - size1 / 2)) +
-							((dz - size1 / 2) * (dz - size1 / 2));
-						hasCollision = true;
-					}
-
+				else if (dx < (size1 / 2)) { hasCollision = true; }
+				else if (dy < (size1 / 2) + size00) { hasCollision = true; }
+				else if (dz < (size1 / 2)) { hasCollision = true; }
+				else {
+					float cornerDistance_sq = ((dx - size1 / 2) * (dx - size1 / 2)) +
+						((dy - size1 / 2) * (dy - size1 / 2)) +
+						((dz - size1 / 2) * (dz - size1 / 2));
+					hasCollision = true;
 				}
-				else if (shapeArray[j].shapeType == T_CYLINDER) {
-					hasCollision = false;
-				}
-				else if (shapeArray[j].shapeType == T_SPHERE) {
-					dsqr = dx * dx + dz * dz;
 
-					if (dx > (size1 / 2 + size0)) { hasCollision = false; }
-					else if (dy > (size1 / 2 + size0)) { hasCollision = false; }
-					else if (dz > (size1 / 2 + size0)) { hasCollision = false; }
-					else if ((dsqr <= (((size0)+(size1 / 2)) * ((size1 / 2) + (size0))) && dy <= (size1 / 2))) { hasCollision = true; }
-					else {
-						dsqr = dx * dx + dy * dy + dz * dz;
-						hasCollision = (dsqr <= (size0 / 2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2));
-					}
-				}
-				else if (shapeArray[j].shapeType == T_RING) {
-					hasCollision = false;
+			}
+			else if (shapeArray[j].shapeType == T_CYLINDER) {
+				hasCollision = false;
+			}
+			else if (shapeArray[j].shapeType == T_SPHERE) {
+				dsqr = dx * dx + dz * dz;
+
+				if (dx > (size1 / 2 + size0)) { hasCollision = false; }
+				else if (dy > (size1 / 2 + size0)) { hasCollision = false; }
+				else if (dz > (size1 / 2 + size0)) { hasCollision = false; }
+				else if ((dsqr <= (((size0)+(size1 / 2)) * ((size1 / 2) + (size0))) && dy <= (size1 / 2))) { hasCollision = true; }
+				else {
+					dsqr = dx * dx + dy * dy + dz * dz;
+					hasCollision = (dsqr <= (size0 / 2 + SQRT_2 * size1 / 2) * (size0 / 2 + SQRT_2 * size1 / 2));
 				}
 			}
+			else if (shapeArray[j].shapeType == T_RING) {
+				hasCollision = false;
+			}
+		}
 
-			if (hasCollision) {
-				Collide(s, j);
-				Collide(j, s);
+		if (hasCollision) {
+			Collide(s, j);
+			Collide(j, s);
 #ifdef _WIN32
-				if (index > 1 && soundsEnabled) {
-					PlaySound(TEXT("collision.wav"), NULL, SND_FILENAME | SND_ASYNC);
-				}
-#endif
+			if (size0 <= 10 && soundsEnabled) {
+				PlaySound(TEXT("collision.wav"), NULL, SND_FILENAME | SND_ASYNC);
 			}
+#endif
 		}
 	}
 }
@@ -565,12 +563,14 @@ void DynamicShapeArray::CreateSphere(float x0, float y0, float z0, float radius)
 
 	float x, y, z, xy;                              // vertex position
 	float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
-
+	//float s, t;                                    // vertex texCoord
+	std::cout << x0 << ", " << y0 << ", " << z0 << "," << std::endl;
 	float sectorStep = 2 * PI / SPHERE_SECTOR_NUM;
 	float stackStep = PI / SPHERE_STACK_NUM;
 	float sectorAngle, stackAngle;
 	float points[(SPHERE_SECTOR_NUM + 1) * (SPHERE_STACK_NUM + 1) * 3];
 
+	//points = (float*)malloc(size * sizeof(float));
 	for (int i = 0,n=0; i <= SPHERE_STACK_NUM; ++i)
 	{
 		stackAngle = PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
@@ -642,9 +642,9 @@ void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, 
 
 //Ring
 void DynamicShapeArray::CreateRing(float x,float y, float z, float r1, float r2) {
-	float * circle1 = CreateCircle(x, y+r2, z, abs(r1-r2));
+	float * circle1 = CreateCircle(x, y + r2, z, abs(r1-r2));
 	float* circle2 = CreateCircle(x, y, z, abs(r1 - 2*r2));
-	float* circle3 = CreateCircle(x, y-r2, z, abs(r1 - r2));
+	float* circle3 = CreateCircle(x, y - r2, z, abs(r1 - r2));
 	float* circle4 = CreateCircle(x, y, z, r1);
 
 	float* circle1b = CreateCircle(x, y + r2 / 2, z, abs(r1 - 3 *r2 / 2));
@@ -837,6 +837,7 @@ void DynamicShapeArray::createBuffer(int index) {
 	shapeArray[index].vao_id = vao;
 	shapeArray[index].vb_id = buffer_id;
 	shapeArray[index].ib_id = ibo;
+	std::cout << "buffer created id's are:" << vao << ", " << buffer_id << ", " << ibo << std::endl;
 }
 
 //Initialize Index Arrays

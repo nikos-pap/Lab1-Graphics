@@ -1,11 +1,5 @@
 #pragma once
-#include <iostream>
-// Include GLEW needs to be before any other openGL includes
-#include <GL/glew.h>
-// Include GLFW
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtx/string_cast.hpp>
+#include "opengl.h"
 
 #define PI 3.14159265f
 #define SQRT_2 1.41421356237f
