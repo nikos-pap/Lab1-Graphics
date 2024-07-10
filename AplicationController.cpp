@@ -23,7 +23,7 @@ unsigned int ApplicationController::loadTexture()
 	//Define all 6 faces
 	// load and generate the texture
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load("texture.jpg", &width, &height, &nrChannels, STBI_rgb_alpha);
+	unsigned char* data = stbi_load("textures/texture.jpg", &width, &height, &nrChannels, STBI_rgb_alpha);
 	if (data)
 	{
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -68,7 +68,7 @@ int ApplicationController::start() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(1000, 1000, u8"Συγκρουόμενα", NULL, NULL);
+	window = glfwCreateWindow(1000, 1000, u8"???????", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		return -1;
