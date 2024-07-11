@@ -1,13 +1,11 @@
-
-### Debug files
-x64/Debug/*
-Lab1Graphics/x64/Debug/*
-### VS Code files
+### Visual Studio 
 .vs/*
 
+### Debug
+x64/Debug/*
+Lab1Graphics/x64/Debug/*
 
 ### Dependencies
 /Dependencies/*
 Imported Code/Sphere(1).cpp
-x64/Debug/dynamicshapearray.new.obj.enc
-x64/Debug/dynamicshapearray.obj.enc
+
