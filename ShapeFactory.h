@@ -100,13 +100,8 @@ public:
 	Shape CreateShape(float x, float y, float z, int size, int ShapeType, int shapeArraySize);
 
 	// Color handlers
-	void SetRandomColor(Shape shape, float alpha_value = 1.0f);
+	void SetRandomColor(Shape& shape, float alpha_value = 1.0f);
 	float* GetColor(Shape& shape);
 	void SetColor(Shape& shape, float r_value, float g_value, float b_value, float alpha_value);
-
-
-
 	
-
-
 };

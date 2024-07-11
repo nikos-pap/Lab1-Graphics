@@ -484,7 +484,7 @@ void ShapeFactory::SetColor(Shape& shape, float r_value, float g_value, float b_
 	shape.color[3] = alpha_value;
 }
 
-void ShapeFactory::SetRandomColor(Shape shape, float alpha_value) {
+void ShapeFactory::SetRandomColor(Shape& shape, float alpha_value) {
 	shape.color[0] = RandomFloat(0.0f, 1.0f);
 	shape.color[1] = RandomFloat(0.0f, 1.0f);
 	shape.color[2] = RandomFloat(0.0f, 1.0f);
