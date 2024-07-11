@@ -1,34 +1,9 @@
 
-.vs/Lab1Graphics/v16/.suo
-x64/Debug/Application.obj
-.vs/Lab1Graphics/v16/Browse.VC.db
-.vs/Lab1Graphics/v16/ipch/AutoPCH/70c67283db6d9870/APPLICATION.ipch
-.vs/Lab1Graphics/v16/ipch/AutoPCH/8ef8b16ab5ef2535/DYNAMICSHAPEARRAY.ipch
-.vs/Lab1Graphics/v16/ipch/AutoPCH/df3fbfd9169d90d/SHADER.ipch
-x64/Debug/DynamicShapeArray.obj
-x64/Debug/Lab1Graphics.exe
-x64/Debug/Lab1Graphics.exe.recipe
-x64/Debug/Lab1Graphics.ilk
-x64/Debug/Lab1Graphics.log
-x64/Debug/Lab1Graphics.pdb
-x64/Debug/Lab1Graphics.tlog/CL.command.1.tlog
-x64/Debug/Lab1Graphics.tlog/CL.read.1.tlog
-x64/Debug/Lab1Graphics.tlog/CL.write.1.tlog
-x64/Debug/Lab1Graphics.tlog/Lab1Graphics.lastbuildstate
-x64/Debug/Lab1Graphics.tlog/link.command.1.tlog
-x64/Debug/Lab1Graphics.tlog/link.read.1.tlog
-x64/Debug/Lab1Graphics.tlog/link.write.1.tlog
-x64/Debug/Lab1Graphics.vcxproj.FileListAbsolute.txt
-x64/Debug/Shader.obj
-x64/Debug/vc142.idb
-x64/Debug/vc142.pdb
-.vs/Lab1Graphics/v16/ipch/AutoPCH/e9c7c730cecb3891/DYNAMICSHAPEARRAY.ipch
-.vs/Lab1Graphics/v16/ipch/AutoPCH/5a4e3c41d8ef655c/APPLICATION.ipch
-.vs/Lab1Graphics/v16/Browse.VC.db-shm
-.vs/Lab1Graphics/v16/Browse.VC.db-wal
-.vs/Lab1Graphics/v16/Browse.VC.opendb
-.vs/Lab1Graphics/v16/ipch/AutoPCH/c9a8130d7221fd05/SPHEREFUNC.ipch
-*.ipch
+#Visual Studio
+.vs/*
+#Debug
+x64/Debug/*
+Lab1Graphics/x64/Debug/*
+
+# Odd files
 Imported Code/Sphere(1).cpp
-x64/Debug/dynamicshapearray.new.obj.enc
-x64/Debug/dynamicshapearray.obj.enc
