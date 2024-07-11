@@ -22,13 +22,11 @@ x64/Debug/Lab1Graphics.vcxproj.FileListAbsolute.txt
 x64/Debug/Shader.obj
 x64/Debug/vc142.idb
 x64/Debug/vc142.pdb
-.vs/Lab1Graphics/v16/ipch/AutoPCH/e9c7c730cecb3891/DYNAMICSHAPEARRAY.ipch
-.vs/Lab1Graphics/v16/ipch/AutoPCH/5a4e3c41d8ef655c/APPLICATION.ipch
-.vs/Lab1Graphics/v16/Browse.VC.db-shm
-.vs/Lab1Graphics/v16/Browse.VC.db-wal
-.vs/Lab1Graphics/v16/Browse.VC.opendb
-.vs/Lab1Graphics/v16/ipch/AutoPCH/c9a8130d7221fd05/SPHEREFUNC.ipch
+.vs/*
 *.ipch
+
+### Dependencies
+/Dependencies/*
 Imported Code/Sphere(1).cpp
 x64/Debug/dynamicshapearray.new.obj.enc
 x64/Debug/dynamicshapearray.obj.enc

@@ -1,12 +1,10 @@
 #include "DynamicShapeArray.h"
-#include <cstdlib>
-#include <chrono>
-#include <random>
+
 #ifdef _WIN32
-#include <Windows.h>
-#undef max
+	#include <Windows.h>
+    #undef max
 #endif
-#include <iostream>
+
 
 
 //Normals
@@ -68,11 +66,11 @@ bool soundsEnabled = true;
 -initializes the Array with a capacity of 10
 */
 DynamicShapeArray::DynamicShapeArray() {
+	shapeFactory = new ShapeFactory();
 	capacity = 10;
 	shapeArray = (Shape *) malloc(capacity * sizeof(Shape));
 	size = 0;
-	InitSphereIndices();
-	InitCylinderIndices();
+	
 }
 
 /*
@@ -87,6 +85,7 @@ DynamicShapeArray::~DynamicShapeArray() {
 /*
 *Random Shape creator
 -generates random shapes and adds them to the ShapeArray
+- Deprecated. Moved to ShapeFactory.
 */
 void DynamicShapeArray::CreateRandomShape() {
 	int shapeType = RandomInt(0, 3);
@@ -117,6 +116,7 @@ void DynamicShapeArray::CreateRandomShape() {
 /*
 Shape Creator
 -creates new shape to add to the Array
+- Deprecated. Moved to ShapeFactory.
 */
 void DynamicShapeArray::CreateShape(float x, float y, float z, int size, int ShapeType) {
 	switch (ShapeType)
@@ -213,6 +213,7 @@ float* DynamicShapeArray::GetColor(int id) {
 /*
 Index Buffer Pointer Size
 - this is needed to draw the right amount of triangles for each shape
+- Deprecated. Moved to ShapeFactory.
 */
 int DynamicShapeArray::GetIndexPointerSize(int index) {
 	int shapeType = shapeArray[index].shapeType;
@@ -236,6 +237,7 @@ int DynamicShapeArray::GetIndexPointerSize(int index) {
 /*
 *Simple Color Setter
 - just sets rgba color of shape at index
+- Deprecated. Moved to ShapeFactory.
 */
 void DynamicShapeArray::SetColor(int index, float r_value, float g_value, float b_value, float alpha_value) {
 	if (index < size) {
@@ -559,6 +561,7 @@ void DynamicShapeArray::CreateCube(float x0, float y0, float z0, float size) {
 }
 
 //Sphere
+// Deprecated. Moved to ShapeFactory
 void DynamicShapeArray::CreateSphere(float x0, float y0, float z0, float radius) {
 
 	float x, y, z, xy;                              // vertex position
@@ -607,6 +610,7 @@ void DynamicShapeArray::CreateSphere(float x0, float y0, float z0, float radius)
 }
 
 //Cylinder
+// Deprecated. Moved to ShapeFactory
 void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, float height) {
 	float* circle1, * circle2;
 	circle1 = CreateCircle(x, y, z, radius);
@@ -641,6 +645,7 @@ void DynamicShapeArray::CreateCylinder(float x, float y, float z, float radius, 
 }
 
 //Ring
+// Deprecated. Moved to ShapeFactory
 void DynamicShapeArray::CreateRing(float x,float y, float z, float r1, float r2) {
 	float * circle1 = CreateCircle(x, y + r2, z, abs(r1-r2));
 	float* circle2 = CreateCircle(x, y, z, abs(r1 - 2*r2));
@@ -757,6 +762,7 @@ void DynamicShapeArray::CreateRing(float x,float y, float z, float r1, float r2)
 }
 
 //Circle helps with Cylinder and Ring
+// Deprecated. Added to ShapeFactory
 float* DynamicShapeArray::CreateCircle(float x, float y, float z, float radius) {
 	int num_of_sides = CIRCLE_TRIANGLE_NUM;
 	int num_of_vertices = num_of_sides + 2;
@@ -825,7 +831,7 @@ void DynamicShapeArray::createBuffer(int index) {
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(shape_size * sizeof(float)));
 
-	//create a buffer for the indexes
+	//create a buffer for the indices
 	unsigned int ibo;
 	//glGenBuffers creates the random id for that buffer and stores it in the variable
 	glGenBuffers(1, &ibo);
@@ -842,6 +848,7 @@ void DynamicShapeArray::createBuffer(int index) {
 
 //Initialize Index Arrays
 //fills sphere_indices
+// Deprecated. Moved to ShapeFactory.
 void DynamicShapeArray::InitSphereIndices() {
 	unsigned int k1, k2;
 
@@ -871,6 +878,7 @@ void DynamicShapeArray::InitSphereIndices() {
 }
 
 //Cylinder
+// Deprecated. Moved to ShapeFactory.
 void DynamicShapeArray::InitCylinderIndices() {
 	int offset = CIRCLE_TRIANGLE_NUM + 2;
 
@@ -944,6 +952,7 @@ unsigned int* DynamicShapeArray::GetIndexPointer(int index) {
 }
 
 //Adds a shape to shapeArray
+// Deprecated. Moved to ShapeFactory.
 void DynamicShapeArray::AddShape(float * element, int elementSize, int shapeType, float x0, float y0, float z0, float d) {
 	if (capacity == size) {
 		Extend();
@@ -967,11 +976,18 @@ void DynamicShapeArray::AddShape(float * element, int elementSize, int shapeType
 		shapeArray[index].center[2] = z0;
 		shapeArray[index].d = d;
 
-		createBuffer(index);
+		createBuffer(index); //Keep this
 	} else {
 		std::cout << "Error: Could not Add Shape in Array" << std::endl;
 
 	}
+}
+//Adds a shape to shapeArray
+void DynamicShapeArray::AddShape(Shape shape) {
+	if (capacity == size) {
+		Extend();
+	}
+	shapeArray[size++] = shape;
 }
 
 //Random number generators

@@ -1,6 +1,7 @@
 #pragma once
-#include "opengl.h"
-
+#include "ShapeFactory.h"
+/*
+	Deprecated. Added to ShapeFactory.
 #define PI 3.14159265f
 #define SQRT_2 1.41421356237f
 #define T_CUBE 0
@@ -13,13 +14,14 @@
 #define SPHERE_SECTOR_NUM 36
 #define SPHERE_STACK_NUM 18
 #define CIRCLE_TRIANGLE_NUM 34
-
+*/
 #define GLOBAL_SPEED 60
 #define MAX_SPEEDUP 100
 
 
 extern bool soundsEnabled;
-
+/*
+	Deprecated. Added to ShapeFactory.
 struct Shape {
 	float * data;
 	int size;
@@ -33,7 +35,7 @@ struct Shape {
 	float center[3];
 	float d;
 	float d2;
-};
+};*/
 
 class DynamicShapeArray
 {
@@ -65,6 +67,7 @@ public:
 
 private:
 	Shape* shapeArray;
+	ShapeFactory* shapeFactory;
 	int size = 0;
 	int capacity;
 	
@@ -95,6 +98,7 @@ private:
 	float * GetNormals(int shapeType);
 	unsigned int* GetIndexPointer(int index);
 	void AddShape(float* element, int size, int shapeType, float x0, float y0, float z0, float d);//helps with shape creation
+	void AddShape(Shape shape);
 	
 	//Random functions
 	int RandomInt(int min, int max);

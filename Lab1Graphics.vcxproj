@@ -125,7 +125,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Code</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Libraries</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib;Winmm.lib;winmm.lib</AdditionalDependencies>
@@ -157,6 +157,7 @@
     <ClCompile Include="DynamicShapeArray.cpp" />
     <ClCompile Include="InputController.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShapeFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationController.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="InputController.h" />
     <ClInclude Include="opengl.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShapeFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader.shader" />
