@@ -68,14 +68,15 @@ private:
 
 
 	void createBuffer(Shape& shape, int index);
+
+	unsigned int* GetIndexPointer(Shape shape, int index);
+
+
 	void InitSphereIndices();
 	void InitCylinderIndices();
-	void AddCircleIndices(unsigned int* indices, int index, int offset);
-	unsigned int* GetIndexPointer(Shape shape, int index);
-	int GetIndexPointerSize(Shape& shape);
-	void SetColor(Shape& shape, float r_value, float g_value, float b_value, float alpha_value);
+	void AddCircleIndices(unsigned int* indices, int index, int offset = 0);
+
 	Shape CreateShapeObject(float* element, int elementSize, int shapeType, float x0, float y0, float z0, float d, int size);
-	
 	
 	//functions that create shapes
 	float* CreateCircle(float x, float y, float z, float radius);
@@ -85,16 +86,23 @@ private:
 	Shape CreateRing(float x0, float y0, float z0, float r1, float r2, int shapeArraySize);
 	
 
-	float* GetNormals(int shapeType);
 	int RandomInt(int min, int max);
 	float RandomFloat(float min, float max);
 
 public:
 	ShapeFactory();
 
+	int GetIndexPointerSize(int shapeType);
+	float* GetNormals(int shapeType);
+
 	//creates Shapes and adds them to the Array
 	Shape CreateRandomShape(int shapeArraySize);
 	Shape CreateShape(float x, float y, float z, int size, int ShapeType, int shapeArraySize);
+
+	// Color handlers
+	void SetRandomColor(Shape shape, float alpha_value = 1.0f);
+	float* GetColor(Shape& shape);
+	void SetColor(Shape& shape, float r_value, float g_value, float b_value, float alpha_value);
 
 
 

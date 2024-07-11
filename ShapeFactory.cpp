@@ -90,7 +90,7 @@ void ShapeFactory::createBuffer(Shape& shape, int index) {
 	unsigned int buffer_id;
 	float * shapeData = shape.data;
 	int shape_size = shape.size;
-	int index_pointer_size = GetIndexPointerSize(shape);
+	int index_pointer_size = GetIndexPointerSize(shape.shapeType);
 	int normal_pointer_size;
 	float* normals = GetNormals(shape.shapeType);
 	if (shape.shapeType == T_CUBE) {
@@ -466,6 +466,14 @@ Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shap
 }
 
 /*
+Shape Color
+-return shape color to pass to shader
+*/
+float* ShapeFactory::GetColor(Shape& shape) {
+	return shape.color;
+}
+
+/*
 *Simple Color Setter
 - just sets rgba color of shape at index
 */
@@ -474,6 +482,14 @@ void ShapeFactory::SetColor(Shape& shape, float r_value, float g_value, float b_
 	shape.color[1] = g_value;
 	shape.color[2] = b_value;
 	shape.color[3] = alpha_value;
+}
+
+void ShapeFactory::SetRandomColor(Shape shape, float alpha_value) {
+	shape.color[0] = RandomFloat(0.0f, 1.0f);
+	shape.color[1] = RandomFloat(0.0f, 1.0f);
+	shape.color[2] = RandomFloat(0.0f, 1.0f);
+	shape.color[3] = alpha_value;
+
 }
 
 
@@ -497,8 +513,7 @@ float* ShapeFactory::GetNormals(int shapeType) {
 Index Buffer Pointer Size
 - this is needed to draw the right amount of triangles for each shape
 */
-int ShapeFactory::GetIndexPointerSize(Shape& shape) {
-	int shapeType = shape.shapeType;
+int ShapeFactory::GetIndexPointerSize(int shapeType) {
 	switch (shapeType)
 	{
 	case T_CUBE:
