@@ -44,7 +44,7 @@ unsigned int cube_indices[] = {
 		5, 7, 1,//top
 		3, 1, 7,//top
 		4, 0, 6,//bottom
-		2, 6, 0//bottom
+		2, 6, 0 //bottom
 };
 
 unsigned int cylinder_indices[CIRCLE_TRIANGLE_NUM * 3 * 4];
@@ -87,7 +87,8 @@ DynamicShapeArray::~DynamicShapeArray() {
 - Deprecated. Moved to ShapeFactory.
 */
 void DynamicShapeArray::CreateRandomShape() {
-	AddShape(shapeFactory->CreateRandomShape(size));
+	AddShape(shapeFactory->CreateRandomShape());
+
 }
 
 /*
@@ -95,9 +96,33 @@ Shape Creator
 -creates new shape to add to the Array
 - Deprecated. Moved to ShapeFactory.
 */
-void DynamicShapeArray::CreateShape(float x, float y, float z, int size, int ShapeType) {
-	AddShape(shapeFactory->CreateShape(x, y, z, size, ShapeType, this->size));
+void DynamicShapeArray::CreateShape(float x, float y, float z, int elementSize, int ShapeType) {
+	AddShape(shapeFactory->CreateShape(x, y, z, elementSize, ShapeType));
 }
+
+//Assisting functions
+void DynamicShapeArray::Extend()
+{
+	capacity += 10;
+	Shape* temp = (Shape*)realloc(shapeArray, (capacity) * sizeof(Shape));
+	if (temp != nullptr) {
+		for (int i = 0; i < size; i++) {
+			temp[i] = shapeArray[i];
+		}
+		shapeArray = temp;
+	}
+}
+
+
+//Adds a shape to shapeArray
+void DynamicShapeArray::AddShape(Shape shape) {
+	if (capacity == size) {
+		Extend();
+	}
+	shapeArray[size] = shape;
+	size++;
+}
+
 
 void DynamicShapeArray::SetRandomColor(int index, float alpha_value) {
 	shapeFactory->SetRandomColor(shapeArray[index], alpha_value);
@@ -114,8 +139,8 @@ float* DynamicShapeArray::GetColor(int index) {
 	else return nullptr;
 }
 
-int DynamicShapeArray::GetIndexPointerSize(int shapeType) {
-	return shapeFactory->GetIndexPointerSize(shapeType);
+int DynamicShapeArray::GetIndexPointerSize(int index) {
+	return shapeFactory->GetIndexPointerSize(shapeArray[index].shapeType);
 }
 
 float* DynamicShapeArray::GetNormals(int shapeType) {
@@ -128,8 +153,7 @@ Buffer Binder
 - created mainly because it removes 2-3 Getters/Setters
 */
 void DynamicShapeArray::BindShape(int index) {
-	glBindVertexArray(shapeArray[index].vao_id);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shapeArray[index].ib_id);
+	shapeFactory->BindShape(shapeArray[index]);
 }
 
 
@@ -141,7 +165,6 @@ void DynamicShapeArray::BindShape(int index) {
 */
 void DynamicShapeArray::Move(int index) {
 	float* speed = shapeArray[index].speed;
-	float size = shapeArray[index].size;
 	if (speed[0] || speed[1] || speed[2]) {
 		CheckCollision(index);
 		shapeArray[index].Model = glm::translate(glm::mat4(1.0f), glm::vec3(speed[0] * (speedUP * globalSpeed), speed[1] * (speedUP * globalSpeed), speed[2] * (speedUP * globalSpeed))) * shapeArray[index].Model;
@@ -161,6 +184,7 @@ void DynamicShapeArray::MoveSphere(int index, glm::vec3 speed)
 	int next_center[3] = { shapeArray[index].center[0] + speed[0],
 	shapeArray[index].center[1] + speed[1],
 	shapeArray[index].center[2] + speed[2]};
+
 	float upper_limit = 100.0f - shapeArray[index].d / 2;
 	float lower_limit = 0 + shapeArray[index].d / 2;
 	CheckCollision(index);
@@ -470,26 +494,4 @@ void DynamicShapeArray::Collide(int index1, int index2) {
 			shapeArray[index2].speed[2] = Tspeed[2];
 		}
 	}
-}
-
-//Assisting functions
-void DynamicShapeArray::Extend()
-{
-	capacity += 10;
-	Shape * temp = (Shape*) realloc(shapeArray, (capacity) * sizeof(Shape));
-	if (temp != nullptr) {
-		for (int i = 0; i < size; i++) {
-			temp[i] = shapeArray[i];
-		}
-		shapeArray = temp;
-	}
-}
-
-
-//Adds a shape to shapeArray
-void DynamicShapeArray::AddShape(Shape shape) {
-	if (capacity == size) {
-		Extend();
-	}
-	shapeArray[size++] = shape;
 }

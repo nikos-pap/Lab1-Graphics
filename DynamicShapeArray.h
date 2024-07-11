@@ -59,7 +59,7 @@ public:
 	inline int GetSize() { return size; };//Returns the size of the ShapeArray
 	inline glm::mat4 GetModel(int index) { return shapeArray[index].Model; };
 	float * GetColor(int index);//Returns the color of the shape to pass into the shader
-	int GetIndexPointerSize(int shapeType);//Returns the size of the ib to use when drawing
+	int GetIndexPointerSize(int index);//Returns the size of the ib to use when drawing
 
 	//Setters
 	void SetColor(int index, float r_value, float g_value, float b_value, float alpha_value = 1.0f);
@@ -69,7 +69,7 @@ public:
 private:
 	Shape* shapeArray;
 	ShapeFactory* shapeFactory;
-	int size = 0;
+	int size;
 	int capacity;
 	
 	//collision handling

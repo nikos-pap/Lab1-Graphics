@@ -48,15 +48,12 @@ private:
 	The only easy enough to do by hand
 */
 	float cube_normals[24];
-
 	float sphere_normals[2109];
 	float cylinder_normals[216];
 	float ring_normals[8 * (CIRCLE_VERTEX_NUM - 1) * 3];
 
 	//indice arrays
 	unsigned int cube_indices[36];
-
-
 	unsigned int cylinder_indices[CIRCLE_TRIANGLE_NUM * 3 * 4];
 	unsigned int sphere_indices[2 * 3 * (SPHERE_STACK_NUM - 1) * SPHERE_SECTOR_NUM];
 	unsigned int  ring_indices[2 * 8 * CIRCLE_TRIANGLE_NUM * 3];
@@ -67,23 +64,23 @@ private:
 	bool firstSphere = true;
 
 
-	void createBuffer(Shape& shape, int index);
+	void createBuffer(Shape& shape);
 
-	unsigned int* GetIndexPointer(Shape shape, int index);
+	unsigned int* GetIndexPointer(int shapeType);
 
 
 	void InitSphereIndices();
 	void InitCylinderIndices();
 	void AddCircleIndices(unsigned int* indices, int index, int offset = 0);
 
-	Shape CreateShapeObject(float* element, int elementSize, int shapeType, float x0, float y0, float z0, float d, int size);
+	Shape CreateShapeObject(float* element, int elementSize, int shapeType, float x0, float y0, float z0, float d);
 	
 	//functions that create shapes
 	float* CreateCircle(float x, float y, float z, float radius);
-	Shape CreateCube(float x0, float y0, float z0, float size, int shapeArraySize);
-	Shape CreateSphere(float x0, float y0, float z0, float radius, int shapeArraySize);
-	Shape CreateCylinder(float x, float y, float z, float radius, float height, int shapeArraySize);
-	Shape CreateRing(float x0, float y0, float z0, float r1, float r2, int shapeArraySize);
+	Shape CreateCube(float x0, float y0, float z0, float size);
+	Shape CreateSphere(float x0, float y0, float z0, float radius);
+	Shape CreateCylinder(float x, float y, float z, float radius, float height);
+	Shape CreateRing(float x0, float y0, float z0, float r1, float r2);
 	
 
 	int RandomInt(int min, int max);
@@ -95,9 +92,10 @@ public:
 	int GetIndexPointerSize(int shapeType);
 	float* GetNormals(int shapeType);
 
+	void BindShape(Shape shape);
 	//creates Shapes and adds them to the Array
-	Shape CreateRandomShape(int shapeArraySize);
-	Shape CreateShape(float x, float y, float z, int size, int ShapeType, int shapeArraySize);
+	Shape CreateRandomShape();
+	Shape CreateShape(float x, float y, float z, int size, int ShapeType);
 
 	// Color handlers
 	void SetRandomColor(Shape& shape, float alpha_value = 1.0f);

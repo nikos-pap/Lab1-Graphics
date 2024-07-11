@@ -86,9 +86,9 @@ void ShapeFactory::AddCircleIndices(unsigned int* indices, int index, int offset
 
 
 //creates buffers for each shape
-void ShapeFactory::createBuffer(Shape& shape, int index) {
-	unsigned int buffer_id;
-	float * shapeData = shape.data;
+void ShapeFactory::createBuffer(Shape& shape) {
+
+	float * shapeDataPointer = shape.data;
 	int shape_size = shape.size;
 	int index_pointer_size = GetIndexPointerSize(shape.shapeType);
 	int normal_pointer_size;
@@ -105,19 +105,20 @@ void ShapeFactory::createBuffer(Shape& shape, int index) {
 	else if (shape.shapeType == T_RING) {
 		normal_pointer_size = 8 * (CIRCLE_VERTEX_NUM-1) * 3;
 	}
-	unsigned int * index_array = GetIndexPointer(shape, index);
+	unsigned int * index_array = GetIndexPointer(shape.shapeType);
 
 	//create and bind the vao
 	unsigned int vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
-	
+
+	unsigned int buffer_id;
 	//create a buffer to keep out positions
 	glGenBuffers(1, &buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
 	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float) + normal_pointer_size * sizeof(float), 0, GL_STATIC_DRAW);
 	
-	glBufferSubData(GL_ARRAY_BUFFER, 0, shape_size * sizeof(float), shapeData);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, shape_size * sizeof(float), shapeDataPointer);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 	
@@ -140,9 +141,19 @@ void ShapeFactory::createBuffer(Shape& shape, int index) {
 	std::cout << "buffer created id's are:" << vao << ", " << buffer_id << ", " << ibo << std::endl;
 }
 
-Shape ShapeFactory::CreateRandomShape(int shapeArraySize) {
+/*
+Buffer Binder
+- binds shape's vao and ibo
+- created mainly because it removes 2 - 3 Getters / Setters
+*/
+void ShapeFactory::BindShape(Shape shape) {
+	glBindVertexArray(shape.vao_id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape.ib_id);
+}
+
+Shape ShapeFactory::CreateRandomShape() {
 	int shapeType = RandomInt(0, 3);
-	int shape_size = RandomInt(1, 10);
+	int shapeSize = RandomInt(1, 10);
 	float r, g, b, vx, vy, vz;
 	r = RandomFloat(0.0f, 1.0f);
 	g = RandomFloat(0.0f, 1.0f);
@@ -151,10 +162,9 @@ Shape ShapeFactory::CreateRandomShape(int shapeArraySize) {
 	vy = RandomFloat(0.0f, 0.9f);
 	vz = RandomFloat(0.0f, 0.9f);
 
-	Shape newShape = CreateShape(0.0f, 0.0f, 0.0f, shape_size, shapeType, shapeArraySize);
+	Shape newShape = CreateShape(0.0f, 0.0f, 0.0f, shapeSize, shapeType);
 	
 	std::cout << "Spawned new shape: " << shapeType << std::endl;
-	std::cout << "r: " << r << " g: " << g << " b: " << b << ", size: " << shape_size << std::endl;
 	SetColor(newShape, r, g, b, 1.0f);
 	newShape.speed[0] = vx;
 	newShape.speed[1] = vy;
@@ -167,27 +177,27 @@ Shape ShapeFactory::CreateRandomShape(int shapeArraySize) {
 Shape Creator
 -creates new shape to add to the Array
 */
-Shape ShapeFactory::CreateShape(float x, float y, float z, int size, int ShapeType, int shapeArraySize) {
+Shape ShapeFactory::CreateShape(float x, float y, float z, int shapeSize, int ShapeType) {
 	switch (ShapeType)
 	{
 	case T_CUBE:
-		return CreateCube(x, y, z, size, shapeArraySize);
+		return CreateCube(x, y, z, shapeSize);
 	case T_SPHERE:
-		return CreateSphere(x + size / 2.0f, y + size / 2.0f, z + size / 2.0f, size / 2.0f, shapeArraySize);
+		return CreateSphere(x + shapeSize / 2.0f, y + shapeSize / 2.0f, z + shapeSize / 2.0f, shapeSize / 2.0f);
 	case T_CYLINDER:
-		return CreateCylinder(x + size / 2.0f, y, z + size / 2.0f, size / 2.0f, size, shapeArraySize);
+		return CreateCylinder(x + shapeSize / 2.0f, y, z + shapeSize / 2.0f, shapeSize / 2.0f, shapeSize);
 	
     case T_RING:
         float r = RandomFloat(0.0f, 1.0f);
-		float r1 = 0.5* size;
+		float r1 = 0.5* shapeSize;
 		float r2 = r1/(float)RandomInt(3, 10);
-		return CreateRing(r+5,2*r2+5, r1+5,r1,r2, shapeArraySize);
+		return CreateRing(r+5,2*r2+5, r1+5,r1,r2);
     }
-	return CreateCube(x, y, z, size, shapeArraySize);
+	return CreateCube(x, y, z, shapeSize);
 }
 
 //Ring
-Shape ShapeFactory::CreateRing(float x,float y, float z, float r1, float r2, int shapeArraySize) {
+Shape ShapeFactory::CreateRing(float x,float y, float z, float r1, float r2) {
 	float * circle1 = CreateCircle(x, y + r2, z, abs(r1-r2));
 	float* circle2 = CreateCircle(x, y, z, abs(r1 - 2*r2));
 	float* circle3 = CreateCircle(x, y - r2, z, abs(r1 - r2));
@@ -290,7 +300,7 @@ Shape ShapeFactory::CreateRing(float x,float y, float z, float r1, float r2, int
 		}
 	}
 	firstRing = false;
-	Shape tempShape = CreateShapeObject(ringVertices, 8*vertex_size, T_RING, x, y, z, r1, shapeArraySize);
+	Shape tempShape = CreateShapeObject(ringVertices, 8*vertex_size, T_RING, x, y, z, r1);
 	tempShape.d2 = r2;
 	free(circle1);
 	free(circle2);
@@ -337,7 +347,7 @@ float* ShapeFactory::CreateCircle(float x, float y, float z, float radius) {
 
 //Creating Shapes
 //Cube
-Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size, int shapeArraySize) {
+Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size) {
 	float x1 = x0 + size;
 	float y1 = y0 + size;
 	float z1 = z0 + size;
@@ -352,11 +362,11 @@ Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size, int sha
 		x1, y1, z1,//11 front(1)7
 	};
 
-	return CreateShapeObject(positions, 8 * 3, T_CUBE, x0+size/2, y0 + size / 2, z0 + size / 2, size, shapeArraySize);
+	return CreateShapeObject(positions, 8 * 3, T_CUBE, x0+size/2, y0 + size / 2, z0 + size / 2, size);
 }
 
 //Sphere
-Shape ShapeFactory::CreateSphere(float x0, float y0, float z0, float radius, int shapeArraySize) {
+Shape ShapeFactory::CreateSphere(float x0, float y0, float z0, float radius) {
 
 	float x, y, z, xy;                              // vertex position
 	float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
@@ -400,10 +410,10 @@ Shape ShapeFactory::CreateSphere(float x0, float y0, float z0, float radius, int
 		}
 	}
 	firstSphere = false;
-	return CreateShapeObject(points, (SPHERE_SECTOR_NUM + 1) * (SPHERE_STACK_NUM + 1) * 3, T_SPHERE, x0, y0, z0, 2 * radius,shapeArraySize);
+	return CreateShapeObject(points, (SPHERE_SECTOR_NUM + 1) * (SPHERE_STACK_NUM + 1) * 3, T_SPHERE, x0, y0, z0, 2 * radius);
 }
 
-Shape ShapeFactory::CreateCylinder(float x, float y, float z, float radius, float height, int shapeArraySize) {
+Shape ShapeFactory::CreateCylinder(float x, float y, float z, float radius, float height) {
 	float* circle1, * circle2;
 	circle1 = CreateCircle(x, y, z, radius);
 	circle2 = CreateCircle(x, (y + height), z, radius);
@@ -433,11 +443,11 @@ Shape ShapeFactory::CreateCylinder(float x, float y, float z, float radius, floa
 		firstCylinder = false;
 	}
 
-	return CreateShapeObject(cylinder_pos, 216, T_CYLINDER, x, y + height / 2, z, 2 * radius, shapeArraySize);
+	return CreateShapeObject(cylinder_pos, 216, T_CYLINDER, x, y + height / 2, z, 2 * radius);
 }
 
 //Adds a shape to shapeArray
-Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shapeType, float x0, float y0, float z0, float d, int size) {
+Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shapeType, float x0, float y0, float z0, float d) {
 
 	float * tmpData = (float*)malloc(elementSize * sizeof(float));
 	if (tmpData != nullptr) {
@@ -445,7 +455,6 @@ Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shap
 			tmpData[i] = element[i];
 		}
         Shape tempShape;
-        int index = size++;
 		tempShape.data = tmpData;
 		tempShape.size = elementSize;
 		tempShape.shapeType = shapeType;
@@ -457,10 +466,10 @@ Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shap
 		tempShape.center[1] = y0;
 		tempShape.center[2] = z0;
 		tempShape.d = d;
-        createBuffer(tempShape,index);
+        createBuffer(tempShape);
         return tempShape;
 	} else {
-		std::cout << "Error: Could not Add Shape in Array" << std::endl;
+		std::cout << "Error: Could not Create Shape" << std::endl;
 
 	}
 }
@@ -529,8 +538,7 @@ int ShapeFactory::GetIndexPointerSize(int shapeType) {
 }
 
 
-unsigned int* ShapeFactory::GetIndexPointer(Shape shape,int index) {
-	int shapeType = shape.shapeType;
+unsigned int* ShapeFactory::GetIndexPointer(int shapeType) {
 	switch (shapeType)
 	{
 	case T_CUBE:
