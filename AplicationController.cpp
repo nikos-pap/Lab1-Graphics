@@ -1,4 +1,4 @@
-#include "ApplicationController.h"
+﻿#include "ApplicationController.h"
 #include <iostream>
 #define STB_IMAGE_IMPLEMENTATION   
 #include "stb_image.h"
@@ -68,7 +68,7 @@ int ApplicationController::start() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(1000, 1000, u8"???????", NULL, NULL);
+	window = glfwCreateWindow(1000, 1000, u8"Συγκρουόμενα", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		return -1;

@@ -1,9 +1,13 @@
-
-#Visual Studio
+### Visual Studio 
 .vs/*
-#Debug
+
+# Odd files
+Imported Code/Sphere(1).cpp
+
+### Debug
 x64/Debug/*
 Lab1Graphics/x64/Debug/*
 
-# Odd files
+### Dependencies
+/Dependencies/*
 Imported Code/Sphere(1).cpp

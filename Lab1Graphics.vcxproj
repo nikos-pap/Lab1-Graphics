@@ -157,6 +157,7 @@
     <ClCompile Include="DynamicShapeArray.cpp" />
     <ClCompile Include="InputController.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShapeFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationController.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="InputController.h" />
     <ClInclude Include="opengl.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShapeFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader.shader" />
