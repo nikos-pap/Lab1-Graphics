@@ -8,7 +8,7 @@ To run the **3D Object Collision Demo**, follow these steps:
 1. **Clone the Repository**:
 
     ```bash
-    git clone https://github.com/yourusername/object-collision-demo.git
+    git clone https://github.com/nikos-pap/Lab1-Graphics.git
     ```
 
 2. **Open the Solution in Visual Studio**:
