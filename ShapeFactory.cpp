@@ -14,7 +14,22 @@ ShapeFactory::ShapeFactory():cube_indices{
 	3, 1, 7,//top
 	4, 0, 6,//bottom
 	2, 6, 0//bottom
-}, cube_normals{
+} 
+/*,cube_normals{
+	0.f,0.f,-1.f,
+	0.f,0.f,-1.f,
+	0.f,0.f,1.f,
+	0.f,0.f,1.f,
+	-1.f,0.f,0.f,
+	-1.f,0.f,0.f,
+	1.f,0.f,0.f,
+	1.f,0.f,0.f,
+	0.f,1.f,0.f,
+	0.f,1.f,0.f,
+	0.f,-1.f,0.f,
+	0.f,-1.f,0.f,
+}*/
+,cube_normals{
 	-sqrt(2.0f),-sqrt(2.0f),-sqrt(2.0f),
 	-sqrt(2.0f),sqrt(2.0f),-sqrt(2.0f),
 	sqrt(2.0f),-sqrt(2.0f),-sqrt(2.0f),
