@@ -20,17 +20,17 @@
 
 struct Shape {
 	float * data;
-	int size;
-	int shapeType;
+	int size = 0;
+	int shapeType = -1;
 	float speed[3] = { 0.0f ,0.0f ,0.0f };
 	float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	unsigned int vao_id = 0;
 	unsigned int vb_id = 0;
 	unsigned int ib_id = 0;
-	glm::mat4 Model;
+	glm::mat4 Model{ 1.f };
 	float center[3];
-	float d;
-	float d2;
+	float d = 0.f;
+	float d2 = 0.f;
 };
 
 class ShapeFactory {
@@ -47,7 +47,7 @@ private:
 	back: 0123, front: 4567, left: 0145, right: 2367, bottom: 4062, top: 5173
 	The only easy enough to do by hand
 */
-	float cube_normals[24];
+	float cube_normals[72];
 	float sphere_normals[2109];
 	float cylinder_normals[216];
 	float ring_normals[8 * (CIRCLE_VERTEX_NUM - 1) * 3];

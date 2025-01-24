@@ -6,38 +6,45 @@ ShapeFactory::ShapeFactory():cube_indices{
 	7, 5, 6,//front
 	0, 1, 2,//back
 	3, 2, 1,//back
-	0, 4, 1,//left
-	5, 1, 4,//left
-	2, 3, 6,//right
-	3, 7, 6,//right
-	5, 7, 1,//top
-	3, 1, 7,//top
-	4, 0, 6,//bottom
-	2, 6, 0//bottom
+
+	0+8, 4+8, 1+8,//left
+	5+8, 1+8, 4+8,//left
+	2+8, 3+8, 6+8,//right
+	3+8, 7+8, 6+8,//right
+
+	5+16, 7+16, 1+16,//top
+	3+16, 1+16, 7+16,//top
+	4+16, 0+16, 6+16,//bottom
+	2+16, 6+16, 0+16 //bottom
 } 
-/*,cube_normals{
-	0.f,0.f,-1.f,
-	0.f,0.f,-1.f,
-	0.f,0.f,1.f,
-	0.f,0.f,1.f,
-	-1.f,0.f,0.f,
-	-1.f,0.f,0.f,
-	1.f,0.f,0.f,
-	1.f,0.f,0.f,
-	0.f,1.f,0.f,
-	0.f,1.f,0.f,
-	0.f,-1.f,0.f,
-	0.f,-1.f,0.f,
-}*/
 ,cube_normals{
-	-sqrt(2.0f),-sqrt(2.0f),-sqrt(2.0f),
-	-sqrt(2.0f),sqrt(2.0f),-sqrt(2.0f),
-	sqrt(2.0f),-sqrt(2.0f),-sqrt(2.0f),
-	sqrt(2.0f),sqrt(2.0f),-sqrt(2.0f),
-	-sqrt(2.0f),-sqrt(2.0f),sqrt(2.0f),
-	-sqrt(2.0f),sqrt(2.0f),sqrt(2.0f),
-	sqrt(2.0f),-sqrt(2.0f),sqrt(2.0f),
-	sqrt(2.0f),sqrt(2.0f),sqrt(2.0f)
+	0.f,0.f,-1.f,
+	0.f,0.f,-1.f,
+	0.f,0.f,-1.f,
+	0.f,0.f,-1.f,
+	0.f,0.f,1.f,
+	0.f,0.f,1.f,
+	0.f,0.f,1.f,
+	0.f,0.f,1.f,
+
+	-1.f,0.f,0.f,
+	-1.f,0.f,0.f,
+	1.f,0.f,0.f,
+	1.f,0.f,0.f,
+	-1.f,0.f,0.f,
+	-1.f,0.f,0.f,
+	1.f,0.f,0.f,
+	1.f,0.f,0.f,
+
+	0.f,-1.f,0.f,
+	0.f,1.f,0.f,
+	0.f,-1.f,0.f,
+	0.f,1.f,0.f,
+	0.f,-1.f,0.f,
+	0.f,1.f,0.f,
+	0.f,-1.f,0.f,
+	0.f,1.f,0.f,
+
 }
 {
 	InitSphereIndices();
@@ -119,6 +126,8 @@ void ShapeFactory::createBuffer(Shape& shape) {
 	}
 	else if (shape.shapeType == T_RING) {
 		normal_pointer_size = 8 * (CIRCLE_VERTEX_NUM-1) * 3;
+	} else {
+		normal_pointer_size = 0; // Safety first.
 	}
 	unsigned int * index_array = GetIndexPointer(shape.shapeType);
 
@@ -375,9 +384,27 @@ Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size) {
 		x0, y1, z1,//01 front(1)5
 		x1, y0, z1,//10 front(1)6
 		x1, y1, z1,//11 front(1)7
+
+		x0, y0, z0,//00  back(0)0
+		x0, y1, z0,//01 back(0)1
+		x1, y0, z0,//10 back(0)2
+		x1, y1, z0,//11 back(0)3
+		x0, y0, z1,//00 front(1)4
+		x0, y1, z1,//01 front(1)5
+		x1, y0, z1,//10 front(1)6
+		x1, y1, z1,//11 front(1)7
+
+		x0, y0, z0,//00  back(0)0
+		x0, y1, z0,//01 back(0)1
+		x1, y0, z0,//10 back(0)2
+		x1, y1, z0,//11 back(0)3
+		x0, y0, z1,//00 front(1)4
+		x0, y1, z1,//01 front(1)5
+		x1, y0, z1,//10 front(1)6
+		x1, y1, z1,//11 front(1)7
 	};
 
-	return CreateShapeObject(positions, 8 * 3, T_CUBE, x0+size/2, y0 + size / 2, z0 + size / 2, size);
+	return CreateShapeObject(positions, 24 * 3, T_CUBE, x0+size/2, y0 + size / 2, z0 + size / 2, size);
 }
 
 //Sphere
