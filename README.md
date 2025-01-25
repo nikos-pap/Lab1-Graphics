@@ -66,11 +66,9 @@ Once you run the demo, the program will open in the 3D scene. You can move aroun
 **TODO**: 
 
 -ShapeFactory: 
-	-remove 'data' as it's handled by the vao (vertex array object).
+DONE:	-remove 'data' as it's handled by the vao (vertex array object).\/
 
 	-refactor shapeFactory so that only one vao, vbo, ebo/ibo is created per shape. As id is a reference, any other copy of the object will hold this id.
 		shapeFactory must hold each shape's type and corresponding id in an unordered map. Key value is 'int shapeType' from Shape. Pair is "vao_id" from Shape.
-DONE:	+fix cube indices by making them 3 times as bigger. the indices will stay the same, the 2 other times they will be shifted by 8 or 16. \/
-	Correct indices for front/rear are in comment in ShapeFactory.cpp. Correct for Top Bottom and Left Right will have to follow. Some maths required. \/
 	
 

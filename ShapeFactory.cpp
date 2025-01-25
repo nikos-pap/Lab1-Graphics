@@ -108,9 +108,9 @@ void ShapeFactory::AddCircleIndices(unsigned int* indices, int index, int offset
 
 
 //creates buffers for each shape
-void ShapeFactory::createBuffer(Shape& shape) {
+void ShapeFactory::createBuffer(Shape& shape, float *data) {
 
-	float * shapeDataPointer = shape.data;
+	float * shapeDataPointer = data;
 	int shape_size = shape.size;
 	int index_pointer_size = GetIndexPointerSize(shape.shapeType);
 	int normal_pointer_size;
@@ -497,7 +497,6 @@ Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shap
 			tmpData[i] = element[i];
 		}
         Shape tempShape;
-		tempShape.data = tmpData;
 		tempShape.size = elementSize;
 		tempShape.shapeType = shapeType;
 		tempShape.Model = glm::mat4(1.0f);
@@ -508,7 +507,8 @@ Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shap
 		tempShape.center[1] = y0;
 		tempShape.center[2] = z0;
 		tempShape.d = d;
-        createBuffer(tempShape);
+        createBuffer(tempShape,tmpData);
+		free(tmpData);
         return tempShape;
 	} else {
 		std::cout << "Error: Could not Create Shape" << std::endl;

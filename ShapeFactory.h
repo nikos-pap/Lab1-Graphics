@@ -3,6 +3,8 @@
 #include <chrono>
 #include <random>
 #include <iostream>
+#include <map>
+#include <vector>
 
 #define PI 3.14159265f
 #define SQRT_2 1.41421356237f
@@ -17,9 +19,7 @@
 #define SPHERE_STACK_NUM 18
 #define CIRCLE_TRIANGLE_NUM 34
 
-
 struct Shape {
-	float * data;
 	int size = 0;
 	int shapeType = -1;
 	float speed[3] = { 0.0f ,0.0f ,0.0f };
@@ -37,7 +37,10 @@ class ShapeFactory {
 private:
 
 
-
+	std::vector<unsigned int> VAOs;
+	std::vector<unsigned int> VBOs;
+	std::vector<unsigned int> IBOs;
+	std::map<int, int> shapeTypeToIndex;
 	//Normals
 /*
 	Indices for cube triangle points have been numbered in the following way on the 2 faces back and front(+4)
@@ -64,7 +67,7 @@ private:
 	bool firstSphere = true;
 
 
-	void createBuffer(Shape& shape);
+	void createBuffer(Shape& shape, float *data);
 
 	unsigned int* GetIndexPointer(int shapeType);
 
