@@ -29,6 +29,13 @@ ShapeFactory::ShapeFactory():cube_indices{
 	InitCylinderIndices();
 }
 
+void ShapeFactory::InitPrototypes()
+{
+	Prototypes.push_back(CreateCube(0.f, 0.f, 0.f, 1.f));
+	Prototypes.push_back(CreateSphere(0.f, 0.f, 0.f, 1.f));
+	Prototypes.push_back(CreateCylinder(0.f, 0.f, 0.f, 1.f, 1.f));
+	Prototypes.push_back(CreateRing(0.f, 0.f, 0.f, 0.5f, 1.f));
+}
 //Initialize Index Arrays
 //fills sphere_indices
 void ShapeFactory::InitSphereIndices() {
@@ -202,56 +209,71 @@ Shape ShapeFactory::CreateRing(float x,float y, float z, float r1, float r2) {
 	float* circle2 = CreateCircle(x, y, z, abs(r1 - 2*r2));
 	float* circle3 = CreateCircle(x, y - r2, z, abs(r1 - r2));
 	float* circle4 = CreateCircle(x, y, z, r1);
+	if (firstRing) {
+		float* circle1 = CreateCircle(x, y + r2, z, abs(r1 - r2));
+		float* circle2 = CreateCircle(x, y, z, abs(r1 - 2 * r2));
+		float* circle3 = CreateCircle(x, y - r2, z, abs(r1 - r2));
+		float* circle4 = CreateCircle(x, y, z, r1);
 
 	float* circle1b = CreateCircle(x, y + r2 / 2, z, abs(r1 - 3 *r2 / 2));
 	float* circle2b = CreateCircle(x, y - r2 / 2, z, abs(r1 - 3*r2 / 2));
+		float* circle1b = CreateCircle(x, y + r2 / 2, z, abs(r1 - 3 * r2 / 2));
+		float* circle2b = CreateCircle(x, y - r2 / 2, z, abs(r1 - 3 * r2 / 2));
 
 	float* circle3b = CreateCircle(x, y - SQRT_2 * r2 / 2, z, abs(r1 - r2 / 2));
 	float* circle4b = CreateCircle(x, y + SQRT_2 * r2 / 2, z, abs(r1 - r2 / 2));
+		float* circle3b = CreateCircle(x, y - SQRT_2 * r2 / 2, z, abs(r1 - r2 / 2));
+		float* circle4b = CreateCircle(x, y + SQRT_2 * r2 / 2, z, abs(r1 - r2 / 2));
 
 	int vertex_num = (CIRCLE_VERTEX_NUM -1);
 	int vertex_size = (CIRCLE_VERTEX_NUM - 1) * 3;
 	float ringVertices[(CIRCLE_VERTEX_NUM - 1)*8 * 3];
+		int vertex_num = (CIRCLE_VERTEX_NUM - 1);
+		int vertex_size = (CIRCLE_VERTEX_NUM - 1) * 3;
+		float ringVertices[(CIRCLE_VERTEX_NUM - 1) * 8 * 3];
 
 	for (int i = 3,n=0; n < vertex_size; i+=3) {
 		ringVertices[n] = circle1[i];
 		ringVertices[n+1] = circle1[i+1];
 		ringVertices[n+2] = circle1[i+2];
+		for (int i = 3, n = 0; n < vertex_size; i += 3) {
+			ringVertices[n] = circle1[i];
+			ringVertices[n + 1] = circle1[i + 1];
+			ringVertices[n + 2] = circle1[i + 2];
 
-		ringVertices[n + vertex_size] = circle1b[i];
-		ringVertices[n + vertex_size + 1] = circle1b[i + 1];
-		ringVertices[n + vertex_size + 2] = circle1b[i + 2];
-		
-		ringVertices[n + 2 * vertex_size] = circle2[i];
-		ringVertices[n + 2 * vertex_size + 1] = circle2[i + 1];
-		ringVertices[n + 2 * vertex_size + 2] = circle2[i + 2];
+			ringVertices[n + vertex_size] = circle1b[i];
+			ringVertices[n + vertex_size + 1] = circle1b[i + 1];
+			ringVertices[n + vertex_size + 2] = circle1b[i + 2];
 
-		ringVertices[n + 3 * vertex_size] = circle2b[i];
-		ringVertices[n + 3 * vertex_size + 1] = circle2b[i + 1];
-		ringVertices[n + 3 * vertex_size + 2] = circle2b[i + 2];
-		
-		ringVertices[n + 4 * vertex_size] = circle3[i];
-		ringVertices[n + 4 * vertex_size + 1] = circle3[i + 1];
-		ringVertices[n + 4 * vertex_size + 2] = circle3[i + 2];
-		
-		ringVertices[n + 5 * vertex_size] = circle3b[i];
-		ringVertices[n + 5 * vertex_size + 1] = circle3b[i + 1];
-		ringVertices[n + 5 * vertex_size + 2] = circle3b[i + 2];
+			ringVertices[n + 2 * vertex_size] = circle2[i];
+			ringVertices[n + 2 * vertex_size + 1] = circle2[i + 1];
+			ringVertices[n + 2 * vertex_size + 2] = circle2[i + 2];
 
-		ringVertices[n + 6 * vertex_size] = circle4[i];
-		ringVertices[n + 6 * vertex_size + 1] = circle4[i + 1];
-		ringVertices[n + 6 * vertex_size + 2] = circle4[i + 2];
+			ringVertices[n + 3 * vertex_size] = circle2b[i];
+			ringVertices[n + 3 * vertex_size + 1] = circle2b[i + 1];
+			ringVertices[n + 3 * vertex_size + 2] = circle2b[i + 2];
 
-		ringVertices[n + 7 * vertex_size] = circle4b[i];
-		ringVertices[n + 7 * vertex_size + 1] = circle4b[i + 1];
-		ringVertices[n + 7 * vertex_size + 2] = circle4b[i + 2];
+			ringVertices[n + 4 * vertex_size] = circle3[i];
+			ringVertices[n + 4 * vertex_size + 1] = circle3[i + 1];
+			ringVertices[n + 4 * vertex_size + 2] = circle3[i + 2];
 
-		if (firstRing) {
+			ringVertices[n + 5 * vertex_size] = circle3b[i];
+			ringVertices[n + 5 * vertex_size + 1] = circle3b[i + 1];
+			ringVertices[n + 5 * vertex_size + 2] = circle3b[i + 2];
+
+			ringVertices[n + 6 * vertex_size] = circle4[i];
+			ringVertices[n + 6 * vertex_size + 1] = circle4[i + 1];
+			ringVertices[n + 6 * vertex_size + 2] = circle4[i + 2];
+
+			ringVertices[n + 7 * vertex_size] = circle4b[i];
+			ringVertices[n + 7 * vertex_size + 1] = circle4b[i + 1];
+			ringVertices[n + 7 * vertex_size + 2] = circle4b[i + 2];
+
 			ring_normals[n] = ring_normals[n + 2] = 0.0f;
 			ring_normals[n + 1] = 1.0f;
 
 			ring_normals[n + vertex_size] = -cos(2 * PI * i / (34 * 3));
-			ring_normals[n + vertex_size + 1] = SQRT_2/2;
+			ring_normals[n + vertex_size + 1] = SQRT_2 / 2;
 			ring_normals[n + vertex_size + 2] = -sin(2 * PI * i / (34 * 3));
 
 			ring_normals[n + 2 * vertex_size] = -cos(2 * PI * i / (34 * 3));
@@ -277,16 +299,15 @@ Shape ShapeFactory::CreateRing(float x,float y, float z, float r1, float r2) {
 			ring_normals[n + 7 * vertex_size] = cos(2 * PI * i / (34 * 3));
 			ring_normals[n + 7 * vertex_size + 1] = SQRT_2 / 2;
 			ring_normals[n + 7 * vertex_size + 2] = sin(2 * PI * i / (34 * 3));
+			
+			n += 3;
 		}
-		n +=3;
-	}
-	/*
-		1/\8
-		2||7
-		3||6
-		4\/5
-	*/
-	if (firstRing) {
+		/*
+			1/\8
+			2||7
+			3||6
+			4\/5
+		*/
 		int sector_num = 8;
 		for (int sector = 0, pos = 0; sector < sector_num; sector++) {
 			for (int i = 0; i < CIRCLE_TRIANGLE_NUM; i++) {
@@ -298,19 +319,29 @@ Shape ShapeFactory::CreateRing(float x,float y, float z, float r1, float r2) {
 				ring_indices[pos++] = i + 1 + (sector % sector_num) * vertex_num;
 			}
 		}
+		
+		firstRing = false;
+		Shape tempShape = CreateShapeObject(ringVertices, 8 * vertex_size, T_RING, x, y, z, r1);
+		tempShape.d2 = r2;
+		free(circle1);
+		free(circle2);
+		free(circle3);
+		free(circle4);
+		free(circle1b);
+		free(circle2b);
+		free(circle3b);
+		free(circle4b);
+		return tempShape;
 	}
-	firstRing = false;
-	Shape tempShape = CreateShapeObject(ringVertices, 8*vertex_size, T_RING, x, y, z, r1);
-	tempShape.d2 = r2;
-	free(circle1);
-	free(circle2);
-	free(circle3);
-	free(circle4);
-	free(circle1b);
-	free(circle2b);
-	free(circle3b);
-	free(circle4b);
-    return tempShape;
+	glm::mat4 model{ 1.f };
+	model = glm::translate(model, glm::vec3{ x, y, z });
+	model = glm::scale(model, glm::vec3{ r1, r2, r1 });
+	Shape tempShape{ Prototypes.at(T_RING) };
+	tempShape.Model = model;
+	tempShape.center[0] = x;
+	tempShape.center[1] = y;
+	tempShape.center[2] = z;
+	return tempShape;
 }
 
 
@@ -351,6 +382,7 @@ Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size) {
 	float x1 = x0 + size;
 	float y1 = y0 + size;
 	float z1 = z0 + size;
+<<<<<<< Updated upstream
 	float positions[] = {
 		x0, y0, z0,//00  back(0)0
 		x0, y1, z0,//01 back(0)1
@@ -363,6 +395,49 @@ Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size) {
 	};
 
 	return CreateShapeObject(positions, 8 * 3, T_CUBE, x0+size/2, y0 + size / 2, z0 + size / 2, size);
+=======
+	if (firstCube) {
+		float positions[] = {
+			x0, y0, z0,//00  back(0)0
+			x0, y1, z0,//01 back(0)1
+			x1, y0, z0,//10 back(0)2
+			x1, y1, z0,//11 back(0)3
+			x0, y0, z1,//00 front(1)4
+			x0, y1, z1,//01 front(1)5
+			x1, y0, z1,//10 front(1)6
+			x1, y1, z1,//11 front(1)7
+
+			x0, y0, z0,//00  back(0)0
+			x0, y1, z0,//01 back(0)1
+			x1, y0, z0,//10 back(0)2
+			x1, y1, z0,//11 back(0)3
+			x0, y0, z1,//00 front(1)4
+			x0, y1, z1,//01 front(1)5
+			x1, y0, z1,//10 front(1)6
+			x1, y1, z1,//11 front(1)7
+
+			x0, y0, z0,//00  back(0)0
+			x0, y1, z0,//01 back(0)1
+			x1, y0, z0,//10 back(0)2
+			x1, y1, z0,//11 back(0)3
+			x0, y0, z1,//00 front(1)4
+			x0, y1, z1,//01 front(1)5
+			x1, y0, z1,//10 front(1)6
+			x1, y1, z1,//11 front(1)7
+		};
+		firstCube = false;
+		return CreateShapeObject(positions, 24 * 3, T_CUBE, x0 + size / 2, y0 + size / 2, z0 + size / 2, size);
+	}
+	glm::mat4 model{ 1.f };
+	model = glm::translate(model, glm::vec3{ x0, y0, z0 });
+	model = glm::scale(model, glm::vec3{ size, size, size });
+	Shape tempShape{ Prototypes.at(T_CUBE) };
+	tempShape.Model = model;
+	tempShape.center[0] = x0+size;
+	tempShape.center[1] = y0+size;
+	tempShape.center[2] = z0+size;
+	return tempShape;
+>>>>>>> Stashed changes
 }
 
 //Sphere
@@ -371,32 +446,32 @@ Shape ShapeFactory::CreateSphere(float x0, float y0, float z0, float radius) {
 	float x, y, z, xy;                              // vertex position
 	float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
 	//float s, t;                                    // vertex texCoord
-	std::cout << x0 << ", " << y0 << ", " << z0 << "," << std::endl;
-	float sectorStep = 2 * PI / SPHERE_SECTOR_NUM;
-	float stackStep = PI / SPHERE_STACK_NUM;
-	float sectorAngle, stackAngle;
-	float points[(SPHERE_SECTOR_NUM + 1) * (SPHERE_STACK_NUM + 1) * 3];
+	if (firstSphere) {
+		std::cout << x0 << ", " << y0 << ", " << z0 << "," << std::endl;
+		float sectorStep = 2 * PI / SPHERE_SECTOR_NUM;
+		float stackStep = PI / SPHERE_STACK_NUM;
+		float sectorAngle, stackAngle;
+		float points[(SPHERE_SECTOR_NUM + 1) * (SPHERE_STACK_NUM + 1) * 3];
 
-	//points = (float*)malloc(size * sizeof(float));
-	for (int i = 0, n = 0; i <= SPHERE_STACK_NUM; ++i)
-	{
-		stackAngle = PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
-		xy = radius * cosf(stackAngle);             // r * cos(u)
-		z = radius * sinf(stackAngle);              // r * sin(u)
-
-		// add (SPHERE_SECTOR_NUM+1) vertices per stack
-		// the first and last vertices have same position and normal, but different tex coords
-		for (int j = 0; j <= SPHERE_SECTOR_NUM; ++j)
+		//points = (float*)malloc(size * sizeof(float));
+		for (int i = 0, n = 0; i <= SPHERE_STACK_NUM; ++i)
 		{
-			sectorAngle = j * sectorStep;           // starting from 0 to 2pi
+			stackAngle = PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
+			xy = radius * cosf(stackAngle);             // r * cos(u)
+			z = radius * sinf(stackAngle);              // r * sin(u)
 
-			// vertex position (x, y, z)
-			x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
-			y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
-			points[n] = x + x0;
-			points[n + 1] = y + y0;
-			points[n + 2] = z + z0;
-			if (firstSphere) {
+			// add (SPHERE_SECTOR_NUM+1) vertices per stack
+			// the first and last vertices have same position and normal, but different tex coords
+			for (int j = 0; j <= SPHERE_SECTOR_NUM; ++j)
+			{
+				sectorAngle = j * sectorStep;           // starting from 0 to 2pi
+
+				// vertex position (x, y, z)
+				x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
+				y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
+				points[n] = x + x0;
+				points[n + 1] = y + y0;
+				points[n + 2] = z + z0;
 				// calculating normals
 				nx = x * lengthInv;
 				ny = y * lengthInv;
@@ -405,27 +480,36 @@ Shape ShapeFactory::CreateSphere(float x0, float y0, float z0, float radius) {
 				sphere_normals[n] = nx;
 				sphere_normals[n + 1] = ny;
 				sphere_normals[n + 2] = nz;
+				n += 3;
 			}
-			n += 3;
 		}
+		firstSphere = false;
+		return CreateShapeObject(points, (SPHERE_SECTOR_NUM + 1) * (SPHERE_STACK_NUM + 1) * 3, T_SPHERE, x0, y0, z0, 2 * radius);
 	}
-	firstSphere = false;
-	return CreateShapeObject(points, (SPHERE_SECTOR_NUM + 1) * (SPHERE_STACK_NUM + 1) * 3, T_SPHERE, x0, y0, z0, 2 * radius);
+	glm::mat4 model{ 1.f };
+	model = glm::translate(model, glm::vec3{ x0, y0, z0 });
+	model = glm::scale(model, glm::vec3{ radius, radius, radius });
+	Shape tempShape{ Prototypes.at(T_SPHERE) };
+	tempShape.Model = model;
+	tempShape.center[0] = x0;
+	tempShape.center[1] = y0;
+	tempShape.center[2] = z0;
+	return tempShape;
 }
 
 Shape ShapeFactory::CreateCylinder(float x, float y, float z, float radius, float height) {
-	float* circle1, * circle2;
-	circle1 = CreateCircle(x, y, z, radius);
-	circle2 = CreateCircle(x, (y + height), z, radius);
-	float cylinder_pos[216];
-	for (int i = 0; i < 108; i++) {
-		cylinder_pos[i] = circle1[i];
-		cylinder_pos[i + 108] = circle2[i];
-	}
-	free(circle1);
-	free(circle2);
-
 	if (firstCylinder) {
+
+		float* circle1, * circle2;
+		circle1 = CreateCircle(x, y, z, radius);
+		circle2 = CreateCircle(x, (y + height), z, radius);
+		float cylinder_pos[216];
+		for (int i = 0; i < 108; i++) {
+			cylinder_pos[i] = circle1[i];
+			cylinder_pos[i + 108] = circle2[i];
+		}
+		free(circle1);
+		free(circle2);
 
 		cylinder_normals[0] = cylinder_normals[2] = cylinder_normals[108] = cylinder_normals[110] = 0;
 		cylinder_normals[1] = -34 * cos((2 * PI) / 34);
@@ -441,15 +525,27 @@ Shape ShapeFactory::CreateCylinder(float x, float y, float z, float radius, floa
 			n += 1;
 		}
 		firstCylinder = false;
+		return CreateShapeObject(cylinder_pos, 216, T_CYLINDER, x, y + height / 2, z, 2 * radius);
 	}
+	glm::mat4 model{ 1.f };
+	model = glm::translate(model, glm::vec3{ x, y + height / 2.f, z });
+	model = glm::scale(model, glm::vec3{ radius, height, radius });
+	Shape prototype = Prototypes.at(T_CYLINDER);
+	Shape tempShape{ prototype };
+	tempShape.Model = model;
+	tempShape.center[0] = x;
+	tempShape.center[1] = y + height/2.f;
+	tempShape.center[2] = z;
+	tempShape.d = radius;
 
-	return CreateShapeObject(cylinder_pos, 216, T_CYLINDER, x, y + height / 2, z, 2 * radius);
+	return tempShape;
+
 }
 
 //Adds a shape to shapeArray
 Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shapeType, float x0, float y0, float z0, float d) {
 
-	float * tmpData = (float*)malloc(elementSize * sizeof(float));
+	float *tmpData = new float[elementSize];
 	if (tmpData != nullptr) {
 		for (int i = 0; i < elementSize; i++) {
 			tmpData[i] = element[i];
@@ -466,7 +562,12 @@ Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shap
 		tempShape.center[1] = y0;
 		tempShape.center[2] = z0;
 		tempShape.d = d;
+<<<<<<< Updated upstream
         createBuffer(tempShape);
+=======
+        createBuffer(tempShape,tmpData);
+		delete[] tmpData;
+>>>>>>> Stashed changes
         return tempShape;
 	} else {
 		std::cout << "Error: Could not Create Shape" << std::endl;

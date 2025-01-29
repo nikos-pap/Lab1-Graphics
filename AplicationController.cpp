@@ -102,6 +102,7 @@ int ApplicationController::start() {
 	//for the textures
 	glDisable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	shapeArray->InitFactoryPrototypes();
 
 	//Create the first 2 shapes
 	shapeArray->CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);

@@ -99,6 +99,10 @@ Shape Creator
 void DynamicShapeArray::CreateShape(float x, float y, float z, int elementSize, int ShapeType) {
 	AddShape(shapeFactory->CreateShape(x, y, z, elementSize, ShapeType));
 }
+void DynamicShapeArray::InitFactoryPrototypes()
+{
+	shapeFactory->InitPrototypes();
+}
 
 //Assisting functions
 void DynamicShapeArray::Extend()
@@ -167,7 +171,7 @@ void DynamicShapeArray::Move(int index) {
 	float* speed = shapeArray[index].speed;
 	if (speed[0] || speed[1] || speed[2]) {
 		CheckCollision(index);
-		shapeArray[index].Model = glm::translate(glm::mat4(1.0f), glm::vec3(speed[0] * (speedUP * globalSpeed), speed[1] * (speedUP * globalSpeed), speed[2] * (speedUP * globalSpeed))) * shapeArray[index].Model;
+		shapeArray[index].Model = glm::translate(glm::mat4{1.f}, glm::vec3(speed[0] * (speedUP * globalSpeed), speed[1] * (speedUP * globalSpeed), speed[2] * (speedUP * globalSpeed))) * shapeArray[index].Model;
 		shapeArray[index].center[0] += speed[0] * (speedUP * globalSpeed);
 		shapeArray[index].center[1] += speed[1] * (speedUP * globalSpeed);
 		shapeArray[index].center[2] += speed[2] * (speedUP * globalSpeed);

@@ -27,17 +27,42 @@ struct Shape {
 	unsigned int vao_id = 0;
 	unsigned int vb_id = 0;
 	unsigned int ib_id = 0;
+<<<<<<< Updated upstream
 	glm::mat4 Model;
 	float center[3];
 	float d;
 	float d2;
+=======
+	glm::mat4 Model{ 1.f };
+	float center[3] = { 0.f, 0.f, 0.f };
+	float d = 0.f;
+	float d2 = 0.f;
+	/*
+	Shape() = default;
+	Shape(Shape&) = default;
+	Shape(Shape& oldShape)
+	{
+		size = oldShape.size;
+		shapeType = oldShape.size;
+		vao_id = oldShape.vao_id;
+		vb_id = oldShape.vb_id;
+		ib_id = oldShape.ib_id;
+		d = oldShape.d;
+		d2 = oldShape.d2;
+	}*/
+>>>>>>> Stashed changes
 };
 
 class ShapeFactory {
 private:
 
 
+<<<<<<< Updated upstream
 
+=======
+	std::vector<Shape> Prototypes;
+	std::map<int, int> shapeTypeToIndex;
+>>>>>>> Stashed changes
 	//Normals
 /*
 	Indices for cube triangle points have been numbered in the following way on the 2 faces back and front(+4)
@@ -56,9 +81,10 @@ private:
 	unsigned int cube_indices[36];
 	unsigned int cylinder_indices[CIRCLE_TRIANGLE_NUM * 3 * 4];
 	unsigned int sphere_indices[2 * 3 * (SPHERE_STACK_NUM - 1) * SPHERE_SECTOR_NUM];
-	unsigned int  ring_indices[2 * 8 * CIRCLE_TRIANGLE_NUM * 3];
+	unsigned int ring_indices[2 * 8 * CIRCLE_TRIANGLE_NUM * 3];
 
 	//flags
+	bool firstCube = true;
 	bool firstCylinder = true;
 	bool firstRing = true;
 	bool firstSphere = true;
@@ -88,6 +114,7 @@ private:
 
 public:
 	ShapeFactory();
+	void InitPrototypes();
 
 	int GetIndexPointerSize(int shapeType);
 	float* GetNormals(int shapeType);

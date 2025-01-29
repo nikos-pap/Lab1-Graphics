@@ -13,6 +13,7 @@ public:
 	DynamicShapeArray();
 	~DynamicShapeArray();
 
+	void InitFactoryPrototypes();
 	//creates Shapes and adds them to the Array
 	void CreateRandomShape();
 	void CreateShape(float x, float y, float z, int size, int ShapeType);
