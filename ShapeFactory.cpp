@@ -205,37 +205,22 @@ Shape ShapeFactory::CreateShape(float x, float y, float z, int shapeSize, int Sh
 
 //Ring
 Shape ShapeFactory::CreateRing(float x,float y, float z, float r1, float r2) {
-	float * circle1 = CreateCircle(x, y + r2, z, abs(r1-r2));
-	float* circle2 = CreateCircle(x, y, z, abs(r1 - 2*r2));
-	float* circle3 = CreateCircle(x, y - r2, z, abs(r1 - r2));
-	float* circle4 = CreateCircle(x, y, z, r1);
 	if (firstRing) {
 		float* circle1 = CreateCircle(x, y + r2, z, abs(r1 - r2));
 		float* circle2 = CreateCircle(x, y, z, abs(r1 - 2 * r2));
 		float* circle3 = CreateCircle(x, y - r2, z, abs(r1 - r2));
 		float* circle4 = CreateCircle(x, y, z, r1);
 
-	float* circle1b = CreateCircle(x, y + r2 / 2, z, abs(r1 - 3 *r2 / 2));
-	float* circle2b = CreateCircle(x, y - r2 / 2, z, abs(r1 - 3*r2 / 2));
 		float* circle1b = CreateCircle(x, y + r2 / 2, z, abs(r1 - 3 * r2 / 2));
 		float* circle2b = CreateCircle(x, y - r2 / 2, z, abs(r1 - 3 * r2 / 2));
 
-	float* circle3b = CreateCircle(x, y - SQRT_2 * r2 / 2, z, abs(r1 - r2 / 2));
-	float* circle4b = CreateCircle(x, y + SQRT_2 * r2 / 2, z, abs(r1 - r2 / 2));
 		float* circle3b = CreateCircle(x, y - SQRT_2 * r2 / 2, z, abs(r1 - r2 / 2));
 		float* circle4b = CreateCircle(x, y + SQRT_2 * r2 / 2, z, abs(r1 - r2 / 2));
 
-	int vertex_num = (CIRCLE_VERTEX_NUM -1);
-	int vertex_size = (CIRCLE_VERTEX_NUM - 1) * 3;
-	float ringVertices[(CIRCLE_VERTEX_NUM - 1)*8 * 3];
 		int vertex_num = (CIRCLE_VERTEX_NUM - 1);
 		int vertex_size = (CIRCLE_VERTEX_NUM - 1) * 3;
 		float ringVertices[(CIRCLE_VERTEX_NUM - 1) * 8 * 3];
 
-	for (int i = 3,n=0; n < vertex_size; i+=3) {
-		ringVertices[n] = circle1[i];
-		ringVertices[n+1] = circle1[i+1];
-		ringVertices[n+2] = circle1[i+2];
 		for (int i = 3, n = 0; n < vertex_size; i += 3) {
 			ringVertices[n] = circle1[i];
 			ringVertices[n + 1] = circle1[i + 1];
