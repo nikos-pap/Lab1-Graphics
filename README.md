@@ -66,9 +66,8 @@ Once you run the demo, the program will open in the 3D scene. You can move aroun
 **TODO**: 
 
 -ShapeFactory: 
-DONE:	-remove 'data' as it's handled by the vao (vertex array object).\/
 
-	-refactor shapeFactory so that only one vao, vbo, ebo/ibo is created per shape. As id is a reference, any other copy of the object will hold this id.
-		shapeFactory must hold each shape's type and corresponding id in an unordered map. Key value is 'int shapeType' from Shape. Pair is "vao_id" from Shape.
+DONE:	-refactor shapeFactory so that only one vao, vbo, ebo/ibo is created per shape. As id is a reference, any other copy of the object will hold this id.		\/
+		shapeFactory must hold each shape's type and corresponding id in an unordered map. Key value is 'int shapeType' from Shape. Pair is "vao_id" from Shape.\/
 	
 
