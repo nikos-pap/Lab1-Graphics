@@ -16,23 +16,45 @@ ShapeFactory::ShapeFactory():cube_indices{
 	7, 5, 6,//front
 	0, 1, 2,//back
 	3, 2, 1,//back
-	0, 4, 1,//left
-	5, 1, 4,//left
-	2, 3, 6,//right
-	3, 7, 6,//right
-	5, 7, 1,//top
-	3, 1, 7,//top
-	4, 0, 6,//bottom
-	2, 6, 0//bottom
-}, cube_normals{
-	-sqrt(2.0f),-sqrt(2.0f),-sqrt(2.0f),
-	-sqrt(2.0f),sqrt(2.0f),-sqrt(2.0f),
-	sqrt(2.0f),-sqrt(2.0f),-sqrt(2.0f),
-	sqrt(2.0f),sqrt(2.0f),-sqrt(2.0f),
-	-sqrt(2.0f),-sqrt(2.0f),sqrt(2.0f),
-	-sqrt(2.0f),sqrt(2.0f),sqrt(2.0f),
-	sqrt(2.0f),-sqrt(2.0f),sqrt(2.0f),
-	sqrt(2.0f),sqrt(2.0f),sqrt(2.0f)
+
+	0+8, 4+8, 1+8,//left
+	5+8, 1+8, 4+8,//left
+	2+8, 3+8, 6+8,//right
+	3+8, 7+8, 6+8,//right
+
+	5+16, 7+16, 1+16,//top
+	3+16, 1+16, 7+16,//top
+	4+16, 0+16, 6+16,//bottom
+	2+16, 6+16, 0+16 //bottom
+} 
+,cube_normals{
+	0.f,0.f,-1.f,
+	0.f,0.f,-1.f,
+	0.f,0.f,-1.f,
+	0.f,0.f,-1.f,
+	0.f,0.f,1.f,
+	0.f,0.f,1.f,
+	0.f,0.f,1.f,
+	0.f,0.f,1.f,
+
+	-1.f,0.f,0.f,
+	-1.f,0.f,0.f,
+	1.f,0.f,0.f,
+	1.f,0.f,0.f,
+	-1.f,0.f,0.f,
+	-1.f,0.f,0.f,
+	1.f,0.f,0.f,
+	1.f,0.f,0.f,
+
+	0.f,-1.f,0.f,
+	0.f,1.f,0.f,
+	0.f,-1.f,0.f,
+	0.f,1.f,0.f,
+	0.f,-1.f,0.f,
+	0.f,1.f,0.f,
+	0.f,-1.f,0.f,
+	0.f,1.f,0.f,
+
 }
 {
 	InitSphereIndices();
@@ -103,7 +125,7 @@ void ShapeFactory::AddCircleIndices(unsigned int* indices, int index, int offset
 
 
 //creates buffers for each shape
-void ShapeFactory::createBuffer(Shape& shape, float * data) {
+void ShapeFactory::createBuffer(Shape& shape, float *data) {
 
 	int shape_size = shape.size;
 	int index_pointer_size = GetIndexPointerSize(shape.shapeType);
@@ -120,6 +142,8 @@ void ShapeFactory::createBuffer(Shape& shape, float * data) {
 	}
 	else if (shape.shapeType == T_RING) {
 		normal_pointer_size = 8 * (CIRCLE_VERTEX_NUM-1) * 3;
+	} else {
+		normal_pointer_size = 0; // Safety first.
 	}
 	unsigned int * index_array = GetIndexPointer(shape.shapeType);
 

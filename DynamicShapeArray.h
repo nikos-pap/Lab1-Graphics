@@ -47,8 +47,6 @@ private:
 	void CheckCollision(int index);
 	void Collide(int index1, int index2);
 	
-	
-
 	//Extends the Array used when Array size reaches its capacity
 	void Extend();
 
