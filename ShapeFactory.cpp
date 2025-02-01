@@ -93,9 +93,8 @@ void ShapeFactory::AddCircleIndices(unsigned int* indices, int index, int offset
 
 
 //creates buffers for each shape
-void ShapeFactory::createBuffer(Shape& shape) {
+void ShapeFactory::createBuffer(Shape& shape, float * data) {
 
-	float * shapeDataPointer = shape.data;
 	int shape_size = shape.size;
 	int index_pointer_size = GetIndexPointerSize(shape.shapeType);
 	int normal_pointer_size;
@@ -125,7 +124,7 @@ void ShapeFactory::createBuffer(Shape& shape) {
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
 	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float) + normal_pointer_size * sizeof(float), 0, GL_STATIC_DRAW);
 	
-	glBufferSubData(GL_ARRAY_BUFFER, 0, shape_size * sizeof(float), shapeDataPointer);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, shape_size * sizeof(float), data);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 	
@@ -367,20 +366,6 @@ Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size) {
 	float x1 = x0 + size;
 	float y1 = y0 + size;
 	float z1 = z0 + size;
-<<<<<<< Updated upstream
-	float positions[] = {
-		x0, y0, z0,//00  back(0)0
-		x0, y1, z0,//01 back(0)1
-		x1, y0, z0,//10 back(0)2
-		x1, y1, z0,//11 back(0)3
-		x0, y0, z1,//00 front(1)4
-		x0, y1, z1,//01 front(1)5
-		x1, y0, z1,//10 front(1)6
-		x1, y1, z1,//11 front(1)7
-	};
-
-	return CreateShapeObject(positions, 8 * 3, T_CUBE, x0+size/2, y0 + size / 2, z0 + size / 2, size);
-=======
 	if (firstCube) {
 		float positions[] = {
 			x0, y0, z0,//00  back(0)0
@@ -422,7 +407,6 @@ Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size) {
 	tempShape.center[1] = y0+size;
 	tempShape.center[2] = z0+size;
 	return tempShape;
->>>>>>> Stashed changes
 }
 
 //Sphere
@@ -536,7 +520,6 @@ Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shap
 			tmpData[i] = element[i];
 		}
         Shape tempShape;
-		tempShape.data = tmpData;
 		tempShape.size = elementSize;
 		tempShape.shapeType = shapeType;
 		tempShape.Model = glm::mat4(1.0f);
@@ -547,12 +530,8 @@ Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shap
 		tempShape.center[1] = y0;
 		tempShape.center[2] = z0;
 		tempShape.d = d;
-<<<<<<< Updated upstream
-        createBuffer(tempShape);
-=======
         createBuffer(tempShape,tmpData);
 		delete[] tmpData;
->>>>>>> Stashed changes
         return tempShape;
 	} else {
 		std::cout << "Error: Could not Create Shape" << std::endl;

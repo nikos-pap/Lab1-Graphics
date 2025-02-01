@@ -3,6 +3,7 @@
 #include <chrono>
 #include <random>
 #include <iostream>
+#include <map>
 
 #define PI 3.14159265f
 #define SQRT_2 1.41421356237f
@@ -27,12 +28,6 @@ struct Shape {
 	unsigned int vao_id = 0;
 	unsigned int vb_id = 0;
 	unsigned int ib_id = 0;
-<<<<<<< Updated upstream
-	glm::mat4 Model;
-	float center[3];
-	float d;
-	float d2;
-=======
 	glm::mat4 Model{ 1.f };
 	float center[3] = { 0.f, 0.f, 0.f };
 	float d = 0.f;
@@ -50,19 +45,14 @@ struct Shape {
 		d = oldShape.d;
 		d2 = oldShape.d2;
 	}*/
->>>>>>> Stashed changes
 };
 
 class ShapeFactory {
 private:
 
 
-<<<<<<< Updated upstream
-
-=======
 	std::vector<Shape> Prototypes;
 	std::map<int, int> shapeTypeToIndex;
->>>>>>> Stashed changes
 	//Normals
 /*
 	Indices for cube triangle points have been numbered in the following way on the 2 faces back and front(+4)
@@ -90,7 +80,7 @@ private:
 	bool firstSphere = true;
 
 
-	void createBuffer(Shape& shape);
+	void createBuffer(Shape& shape, float *data);
 
 	unsigned int* GetIndexPointer(int shapeType);
 
