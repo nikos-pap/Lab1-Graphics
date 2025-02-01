@@ -1,6 +1,16 @@
 #include "ShapeFactory.h"
 
 
+
+//Normals
+/*
+	Indices for cube triangle points have been numbered in the following way on the 2 faces back and front(+4)
+	1 - 3 5 - 7
+	| X | | X |
+	0 - 2 4 - 6
+	back: 0123, front: 4567, left: 0145, right: 2367, bottom: 4062, top: 5173
+	The only easy enough to do by hand
+*/
 ShapeFactory::ShapeFactory():cube_indices{
 	4, 6, 5,//front
 	7, 5, 6,//front
@@ -403,9 +413,10 @@ Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size) {
 	model = glm::scale(model, glm::vec3{ size, size, size });
 	Shape tempShape{ Prototypes.at(T_CUBE) };
 	tempShape.Model = model;
-	tempShape.center[0] = x0+size;
-	tempShape.center[1] = y0+size;
-	tempShape.center[2] = z0+size;
+	tempShape.center[0] = x0+size/2.f;
+	tempShape.center[1] = y0+size/2.f;
+	tempShape.center[2] = z0+size/2.f;
+	tempShape.d = size;
 	return tempShape;
 }
 
@@ -463,6 +474,7 @@ Shape ShapeFactory::CreateSphere(float x0, float y0, float z0, float radius) {
 	tempShape.center[0] = x0;
 	tempShape.center[1] = y0;
 	tempShape.center[2] = z0;
+	tempShape.d = 2 * radius;
 	return tempShape;
 }
 
@@ -505,7 +517,7 @@ Shape ShapeFactory::CreateCylinder(float x, float y, float z, float radius, floa
 	tempShape.center[0] = x;
 	tempShape.center[1] = y + height/2.f;
 	tempShape.center[2] = z;
-	tempShape.d = radius;
+	tempShape.d = 2*radius;
 
 	return tempShape;
 
