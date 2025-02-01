@@ -3,7 +3,6 @@
 #include <chrono>
 #include <random>
 #include <iostream>
-#include <map>
 #include <vector>
 
 #define PI 3.14159265f
@@ -37,10 +36,7 @@ class ShapeFactory {
 private:
 
 
-	std::vector<unsigned int> VAOs;
-	std::vector<unsigned int> VBOs;
-	std::vector<unsigned int> IBOs;
-	std::map<int, int> shapeTypeToIndex;
+	std::vector<Shape> Prototypes;
 	//Normals
 /*
 	Indices for cube triangle points have been numbered in the following way on the 2 faces back and front(+4)
@@ -62,6 +58,7 @@ private:
 	unsigned int  ring_indices[2 * 8 * CIRCLE_TRIANGLE_NUM * 3];
 
 	//flags
+	bool firstCube = true;
 	bool firstCylinder = true;
 	bool firstRing = true;
 	bool firstSphere = true;
@@ -91,6 +88,7 @@ private:
 
 public:
 	ShapeFactory();
+	void InitPrototypes();
 
 	int GetIndexPointerSize(int shapeType);
 	float* GetNormals(int shapeType);

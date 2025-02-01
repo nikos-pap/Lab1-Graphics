@@ -66,7 +66,7 @@ void ShapeFactory::InitPrototypes()
 	Prototypes.push_back(CreateCube(0.f, 0.f, 0.f, 1.f));
 	Prototypes.push_back(CreateSphere(0.f, 0.f, 0.f, 1.f));
 	Prototypes.push_back(CreateCylinder(0.f, 0.f, 0.f, 1.f, 1.f));
-	Prototypes.push_back(CreateRing(0.f, 0.f, 0.f, 0.5f, 1.f));
+	Prototypes.push_back(CreateRing(0.f, 0.f, 0.f, 1.0f, 0.3f));
 }
 //Initialize Index Arrays
 //fills sphere_indices
@@ -353,7 +353,7 @@ Shape ShapeFactory::CreateRing(float x,float y, float z, float r1, float r2) {
 	}
 	glm::mat4 model{ 1.f };
 	model = glm::translate(model, glm::vec3{ x, y, z });
-	model = glm::scale(model, glm::vec3{ r1, r2, r1 });
+	model = glm::scale(model, glm::vec3{ r1, 4*r2, r1 });
 	Shape tempShape{ Prototypes.at(T_RING) };
 	tempShape.Model = model;
 	tempShape.center[0] = x;
@@ -402,7 +402,7 @@ Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size) {
 	float z1 = z0 + size;
 	if (firstCube) {
 		float positions[] = {
-			x0, y0, z0,//00  back(0)0
+			x0, y0, z0,//00 back(0)0
 			x0, y1, z0,//01 back(0)1
 			x1, y0, z0,//10 back(0)2
 			x1, y1, z0,//11 back(0)3
@@ -411,23 +411,23 @@ Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size) {
 			x1, y0, z1,//10 front(1)6
 			x1, y1, z1,//11 front(1)7
 
-			x0, y0, z0,//00  back(0)0
-			x0, y1, z0,//01 back(0)1
-			x1, y0, z0,//10 back(0)2
-			x1, y1, z0,//11 back(0)3
-			x0, y0, z1,//00 front(1)4
-			x0, y1, z1,//01 front(1)5
-			x1, y0, z1,//10 front(1)6
-			x1, y1, z1,//11 front(1)7
+			x0, y0, z0,//00 left(0)0
+			x0, y1, z0,//01 left(0)1
+			x1, y0, z0,//10 left(0)2
+			x1, y1, z0,//11 left(0)3
+			x0, y0, z1,//00 right(1)4
+			x0, y1, z1,//01 right(1)5
+			x1, y0, z1,//10 right(1)6
+			x1, y1, z1,//11 right(1)7
 
-			x0, y0, z0,//00  back(0)0
-			x0, y1, z0,//01 back(0)1
-			x1, y0, z0,//10 back(0)2
-			x1, y1, z0,//11 back(0)3
-			x0, y0, z1,//00 front(1)4
-			x0, y1, z1,//01 front(1)5
-			x1, y0, z1,//10 front(1)6
-			x1, y1, z1,//11 front(1)7
+			x0, y0, z0,//00 up(0)0
+			x0, y1, z0,//01 up(0)1
+			x1, y0, z0,//10 up(0)2
+			x1, y1, z0,//11 up(0)3
+			x0, y0, z1,//00 down(1)4
+			x0, y1, z1,//01 down(1)5
+			x1, y0, z1,//10 down(1)6
+			x1, y1, z1,//11 down(1)7
 		};
 		firstCube = false;
 		return CreateShapeObject(positions, 24 * 3, T_CUBE, x0 + size / 2, y0 + size / 2, z0 + size / 2, size);
