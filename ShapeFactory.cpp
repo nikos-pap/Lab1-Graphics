@@ -204,7 +204,7 @@ Shape ShapeFactory::CreateRandomShape() {
 
 	Shape newShape = CreateShape(0.0f, 0.0f, 0.0f, shapeSize, shapeType);
 	
-	std::cout << "Spawned new shape: " << shapeType << std::endl;
+	std::cout << "Spawned new shape: " << shapeType;
 	SetColor(newShape, r, g, b, 1.0f);
 	newShape.speed[0] = vx;
 	newShape.speed[1] = vy;

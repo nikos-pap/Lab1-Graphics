@@ -11,6 +11,7 @@ InputController::InputController(CameraController* camera, DynamicShapeArray* sh
 
 int InputController::parseInputs(GLFWwindow* window) {
 	int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
+	present = 0; // glfwJoystickPresent seems to not work on W11, so we disable joystick input for now
 	if (1 == present) {
 		int axisCount;
 		const float* axis = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axisCount);

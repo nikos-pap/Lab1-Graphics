@@ -68,7 +68,8 @@ bool soundsEnabled = true;
 DynamicShapeArray::DynamicShapeArray() {
 	shapeFactory = new ShapeFactory();
 	capacity = 10;
-	shapeArray = (Shape *) malloc(capacity * sizeof(Shape));
+	//shapeArray = (Shape *) malloc(capacity * sizeof(Shape)); Deprecated, using vector
+	shapeArray.reserve(capacity);
 	size = 0;
 }
 
@@ -78,7 +79,7 @@ DynamicShapeArray::DynamicShapeArray() {
 */
 //remember to free the rest
 DynamicShapeArray::~DynamicShapeArray() {
-	free(shapeArray);
+	//free(shapeArray);
 }
 
 /*
@@ -88,7 +89,7 @@ DynamicShapeArray::~DynamicShapeArray() {
 */
 void DynamicShapeArray::CreateRandomShape() {
 	AddShape(shapeFactory->CreateRandomShape());
-
+	std::cout << " Shape amount:" << size << std::endl;
 }
 
 /*
@@ -105,6 +106,7 @@ void DynamicShapeArray::InitFactoryPrototypes()
 }
 
 //Assisting functions
+/* Deprecated:
 void DynamicShapeArray::Extend()
 {
 	capacity += 10;
@@ -113,17 +115,20 @@ void DynamicShapeArray::Extend()
 		for (int i = 0; i < size; i++) {
 			temp[i] = shapeArray[i];
 		}
-		shapeArray = temp;
+		//shapeArray = temp;
 	}
-}
+} */
 
 
 //Adds a shape to shapeArray
 void DynamicShapeArray::AddShape(Shape shape) {
+	/*
 	if (capacity == size) {
-		Extend();
+		Extend();					// Deprecated, using vector
 	}
 	shapeArray[size] = shape;
+	*/ 
+	shapeArray.push_back(shape);
 	size++;
 }
 

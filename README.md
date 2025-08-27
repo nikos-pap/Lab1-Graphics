@@ -64,10 +64,18 @@ Once you run the demo, the program will open in the 3D scene. You can move aroun
 | **Exit**               | `Esc`          |
 
 **TODO**: 
+	- Abstract Renderer from app to compare renderers:
+		-- Abstract Renderer class
+		-- OpenGLRenderer implements Renderer
+		-- VulkanRenderer implements Renderer
+	- Modernize code
+		-- Utilize modern OpenGL (Direct State Access)
+		-- Utilize modern C++ features (RAII, maybe coroutines?)
+		-- Utilize dynamic link libraries instead of a monolithic exe
+	- Fix InputController for Windows 11
 
 -ShapeFactory: 
 
-DONE:	-refactor shapeFactory so that only one vao, vbo, ebo/ibo is created per shape. As id is a reference, any other copy of the object will hold this id.		\/
-		shapeFactory must hold each shape's type and corresponding id in an unordered map. Key value is 'int shapeType' from Shape. Pair is "vao_id" from Shape.\/
+DONE:	- shapeArray: from C style array to vector, remove supporting classes (Extend, free at Destructor) \/
 	
 
