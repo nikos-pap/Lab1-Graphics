@@ -165,6 +165,7 @@ int ApplicationController::start() {
 			}
 			else {
 				shader.SetUniform1i("isTexture", 1);
+				// renderer.draw(draw amount)
 				glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
 			}
 		}

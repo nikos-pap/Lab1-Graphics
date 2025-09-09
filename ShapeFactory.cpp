@@ -68,8 +68,8 @@ void ShapeFactory::InitPrototypes()
 	Prototypes.push_back(CreateCylinder(0.f, 0.f, 0.f, 1.f, 1.f));
 	Prototypes.push_back(CreateRing(0.f, 0.f, 0.f, 1.0f, 0.3f));
 }
-//Initialize Index Arrays
-//fills sphere_indices
+
+// Initialize Index Arrays
 void ShapeFactory::InitSphereIndices() {
 	unsigned int k1, k2;
 
@@ -97,7 +97,7 @@ void ShapeFactory::InitSphereIndices() {
 		}
 	}
 }
-//Cylinder
+
 void ShapeFactory::InitCylinderIndices() {
 	int offset = CIRCLE_TRIANGLE_NUM + 2;
 
@@ -122,15 +122,13 @@ void ShapeFactory::AddCircleIndices(unsigned int* indices, int index, int offset
 	}
 }
 
-
-
-//creates buffers for each shape
 void ShapeFactory::createBuffer(Shape& shape, float *data) {
 
 	int shape_size = shape.size;
 	int index_pointer_size = GetIndexPointerSize(shape.shapeType);
 	int normal_pointer_size;
 	float* normals = GetNormals(shape.shapeType);
+	// what the.. replace with function, just like GetIndexPointerSize
 	if (shape.shapeType == T_CUBE) {
 		normal_pointer_size = 24;
 	}
@@ -147,44 +145,48 @@ void ShapeFactory::createBuffer(Shape& shape, float *data) {
 	}
 	unsigned int * index_array = GetIndexPointer(shape.shapeType);
 
-	//create and bind the vao
-	unsigned int vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	// this code is old and tired, put it out of its misery and replace it on renderer class:
+	// like renderer.createObjectBuffer(shape, data, normals, index_array, shape_size, normal_pointer_size, index_pointer_size);
+	{
+		unsigned int vao;
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
 
-	unsigned int buffer_id;
-	//create a buffer to keep out positions
-	glGenBuffers(1, &buffer_id);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
-	glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float) + normal_pointer_size * sizeof(float), 0, GL_STATIC_DRAW);
-	
-	glBufferSubData(GL_ARRAY_BUFFER, 0, shape_size * sizeof(float), data);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-	
-	glBufferSubData(GL_ARRAY_BUFFER, shape_size * sizeof(float), normal_pointer_size * sizeof(float), normals);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(shape_size * sizeof(float)));
+		unsigned int buffer_id;
+		//create a buffer to keep out positions
+		glGenBuffers(1, &buffer_id);
+		glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
+		glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float) + normal_pointer_size * sizeof(float), 0, GL_STATIC_DRAW);
 
-	//create a buffer for the indices
-	unsigned int ibo;
-	//glGenBuffers creates the random id for that buffer and stores it in the variable
-	glGenBuffers(1, &ibo);
-	//bind object buffer to target
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,  index_pointer_size * sizeof(unsigned int), index_array, GL_STATIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, shape_size * sizeof(float), data);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+		glBufferSubData(GL_ARRAY_BUFFER, shape_size * sizeof(float), normal_pointer_size * sizeof(float), normals);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(shape_size * sizeof(float)));
+
+		//create a buffer for the indices
+		unsigned int ibo;
+		//glGenBuffers creates the random id for that buffer and stores it in the variable
+		glGenBuffers(1, &ibo);
+		//bind object buffer to target
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_pointer_size * sizeof(unsigned int), index_array, GL_STATIC_DRAW);
 	
-	//keep the three buffers in the shape
-	shape.vao_id = vao;
-	shape.vb_id = buffer_id;
-	shape.ib_id = ibo;
-	std::cout << "buffer created id's are:" << vao << ", " << buffer_id << ", " << ibo << std::endl;
+		//keep the three buffers in the shape
+		shape.vao_id = vao;
+		shape.vb_id = buffer_id;
+		shape.ib_id = ibo;
+		std::cout << "buffer created id's are:" << vao << ", " << buffer_id << ", " << ibo << std::endl;
+	}
 }
 
 /*
 Buffer Binder
 - binds shape's vao and ibo
 - created mainly because it removes 2 - 3 Getters / Setters
+- TODO: replace with renderer.bindShape(shape.vao_id, shape_ib_id); or just do a batch draw.
 */
 void ShapeFactory::BindShape(Shape shape) {
 	glBindVertexArray(shape.vao_id);
@@ -236,7 +238,6 @@ Shape ShapeFactory::CreateShape(float x, float y, float z, int shapeSize, int Sh
 	return CreateCube(x, y, z, shapeSize);
 }
 
-//Ring
 Shape ShapeFactory::CreateRing(float x,float y, float z, float r1, float r2) {
 	if (firstRing) {
 		float* circle1 = CreateCircle(x, y + r2, z, abs(r1 - r2));
@@ -363,7 +364,7 @@ Shape ShapeFactory::CreateRing(float x,float y, float z, float r1, float r2) {
 }
 
 
-//Circle helps with Cylinder and Ring
+// Helper function for cylinder and ring creation
 float* ShapeFactory::CreateCircle(float x, float y, float z, float radius) {
 	int num_of_sides = CIRCLE_TRIANGLE_NUM;
 	int num_of_vertices = num_of_sides + 2;
@@ -392,10 +393,6 @@ float* ShapeFactory::CreateCircle(float x, float y, float z, float radius) {
 	return nullptr;
 }
 
-
-
-//Creating Shapes
-//Cube
 Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size) {
 	float x1 = x0 + size;
 	float y1 = y0 + size;
@@ -444,7 +441,6 @@ Shape ShapeFactory::CreateCube(float x0, float y0, float z0, float size) {
 	return tempShape;
 }
 
-//Sphere
 Shape ShapeFactory::CreateSphere(float x0, float y0, float z0, float radius) {
 
 	float x, y, z, xy;                              // vertex position
@@ -547,9 +543,8 @@ Shape ShapeFactory::CreateCylinder(float x, float y, float z, float radius, floa
 
 }
 
-//Adds a shape to shapeArray
+// Creates an Object and its GPU buffer
 Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shapeType, float x0, float y0, float z0, float d) {
-
 	float *tmpData = new float[elementSize];
 	if (tmpData != nullptr) {
 		for (int i = 0; i < elementSize; i++) {
@@ -571,7 +566,6 @@ Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shap
         return tempShape;
 	} else {
 		std::cout << "Error: Could not Create Shape" << std::endl;
-
 	}
 }
 
@@ -655,6 +649,7 @@ unsigned int* ShapeFactory::GetIndexPointer(int shapeType) {
 }
 
 //Random number generators
+// TODO: replace with a static random class.
 int ShapeFactory::RandomInt(int min, int max) {
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::default_random_engine generator(seed);
@@ -666,6 +661,6 @@ float ShapeFactory::RandomFloat(float min, float max) {
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::default_random_engine generator(seed);
 	std::uniform_real_distribution<float> distributionDouble(min, max);
-	return (float)distributionDouble(generator);
+	return static_cast<float>(distributionDouble(generator));
 }
 
