@@ -124,29 +124,38 @@ void ShapeFactory::AddCircleIndices(unsigned int* indices, int index, int offset
 
 
 
-//creates buffers for each shape
+/* TODO: put renderer specific code in Renderer class
+*
+*/
 void ShapeFactory::createBuffer(Shape& shape, float *data) {
 
 	int shape_size = shape.size;
 	int index_pointer_size = GetIndexPointerSize(shape.shapeType);
 	int normal_pointer_size;
 	float* normals = GetNormals(shape.shapeType);
-	if (shape.shapeType == T_CUBE) {
-		normal_pointer_size = 24;
-	}
-	else if (shape.shapeType == T_SPHERE) {
-		normal_pointer_size = 2109;
-	}
-	else if (shape.shapeType == T_CYLINDER) {
-		normal_pointer_size = 216;
-	}
-	else if (shape.shapeType == T_RING) {
-		normal_pointer_size = 8 * (CIRCLE_VERTEX_NUM-1) * 3;
-	} else {
-		normal_pointer_size = 0; // Safety first.
+	// what the.... Put this on a seperate function (like ShapeFactory::GetIndexPointerSize)
+	{
+		if (shape.shapeType == T_CUBE) {
+			normal_pointer_size = 24;
+		}
+		else if (shape.shapeType == T_SPHERE) {
+			normal_pointer_size = 2109;
+		}
+		else if (shape.shapeType == T_CYLINDER) {
+			normal_pointer_size = 216;
+		}
+		else if (shape.shapeType == T_RING) {
+			normal_pointer_size = 8 * (CIRCLE_VERTEX_NUM - 1) * 3;
+		}
+		else {
+			normal_pointer_size = 0; // Safety first.
+		}
 	}
 	unsigned int * index_array = GetIndexPointer(shape.shapeType);
 
+	/*
+	* From here on out, put this on OpenGLRenderer class:
+	*/
 	//create and bind the vao
 	unsigned int vao;
 	glGenVertexArrays(1, &vao);
