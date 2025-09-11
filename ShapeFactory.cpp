@@ -1,7 +1,5 @@
 #include "ShapeFactory.h"
 
-
-
 //Normals
 /*
 	Indices for cube triangle points have been numbered in the following way on the 2 faces back and front(+4)
@@ -69,7 +67,6 @@ void ShapeFactory::InitPrototypes()
 	Prototypes.push_back(CreateRing(0.f, 0.f, 0.f, 1.0f, 0.3f));
 }
 
-// Initialize Index Arrays
 void ShapeFactory::InitSphereIndices() {
 	unsigned int k1, k2;
 

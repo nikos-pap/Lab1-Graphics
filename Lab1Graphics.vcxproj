@@ -156,6 +156,7 @@
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="DynamicShapeArray.cpp" />
     <ClCompile Include="InputController.cpp" />
+    <ClCompile Include="OpenGLRenderer.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShapeFactory.cpp" />
   </ItemGroup>
@@ -165,6 +166,7 @@
     <ClInclude Include="DynamicShapeArray.h" />
     <ClInclude Include="InputController.h" />
     <ClInclude Include="opengl.h" />
+    <ClInclude Include="OpenGLRenderer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShapeFactory.h" />
   </ItemGroup>

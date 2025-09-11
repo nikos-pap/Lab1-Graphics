@@ -55,7 +55,10 @@ unsigned int ApplicationController::loadTexture()
 }
 
 int ApplicationController::start() {
+	
+	// Deprecated, moved to OpenGLRenderer
 	unsigned int textureID;
+	/*
 
 	if (!glfwInit()) {
 		return -1;
@@ -77,12 +80,13 @@ int ApplicationController::start() {
 
 	glfwMakeContextCurrent(window);
 
-	/* need to do this after I have a valid context */
+	// need to do this after I have a valid context 
 	if (glewInit() != GLEW_OK)
 		std::cout << "Error!" << std::endl;
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 	std::cout << glGetString(GL_VERSION) << std::endl;
+	*/
 	glm::mat4 Projection = glm::perspective(glm::radians(40.0f), 1.0f, 0.001f, 1000.0f);
 
 
@@ -93,6 +97,7 @@ int ApplicationController::start() {
 	//ModelViewProjection Matrix
 	glm::mat4 MVP;// Projection * View * Model;
 
+	/*
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
@@ -102,6 +107,7 @@ int ApplicationController::start() {
 	//for the textures
 	glDisable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	*/
 	shapeArray->InitFactoryPrototypes();
 
 	//Create the first 2 shapes
@@ -114,7 +120,7 @@ int ApplicationController::start() {
 	Shader shader("Shader.shader");
 	shader.SetUniformMat4f("model", Model);
 	unsigned int ib_size;
-	int shapeArrSize;
+	uint32_t shapeArrSize;
 	float x = 1.0f;
 	float l = 1.0f;
 	textureID = loadTexture();
@@ -130,16 +136,20 @@ int ApplicationController::start() {
 		else
 			mciSendString("pause mp3 ", NULL, 0, NULL);
 #endif
-		shader.Bind();
+		//shader.Bind();
 		shapeArrSize = shapeArray->GetSize();
+		// renderer.clear();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		x += l;
-		if (x == 150.0f || x == 0.0f) {
+		if (x >= 150.0f || x <= 0.0f) {
 			l = (-1.0f) * l;
-			//std::cout << "change" << std::endl;
 		}
 		MVP = Projection * camera->getView() * Model;
 
+		// This can be a compute shader, then batch draw (utilize instancing and ssbos).
+		// Example:
+		// moveShader.bind()
+		// glDispatchCompute(shapeArrSize, 1, 1);
 		for (int i = shapeArrSize - 1; i >= 0; i--) {
 			float* color = shapeArray->GetColor(i);
 			ib_size = shapeArray->GetIndexPointerSize(i);
@@ -149,11 +159,12 @@ int ApplicationController::start() {
 			}
 			Model = shapeArray->GetModel(i);
 			MVP = Projection * camera->getView() * Model;
+			// update this to SSBOs
 			shader.SetUniformMat4f("u_MVP", MVP);
 			shader.SetUniform4f("u_Color", color);
 			shader.SetUniformMat4f("model", Model);
 			shader.SetUniform3f("u_Light", 150.0f, x, 150.0f);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			shader.SetUniform3f("u_vPos", camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
 
 			if (i == 1 && tex) {
@@ -170,12 +181,13 @@ int ApplicationController::start() {
 			}
 		}
 
-		/* Swap front and back buffers */
+		// renderer.endFrame()
+		// Swap front and back buffers 
 		glfwSwapBuffers(window);
 
-		/* Poll for and process events */
+		// Poll for and process events 
 		glfwPollEvents();
-		shader.Unbind();
+		//shader.Unbind();
 	}
 	glfwTerminate();
 

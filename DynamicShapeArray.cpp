@@ -381,7 +381,7 @@ void DynamicShapeArray::CheckCollision(int index) {
 			Collide(s, j);
 			Collide(j, s);
 #ifdef _WIN32
-			if (size0 <= 10 && soundsEnabled) {
+			if (index <= 10 && soundsEnabled) {
 				PlaySound(TEXT("collision.wav"), NULL, SND_FILENAME | SND_ASYNC);
 			}
 #endif
