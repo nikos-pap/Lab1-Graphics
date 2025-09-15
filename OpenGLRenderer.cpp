@@ -1,5 +1,7 @@
 #include "OpenGLRenderer.h"
 #include <iostream>
+#define STB_IMAGE_IMPLEMENTATION   
+#include "stb_image.h"
 
 #ifdef _DEBUG
 void APIENTRY glDebugOutput(GLenum source,
@@ -20,6 +22,46 @@ OpenGLRenderer::OpenGLRenderer() {
 OpenGLRenderer::~OpenGLRenderer() {
 	if (window) glfwDestroyWindow(window);
 	glfwTerminate();
+}
+
+//loads texture from file
+void OpenGLRenderer::loadTexture(std::string fileName)
+{
+	uint32_t texture;
+	glGenTextures(1, &texture);
+
+	//generating cube map
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+
+	//Define all 6 faces
+	// load and generate the texture
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load(fileName.c_str(), &width, &height, &nrChannels, STBI_rgb_alpha);
+	if (data)
+	{
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
+
+	stbi_image_free(data);
+	textures.push_back(texture);
 }
 int16_t OpenGLRenderer::init(uint16_t windowWidth, uint16_t windowHeight) {
 
@@ -79,6 +121,15 @@ int16_t OpenGLRenderer::init(uint16_t windowWidth, uint16_t windowHeight) {
 	return 1;
 
 }
+void OpenGLRenderer::BindShape(int shapeType) {
+	if (shapeVAOIDmap.find(shapeType) != shapeVAOIDmap.end()) {
+		glBindVertexArray(shapeVAOIDmap[shapeType]);
+	}
+	if (shapeIBOIDmap.find(shapeType) != shapeIBOIDmap.end()) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shapeIBOIDmap[shapeType]);
+	}
+}
+
 void OpenGLRenderer::createObjectBuffer(Shape &shape, int32_t index_pointer_size, int32_t normal_pointer_size, float *normals, uint32_t *index_array, std::vector<float> objDataVector) {
 	unsigned int vao;
 	glGenVertexArrays(1, &vao);
@@ -106,10 +157,13 @@ void OpenGLRenderer::createObjectBuffer(Shape &shape, int32_t index_pointer_size
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_pointer_size * sizeof(unsigned int), index_array, GL_STATIC_DRAW);
 
-	//keep the three buffers in the shape
-	shape.vao_id = vao;
-	shape.vb_id = buffer_id;
-	shape.ib_id = ibo;
+	//keep the three buffers in the shape DEPRECATED due to abstraction. These values are stored in maps
+	shapeVAOIDmap[shape.shapeType] = vao;
+	shapeVBOIDmap[shape.shapeType] = buffer_id;
+	shapeIBOIDmap[shape.shapeType] = ibo;
+//	shape.vao_id = vao;
+//	shape.vb_id = buffer_id;
+//	shape.ib_id = ibo;
 	std::cout << "buffer created id's are:" << vao << ", " << buffer_id << ", " << ibo << std::endl;
 }
 void OpenGLRenderer::clear() {

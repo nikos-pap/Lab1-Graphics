@@ -67,15 +67,21 @@ Once you run the demo, the program will open in the 3D scene. You can move aroun
 	- Abstract Renderer from app to compare renderers:
 		-- Abstract Renderer class
 		-- OpenGLRenderer implements Renderer
+			--- Rewrite Shader class to be abstracted from any API specific code. OpenGLShader extends abstract Shader?
+				---- Remove every shader reference from ApplicationController. Move to 
+			--- Find a way to have the same shader utilized for all solutions. Write it in slang and compile it on runtime to HLSL, GLSL, SpirV?
+				---- remove uniform variables and replace them with Uniform Buffers, or write the render function to batch render the objects and use SSBOs.
 		-- VulkanRenderer implements Renderer
 	- Modernize code
 		-- Utilize modern OpenGL (Direct State Access)
-		-- Utilize modern C++ features (RAII, maybe coroutines?)
+		-- Utilize modern C++ features (RAII, coroutines?)
 		-- Utilize dynamic link libraries instead of a monolithic exe
 	- Fix InputController for Windows 11
 
 -ShapeFactory: 
 
-DONE:	- shapeArray: from C style array to vector, remove supporting classes (Extend, free at Destructor) \/
+DONE:	- Implemented OpenGLRenderer class. Using renderer pointer to a OpenGLRenderer obj.
+	- Removed OpenGL functions from ApplicationController, DynamicShapeArray and ShapeFactory, moved to OpenGLRenderer.
+	- Added Shape.h file to hold Shape struct. Removed any OpenGL specific information (vao, vbo, ibo), and integrated it to OpenGLRenderer.
 	
 

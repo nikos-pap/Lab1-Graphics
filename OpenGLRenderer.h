@@ -3,13 +3,17 @@
 #include "Shape.h"
 #include "opengl.h"
 #include <vector>
+#include <map>
 #include <string>
 class OpenGLRenderer
 {
 private:
 	GLFWwindow *window;
 	Shader *shader; // one shader for now
-	std::vector<GLuint> textures;
+	std::map<uint32_t, int> shapeVAOIDmap;
+	std::map<uint32_t, int> shapeVBOIDmap;
+	std::map<uint32_t, int> shapeIBOIDmap;
+	std::vector<uint32_t> textures;
 	//std::vector<GLuint> framebuffers;
 public:
 	OpenGLRenderer();
@@ -17,9 +21,10 @@ public:
 
 	inline GLFWwindow* getWindow() { return window; };
 	void setShader(Shader* shader);
-	void loadTexture();
+	void loadTexture(std::string fileName);
 
 	void BindShader();
+	void BindShape(int shapeType);
 	void setViewport(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
 
 	int16_t init(uint16_t windowWidth, uint16_t windowHeight);

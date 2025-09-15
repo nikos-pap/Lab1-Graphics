@@ -63,9 +63,6 @@ private:
 	bool firstRing = true;
 	bool firstSphere = true;
 
-	// Deprecated: moved to renderer class
-	void createBuffer(Shape& shape, std::vector<float> &data);
-
 	unsigned int* GetIndexPointer(int shapeType);
 
 	void InitSphereIndices();

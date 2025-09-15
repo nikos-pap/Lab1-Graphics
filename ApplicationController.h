@@ -19,5 +19,6 @@ private:
 	unsigned int loadTexture();
 public:
 	ApplicationController();
+	~ApplicationController();
 	int start();
 };

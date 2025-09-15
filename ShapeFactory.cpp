@@ -137,17 +137,6 @@ int32_t ShapeFactory::GetNormalPointerSize(int32_t shapeType) {
 	return 0;
 }
 
-// Deprecated, integrate to CreateShapeObject
-void ShapeFactory::createBuffer(Shape& shape, std::vector<float> &dataVector) {
-
-	int index_pointer_size = GetIndexPointerSize(shape.shapeType);
-	int32_t normal_pointer_size	= GetNormalPointerSize(shape.shapeType);
-	float* normals = GetNormals(shape.shapeType);
-	uint32_t *index_array = GetIndexPointer(shape.shapeType);
-
-	renderer->createObjectBuffer(shape, index_pointer_size, normal_pointer_size, normals, index_array, dataVector);
-}
-
 /*
 Buffer Binder
 - binds shape's vao and ibo
@@ -155,8 +144,7 @@ Buffer Binder
 - TODO: replace with renderer.bindShape(shape.vao_id, shape_ib_id); or just do a batch draw.
 */
 void ShapeFactory::BindShape(Shape shape) {
-	glBindVertexArray(shape.vao_id);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape.ib_id);
+	renderer->BindShape(shape.shapeType);
 }
 
 Shape ShapeFactory::CreateRandomShape() {
@@ -527,7 +515,13 @@ Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shap
 	tempShape.center[1] = y0;
 	tempShape.center[2] = z0;
 	tempShape.d = d;
-	createBuffer(tempShape,dataVector);
+	int index_pointer_size = GetIndexPointerSize(tempShape.shapeType);
+	int32_t normal_pointer_size	= GetNormalPointerSize(tempShape.shapeType);
+	float* normals = GetNormals(tempShape.shapeType);
+	uint32_t *index_array = GetIndexPointer(tempShape.shapeType);
+
+	renderer->createObjectBuffer(tempShape, index_pointer_size, normal_pointer_size, normals, index_array, dataVector);
+
 	return tempShape;
 }
 

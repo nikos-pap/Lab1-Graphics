@@ -1,7 +1,5 @@
 ﻿#include "ApplicationController.h"
 #include <iostream>
-#define STB_IMAGE_IMPLEMENTATION   
-#include "stb_image.h"
 
 
 ApplicationController::ApplicationController() {
@@ -10,54 +8,14 @@ ApplicationController::ApplicationController() {
 	shapeArray = new DynamicShapeArray();
 	inputController = new InputController(camera, shapeArray);
 }
-
-//loads texture from file
-unsigned int ApplicationController::loadTexture()
-{
-	unsigned int texture;
-	glGenTextures(1, &texture);
-
-	//generating cube map
-	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
-
-	//Define all 6 faces
-	// load and generate the texture
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("textures/texture.jpg", &width, &height, &nrChannels, STBI_rgb_alpha);
-	if (data)
-	{
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
-
-
-
-	stbi_image_free(data);
-
-	return texture;
+ApplicationController::~ApplicationController() {
+	delete camera;
+	delete shapeArray;
+	delete inputController;
+	delete renderer;
 }
 
 int ApplicationController::start() {
-	
-	// Deprecated, moved to OpenGLRenderer
-	unsigned int textureID;
 	
 	renderer = new OpenGLRenderer();
 	if (renderer->init(1000, 1000) != 1) return -1; // TODO: Update to error codes
@@ -90,7 +48,7 @@ int ApplicationController::start() {
 	uint32_t shapeArrSize;
 	float x = 1.0f;
 	float l = 1.0f;
-	textureID = loadTexture();
+	renderer->loadTexture("textures/texture.jpg");
 #ifdef _WIN32
 	mciSendString("open \"Elevator Music.mp3\" type mpegvideo alias mp3", NULL, 0, NULL);
 	mciSendString("play mp3 repeat", NULL, 0, NULL);
@@ -145,7 +103,5 @@ int ApplicationController::start() {
 
 		renderer->endFrame();
 	}
-	glfwTerminate();
-
 	return 0;
 }
