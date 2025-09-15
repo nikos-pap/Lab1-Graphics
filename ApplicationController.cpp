@@ -58,12 +58,18 @@ int ApplicationController::start() {
 	
 	// Deprecated, moved to OpenGLRenderer
 	unsigned int textureID;
-	/*
+	
+	renderer = new OpenGLRenderer();
+	if (renderer->init(1000, 1000) != 1) return -1; // TODO: Update to error codes
+	window = renderer->getWindow();
+	if (!window) return -1;
+	
+	
 
+	/*
 	if (!glfwInit()) {
 		return -1;
 	}
-
 
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -84,12 +90,11 @@ int ApplicationController::start() {
 	if (glewInit() != GLEW_OK)
 		std::cout << "Error!" << std::endl;
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-
 	std::cout << glGetString(GL_VERSION) << std::endl;
 	*/
+	
+
 	glm::mat4 Projection = glm::perspective(glm::radians(40.0f), 1.0f, 0.001f, 1000.0f);
-
-
 
 	// Model Matrix
 	glm::mat4 Model = glm::mat4(1.0f);
@@ -108,6 +113,7 @@ int ApplicationController::start() {
 	glDisable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	*/
+
 	shapeArray->InitFactoryPrototypes();
 
 	//Create the first 2 shapes
@@ -118,6 +124,7 @@ int ApplicationController::start() {
 
 	//Initialize Shader
 	Shader shader("Shader.shader");
+	shader.Bind();
 	shader.SetUniformMat4f("model", Model);
 	unsigned int ib_size;
 	uint32_t shapeArrSize;
@@ -136,9 +143,8 @@ int ApplicationController::start() {
 		else
 			mciSendString("pause mp3 ", NULL, 0, NULL);
 #endif
-		//shader.Bind();
 		shapeArrSize = shapeArray->GetSize();
-		// renderer.clear();
+		//renderer->clear();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		x += l;
 		if (x >= 150.0f || x <= 0.0f) {

@@ -11,6 +11,7 @@ private:
 	std::vector<GLuint> textures;
 	//std::vector<GLuint> framebuffers;
 public:
+	inline GLFWwindow* getWindow() { return window; };
 	int16_t init(uint16_t windowWidth, uint16_t windowHeight);
 	uint32_t createTexture(std::string& imagePath);
 	void clear();
