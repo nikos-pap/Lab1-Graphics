@@ -1,6 +1,15 @@
 #include "OpenGLRenderer.h"
 #include <iostream>
 
+#ifdef _DEBUG
+void APIENTRY glDebugOutput(GLenum source,
+	GLenum type,
+	unsigned int id,
+	GLenum severity,
+	GLsizei length,
+	const char* message,
+	const void* userParam);
+#endif
 OpenGLRenderer::OpenGLRenderer() {
 	// Initialize OpenGL context here if needed
 	window = nullptr;
@@ -70,6 +79,39 @@ int16_t OpenGLRenderer::init(uint16_t windowWidth, uint16_t windowHeight) {
 	return 1;
 
 }
+void OpenGLRenderer::createObjectBuffer(Shape &shape, int32_t index_pointer_size, int32_t normal_pointer_size, float *normals, uint32_t *index_array, std::vector<float> objDataVector) {
+	unsigned int vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	unsigned int buffer_id;
+
+	glGenBuffers(1, &buffer_id);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
+	glBufferData(GL_ARRAY_BUFFER, shape.size * sizeof(float) + normal_pointer_size * sizeof(float), 0, GL_STATIC_DRAW);
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, shape.size * sizeof(float), objDataVector.data());
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+	glBufferSubData(GL_ARRAY_BUFFER, shape.size * sizeof(float), normal_pointer_size * sizeof(float), normals);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(shape.size * sizeof(float)));
+
+	//create a buffer for the indices
+	unsigned int ibo;
+	//glGenBuffers creates the random id for that buffer and stores it in the variable
+	glGenBuffers(1, &ibo);
+	//bind object buffer to target
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_pointer_size * sizeof(unsigned int), index_array, GL_STATIC_DRAW);
+
+	//keep the three buffers in the shape
+	shape.vao_id = vao;
+	shape.vb_id = buffer_id;
+	shape.ib_id = ibo;
+	std::cout << "buffer created id's are:" << vao << ", " << buffer_id << ", " << ibo << std::endl;
+}
 void OpenGLRenderer::clear() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
@@ -79,7 +121,20 @@ void OpenGLRenderer::clear(GLuint framebufferID) {
 }
 
 void OpenGLRenderer::render() {
-	// TODO: implement the rendering process.
+	// TODO: implement the complete rendering process.
+}
+void OpenGLRenderer::drawElements(uint32_t ib_size) {
+	glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
+}
+void OpenGLRenderer::setShader(Shader* shader) {
+	this->shader = shader;
+	if (shader) shader->Bind();
+}
+void OpenGLRenderer::setViewport(uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
+	glViewport(x, y, width, height);
+}
+void OpenGLRenderer::BindShader() {
+	shader->Bind();
 }
 
 void OpenGLRenderer::endFrame() {

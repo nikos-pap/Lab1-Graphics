@@ -171,6 +171,7 @@
     <ClInclude Include="OpenGLRenderer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Shape.h" />
     <ClInclude Include="ShapeFactory.h" />
   </ItemGroup>
   <ItemGroup>

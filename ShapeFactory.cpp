@@ -58,6 +58,10 @@ ShapeFactory::ShapeFactory():cube_indices{
 	InitSphereIndices();
 	InitCylinderIndices();
 }
+void ShapeFactory::setRenderer(OpenGLRenderer* rend) {
+	renderer = rend;
+}
+
 
 void ShapeFactory::InitPrototypes()
 {
@@ -111,72 +115,37 @@ void ShapeFactory::InitCylinderIndices() {
 	}
 }
 
-void ShapeFactory::AddCircleIndices(unsigned int* indices, int index, int offset) {
+void ShapeFactory::AddCircleIndices(std::array<uint32_t, 3 * 4 * CIRCLE_TRIANGLE_NUM> &indices, int index, int offset) {
 	for (int i = 1; i <= CIRCLE_TRIANGLE_NUM; i++) {
 		indices[index++] = offset + i;
 		indices[index++] = offset;
 		indices[index++] = offset + i + 1;
 	}
 }
-
-void ShapeFactory::createBuffer(Shape& shape, float *data) {
-
-	int shape_size = shape.size;
-	int index_pointer_size = GetIndexPointerSize(shape.shapeType);
-	int normal_pointer_size;
-	float* normals = GetNormals(shape.shapeType);
-	// what the.. replace with function, just like GetIndexPointerSize
-	if (shape.shapeType == T_CUBE) {
-		normal_pointer_size = 24;
-	}
-	else if (shape.shapeType == T_SPHERE) {
-		normal_pointer_size = 2109;
-	}
-	else if (shape.shapeType == T_CYLINDER) {
-		normal_pointer_size = 216;
-	}
-	else if (shape.shapeType == T_RING) {
-		normal_pointer_size = 8 * (CIRCLE_VERTEX_NUM-1) * 3;
-	} else {
-		normal_pointer_size = 0; // Safety first.
-	}
-	unsigned int * index_array = GetIndexPointer(shape.shapeType);
-
-	// this code is old and tired, put it out of its misery and replace it on renderer class:
-	// like renderer.createObjectBuffer(shape, data, normals, index_array, shape_size, normal_pointer_size, index_pointer_size);
+int32_t ShapeFactory::GetNormalPointerSize(int32_t shapeType) {
+	switch (shapeType)
 	{
-		unsigned int vao;
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-
-		unsigned int buffer_id;
-		//create a buffer to keep out positions
-		glGenBuffers(1, &buffer_id);
-		glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
-		glBufferData(GL_ARRAY_BUFFER, shape_size * sizeof(float) + normal_pointer_size * sizeof(float), 0, GL_STATIC_DRAW);
-
-		glBufferSubData(GL_ARRAY_BUFFER, 0, shape_size * sizeof(float), data);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-
-		glBufferSubData(GL_ARRAY_BUFFER, shape_size * sizeof(float), normal_pointer_size * sizeof(float), normals);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(shape_size * sizeof(float)));
-
-		//create a buffer for the indices
-		unsigned int ibo;
-		//glGenBuffers creates the random id for that buffer and stores it in the variable
-		glGenBuffers(1, &ibo);
-		//bind object buffer to target
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_pointer_size * sizeof(unsigned int), index_array, GL_STATIC_DRAW);
-	
-		//keep the three buffers in the shape
-		shape.vao_id = vao;
-		shape.vb_id = buffer_id;
-		shape.ib_id = ibo;
-		std::cout << "buffer created id's are:" << vao << ", " << buffer_id << ", " << ibo << std::endl;
+	case T_CUBE:
+		return 24;
+	case T_CYLINDER:
+		return 216;
+	case T_SPHERE:
+		return 2109;
+	case T_RING:
+		return 8 * (CIRCLE_VERTEX_NUM - 1) * 3;
 	}
+	return 0;
+}
+
+// Deprecated, integrate to CreateShapeObject
+void ShapeFactory::createBuffer(Shape& shape, std::vector<float> &dataVector) {
+
+	int index_pointer_size = GetIndexPointerSize(shape.shapeType);
+	int32_t normal_pointer_size	= GetNormalPointerSize(shape.shapeType);
+	float* normals = GetNormals(shape.shapeType);
+	uint32_t *index_array = GetIndexPointer(shape.shapeType);
+
+	renderer->createObjectBuffer(shape, index_pointer_size, normal_pointer_size, normals, index_array, dataVector);
 }
 
 /*
@@ -542,28 +511,24 @@ Shape ShapeFactory::CreateCylinder(float x, float y, float z, float radius, floa
 
 // Creates an Object and its GPU buffer
 Shape ShapeFactory::CreateShapeObject(float * element, int elementSize, int shapeType, float x0, float y0, float z0, float d) {
-	float *tmpData = new float[elementSize];
-	if (tmpData != nullptr) {
-		for (int i = 0; i < elementSize; i++) {
-			tmpData[i] = element[i];
-		}
-        Shape tempShape;
-		tempShape.size = elementSize;
-		tempShape.shapeType = shapeType;
-		tempShape.Model = glm::mat4(1.0f);
-		tempShape.speed[0] = 0.0f;
-		tempShape.speed[1] = 0.0f;
-		tempShape.speed[2] = 0.0f;
-		tempShape.center[0] = x0;
-		tempShape.center[1] = y0;
-		tempShape.center[2] = z0;
-		tempShape.d = d;
-        createBuffer(tempShape,tmpData);
-		delete[] tmpData;
-        return tempShape;
-	} else {
-		std::cout << "Error: Could not Create Shape" << std::endl;
+	std::vector<float> dataVector;
+	dataVector.reserve(elementSize);
+	for (int i = 0; i < elementSize; i++) {
+		dataVector.push_back(element[i]);
 	}
+	Shape tempShape;
+	tempShape.size = elementSize;
+	tempShape.shapeType = shapeType;
+	tempShape.Model = glm::mat4(1.0f);
+	tempShape.speed[0] = 0.0f;
+	tempShape.speed[1] = 0.0f;
+	tempShape.speed[2] = 0.0f;
+	tempShape.center[0] = x0;
+	tempShape.center[1] = y0;
+	tempShape.center[2] = z0;
+	tempShape.d = d;
+	createBuffer(tempShape,dataVector);
+	return tempShape;
 }
 
 /*
@@ -600,15 +565,15 @@ float* ShapeFactory::GetNormals(int shapeType) {
 	switch (shapeType)
 	{
 	case T_CUBE:
-		return cube_normals;
+		return cube_normals.data();
 	case T_SPHERE:
-		return sphere_normals;
+		return sphere_normals.data();
 	case T_CYLINDER:
-		return cylinder_normals;
+		return cylinder_normals.data();
 	case T_RING:
-		return ring_normals;
+		return ring_normals.data();
 	}
-	return nullptr;
+	return nullptr; // TODO: REMOVE THIS
 }
 /*
 Index Buffer Pointer Size
@@ -630,7 +595,7 @@ int ShapeFactory::GetIndexPointerSize(int shapeType) {
 }
 
 
-unsigned int* ShapeFactory::GetIndexPointer(int shapeType) {
+uint32_t *ShapeFactory::GetIndexPointer(int shapeType) {
 	switch (shapeType)
 	{
 	case T_CUBE:

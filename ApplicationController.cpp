@@ -63,37 +63,8 @@ int ApplicationController::start() {
 	if (renderer->init(1000, 1000) != 1) return -1; // TODO: Update to error codes
 	window = renderer->getWindow();
 	if (!window) return -1;
+	shapeArray->setRenderer(renderer);
 	
-	
-
-	/*
-	if (!glfwInit()) {
-		return -1;
-	}
-
-	glfwWindowHint(GLFW_SAMPLES, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	window = glfwCreateWindow(1000, 1000, u8"Συγκρουόμενα", NULL, NULL);
-	if (!window) {
-		glfwTerminate();
-		return -1;
-	}
-
-
-	glfwMakeContextCurrent(window);
-
-	// need to do this after I have a valid context 
-	if (glewInit() != GLEW_OK)
-		std::cout << "Error!" << std::endl;
-	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-	std::cout << glGetString(GL_VERSION) << std::endl;
-	*/
-	
-
 	glm::mat4 Projection = glm::perspective(glm::radians(40.0f), 1.0f, 0.001f, 1000.0f);
 
 	// Model Matrix
@@ -102,19 +73,8 @@ int ApplicationController::start() {
 	//ModelViewProjection Matrix
 	glm::mat4 MVP;// Projection * View * Model;
 
-	/*
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
-	glEnable(GL_NORMALIZE);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//for the textures
-	glDisable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	*/
-
 	shapeArray->InitFactoryPrototypes();
+
 
 	//Create the first 2 shapes
 	shapeArray->CreateShape(0.0f, 0.0f, 0.0f, 100.0f, T_CUBE);
@@ -144,8 +104,8 @@ int ApplicationController::start() {
 			mciSendString("pause mp3 ", NULL, 0, NULL);
 #endif
 		shapeArrSize = shapeArray->GetSize();
-		//renderer->clear();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		renderer->clear();
+
 		x += l;
 		if (x >= 150.0f || x <= 0.0f) {
 			l = (-1.0f) * l;
@@ -176,24 +136,14 @@ int ApplicationController::start() {
 			if (i == 1 && tex) {
 
 				shader.SetUniform1i("isTexture", 2);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-				glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 			}
 			else {
 				shader.SetUniform1i("isTexture", 1);
-				// renderer.draw(draw amount)
-				glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
 			}
+			renderer->drawElements(ib_size);
 		}
 
-		// renderer.endFrame()
-		// Swap front and back buffers 
-		glfwSwapBuffers(window);
-
-		// Poll for and process events 
-		glfwPollEvents();
-		//shader.Unbind();
+		renderer->endFrame();
 	}
 	glfwTerminate();
 
