@@ -64,6 +64,7 @@ Once you run the demo, the program will open in the 3D scene. You can move aroun
 | **Exit**               | `Esc`          |
 
 **TODO**: 
+
 	- Abstract Renderer from app to compare renderers:
 		-- Abstract Renderer class
 		-- OpenGLRenderer implements Renderer
