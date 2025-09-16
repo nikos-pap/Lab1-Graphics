@@ -59,7 +59,7 @@ int speedUP = 50;
 bool firstCylinder = true;
 bool firstRing = true;
 bool firstSphere = true;
-bool soundsEnabled = true;
+bool soundsEnabled = false; // testing
 
 /*
 *Simple Constructor
@@ -91,6 +91,22 @@ void DynamicShapeArray::CreateRandomShape() {
 	std::cout << " Shape amount:" << size << std::endl;
 }
 
+void DynamicShapeArray::CreateRandomShapes(int amount) {
+	int count = 0;
+	int perAxis = std::ceil(std::cbrt(amount));
+	float px = 0.f, py = 0.f, pz = 0.f;
+	for (int i = 0 ; i < perAxis; ++i) {
+		for (int j = 0; j < perAxis; ++j) {
+			for (int k = 0; k < perAxis; ++k) {
+				px = i * 100.f / perAxis;
+				py = j * 100.f / perAxis;
+				pz = k * 100.f / perAxis;
+				AddShape(shapeFactory->CreateRandomShape(px, py, pz));
+			}
+		}
+	}
+}
+
 /*
 Shape Creator
 -creates new shape to add to the Array
@@ -104,29 +120,9 @@ void DynamicShapeArray::InitFactoryPrototypes()
 	shapeFactory->InitPrototypes();
 }
 
-//Assisting functions
-/* Deprecated:
-void DynamicShapeArray::Extend()
-{
-	capacity += 10;
-	Shape* temp = (Shape*)realloc(shapeArray, (capacity) * sizeof(Shape));
-	if (temp != nullptr) {
-		for (int i = 0; i < size; i++) {
-			temp[i] = shapeArray[i];
-		}
-		//shapeArray = temp;
-	}
-} */
-
 
 //Adds a shape to shapeArray
 void DynamicShapeArray::AddShape(Shape shape) {
-	/*
-	if (capacity == size) {
-		Extend();					// Deprecated, using vector
-	}
-	shapeArray[size] = shape;
-	*/ 
 	shapeArray.push_back(shape);
 	size++;
 }

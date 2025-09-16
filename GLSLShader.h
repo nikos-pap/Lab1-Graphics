@@ -9,15 +9,15 @@ struct ShaderProgramSource {
 	std::string FragmentSource;
 };
 
-class Shader {
+class GLSLShader {
 private:
 	std::string m_FilePath;
 	unsigned int m_RendererID;
 	//caching for  uniforms
 	std::unordered_map<std::string, int> m_UniformLocationCache;
 public:
-	Shader(const std::string& filepath);
-	~Shader();
+	GLSLShader(const std::string& filepath);
+	~GLSLShader();
 
 	void Bind() const;
 	void Unbind() const;
@@ -35,6 +35,6 @@ public:
 private:
 	ShaderProgramSource ParseShader(const std::string& filepath);
 	unsigned int CompileShader(unsigned int type, const std::string& source);
-	unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
+	unsigned int CreateShader(const std::string& vertexGLSLShader, const std::string& fragmentGLSLShader);
 	int GetUniformLocation(const std::string& name);
 };

@@ -16,6 +16,7 @@ public:
 	void InitFactoryPrototypes();
 	//creates Shapes and adds them to the Array
 	void CreateRandomShape();
+	void CreateRandomShapes(int amount);
 	void CreateShape(float x, float y, float z, int size, int ShapeType);
 	
 	//Binds VAO and ib of the shape at the index

@@ -40,8 +40,10 @@ int ApplicationController::start() {
 	shapeArray->CreateShape(35.0f, 35.0f, 35.0f, 30.0f, T_SPHERE);
 	shapeArray->SetColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
 
+	shapeArray->CreateRandomShapes(1000);
+
 	//Initialize Shader
-	Shader shader("Shader.shader");
+	GLSLShader shader("Shader.shader");
 	shader.Bind();
 	shader.SetUniformMat4f("model", Model);
 	unsigned int ib_size;

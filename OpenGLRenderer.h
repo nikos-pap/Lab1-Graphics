@@ -1,5 +1,5 @@
 #pragma once
-#include "Shader.h"
+#include "GLSLShader.h"
 #include "Shape.h"
 #include "opengl.h"
 #include <vector>
@@ -9,7 +9,7 @@ class OpenGLRenderer
 {
 private:
 	GLFWwindow *window;
-	Shader *shader; // one shader for now
+	GLSLShader *shader; // one shader for now
 	std::map<uint32_t, int> shapeVAOIDmap;
 	std::map<uint32_t, int> shapeVBOIDmap;
 	std::map<uint32_t, int> shapeIBOIDmap;
@@ -20,7 +20,7 @@ public:
 	~OpenGLRenderer();
 
 	inline GLFWwindow* getWindow() { return window; };
-	void setShader(Shader* shader);
+	void setShader(GLSLShader* shader);
 	void loadTexture(std::string fileName);
 
 	void BindShader();

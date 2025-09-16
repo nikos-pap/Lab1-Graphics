@@ -1,71 +1,71 @@
-#include "Shader.h"
+#include "GLSLShader.h"
 
 #include <iostream>
 #include <fstream>
 #include <GL/glew.h>
 
-Shader::Shader(const std::string& filepath)
+GLSLShader::GLSLShader(const std::string& filepath)
 	: m_FilePath(filepath), m_RendererID(0)
 {
 	ShaderProgramSource source = ParseShader(filepath);
 	m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
 }
 
-Shader::~Shader()
+GLSLShader::~GLSLShader()
 {
 	glDeleteProgram(m_RendererID);
 }
 
-void Shader::Bind() const
+void GLSLShader::Bind() const
 {
 	glUseProgram(m_RendererID);
 }
 
-void Shader::Unbind() const
+void GLSLShader::Unbind() const
 {
 	glUseProgram(0);
 }
 
-void Shader::SetUniform1i(const std::string& name, int value)
+void GLSLShader::SetUniform1i(const std::string& name, int value)
 {
 	glUniform1i(GetUniformLocation(name), value);
 }
 
-void Shader::SetUniform1f(const std::string& name, float value)
+void GLSLShader::SetUniform1f(const std::string& name, float value)
 {
 	glUniform1f(GetUniformLocation(name), value);
 }
 
-void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
+void GLSLShader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
 {
 	glUniform4f(GetUniformLocation(name), v0, v1, v2, v3);
 }
 
-void Shader::SetUniform4f(const std::string& name, float * v/*v0, float v1, float v2, float v3*/)
+void GLSLShader::SetUniform4f(const std::string& name, float * v/*v0, float v1, float v2, float v3*/)
 {
 	glUniform4f(GetUniformLocation(name), v[0], v[1], v[2], v[3]);
 }
 
-void Shader::SetUniform3f(const std::string& name, float v0, float v1, float v2)
+void GLSLShader::SetUniform3f(const std::string& name, float v0, float v1, float v2)
 {
 	glUniform3f(GetUniformLocation(name), v0, v1, v2);
 }
-void Shader::SetUniform3f(const std::string& name, float* v/*v0, float v1, float v2, float v3*/)
+void GLSLShader::SetUniform3f(const std::string& name, float* v/*v0, float v1, float v2, float v3*/)
 {
 	glUniform3f(GetUniformLocation(name), v[0], v[1], v[2]);
 }
 
-void Shader::SetUniform3fv(const std::string& name, glm::vec3& v0)
+void GLSLShader::SetUniform3fv(const std::string& name, glm::vec3& v0)
 {
 	glUniform3fv(GetUniformLocation(name),1, &v0[0]);
 }
 
-void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
+void GLSLShader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
 {
 	glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
 }
 
-int Shader::GetUniformLocation(const std::string& name)
+int GLSLShader::GetUniformLocation(const std::string& name)
 {
 	if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end()) {
 		return m_UniformLocationCache[name];
@@ -79,7 +79,7 @@ int Shader::GetUniformLocation(const std::string& name)
 	return location;
 }
 
-ShaderProgramSource Shader::ParseShader(const std::string& filepath) {
+ShaderProgramSource GLSLShader::ParseShader(const std::string& filepath) {
 	std::ifstream stream(filepath);
 
 	enum class ShaderType
@@ -110,7 +110,7 @@ ShaderProgramSource Shader::ParseShader(const std::string& filepath) {
 	return { ss[0].str(), ss[1].str() };
 }
 
-unsigned int Shader::CompileShader(unsigned int type, const std::string& source) {
+unsigned int GLSLShader::CompileShader(unsigned int type, const std::string& source) {
 	unsigned int id = glCreateShader(type);
 	const char* src = source.c_str();
 	glShaderSource(id, 1, &src, nullptr);
@@ -134,10 +134,10 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 	return id;
 }
 
-unsigned int Shader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader) {
+unsigned int GLSLShader::CreateShader(const std::string& vertexGLSLShader, const std::string& fragmentGLSLShader) {
 	unsigned int program = glCreateProgram();
-	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
-	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexGLSLShader);
+	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentGLSLShader);
 
 	glAttachShader(program, vs);
 	glAttachShader(program, fs);

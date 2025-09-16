@@ -77,7 +77,7 @@ int16_t OpenGLRenderer::init(uint16_t windowWidth, uint16_t windowHeight) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(windowWidth, windowHeight, u8"Συγκρουόμενα", NULL, NULL);
+	window = glfwCreateWindow(windowWidth, windowHeight, "Shape Rammer 3000", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		// raise exception.
@@ -180,7 +180,7 @@ void OpenGLRenderer::render() {
 void OpenGLRenderer::drawElements(uint32_t ib_size) {
 	glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
 }
-void OpenGLRenderer::setShader(Shader* shader) {
+void OpenGLRenderer::setShader(GLSLShader* shader) {
 	this->shader = shader;
 	if (shader) shader->Bind();
 }

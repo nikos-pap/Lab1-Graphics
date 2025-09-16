@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{6c9ecfcf-a197-4b3e-a91d-965b3c66dbc6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -21,7 +24,7 @@
     <ClCompile Include="DynamicShapeArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Shader.cpp">
+    <ClCompile Include="GLSLShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CameraController.cpp">
@@ -47,7 +50,7 @@
     <ClInclude Include="DynamicShapeArray.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Shader.h">
+    <ClInclude Include="GLSLShader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="CameraController.h">
@@ -78,6 +81,12 @@
   <ItemGroup>
     <None Include="Shader.shader">
       <Filter>Source Files</Filter>
+    </None>
+    <None Include="common.slang">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="obj_shader.slang">
+      <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

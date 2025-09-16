@@ -1,6 +1,6 @@
 #pragma once
 #include "InputController.h"
-#include "Shader.h"
+#include "GLSLShader.h"
 #include "Renderer.h"
 #include "OpenGLRenderer.h"
 

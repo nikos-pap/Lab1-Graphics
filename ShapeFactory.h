@@ -92,7 +92,7 @@ public:
 
 	void BindShape(Shape shape); // Move to Renderer Class
 
-	Shape CreateRandomShape();
+	Shape CreateRandomShape(float x = 0.f, float y = 0.f, float z = 0.f);
 	Shape CreateShape(float x, float y, float z, int size, int ShapeType);
 
 	// Color handlers, DEBUG: Move to another class

@@ -147,7 +147,7 @@ void ShapeFactory::BindShape(Shape shape) {
 	renderer->BindShape(shape.shapeType);
 }
 
-Shape ShapeFactory::CreateRandomShape() {
+Shape ShapeFactory::CreateRandomShape(float x, float y, float z) {
 	int shapeType = RandomInt(0, 3);
 	int shapeSize = RandomInt(1, 10);
 	float r, g, b, vx, vy, vz;
@@ -158,7 +158,7 @@ Shape ShapeFactory::CreateRandomShape() {
 	vy = RandomFloat(0.0f, 0.9f);
 	vz = RandomFloat(0.0f, 0.9f);
 
-	Shape newShape = CreateShape(0.0f, 0.0f, 0.0f, shapeSize, shapeType);
+	Shape newShape = CreateShape(x, y, z, shapeSize, shapeType);
 	
 	std::cout << "Spawned new shape: " << shapeType;
 	SetColor(newShape, r, g, b, 1.0f);
@@ -484,7 +484,7 @@ Shape ShapeFactory::CreateCylinder(float x, float y, float z, float radius, floa
 	}
 	glm::mat4 model{ 1.f };
 	model = glm::translate(model, glm::vec3{ x, y + height / 2.f, z });
-	model = glm::scale(model, glm::vec3{ radius, height, radius });
+	model = glm::scale(model, glm::vec3{ radius, height/2.f, radius });
 	Shape prototype = Prototypes.at(T_CYLINDER);
 	Shape tempShape{ prototype };
 	tempShape.Model = model;
