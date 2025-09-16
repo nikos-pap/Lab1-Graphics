@@ -83,7 +83,7 @@ int ApplicationController::start() {
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 	std::cout << glGetString(GL_VERSION) << std::endl;
-	glm::mat4 Projection = glm::perspective(glm::radians(40.0f), 1.0f, 0.001f, 1000.0f);
+	glm::mat4 Projection = glm::perspective(glm::radians(40.0f), 1.0f, 0.1f, 1000.0f);
 
 
 
