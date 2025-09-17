@@ -32,18 +32,20 @@ layout (location = 0) out vec4 color;
 
 layout (std140, binding = 1) uniform Light {
 	vec3 u_Light;
-	vec3 u_vPos;
 	vec4 u_Color;
-};)
+};
+layout (std140, binding = 2) uniform Camera {
+	vec3 u_vPos;
+};
 //uniform vec3 u_Light;
 //uniform vec3 u_vPos;
 //uniform vec4 u_Color;
 uniform samplerCube TextureSampler;
 
 
-layout (std140, binding = 2) uniform isTextured {
-	int isTexture;
-}
+layout (std140, binding = 3) uniform isTextured {
+	uint isTexture;
+};
 in vec3 Normal;
 in vec3 FragPos;
 

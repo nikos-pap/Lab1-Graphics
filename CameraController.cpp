@@ -18,7 +18,7 @@ CameraController::~CameraController() {
 
 }
 
-glm::vec3 CameraController::getPosition() {
+glm::vec3 &CameraController::getPosition() {
 	return position;
 }
 

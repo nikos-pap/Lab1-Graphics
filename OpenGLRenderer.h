@@ -26,7 +26,7 @@ public:
 
 	inline GLFWwindow* getWindow() { return window; };
 	void setShader(GLSLShader* shader);
-	void loadTexture(std::string fileName);
+	void loadTexture(const std::string &fileName) override;
 
 	void BindShader();
 	void BindShape(int shapeType);
@@ -39,7 +39,7 @@ public:
 
 	void createObjectBuffer(Shape &shape, int32_t index_pointer_size, int32_t normal_pointer_size, float* normals, uint32_t* index_array, std::vector<float> objDataVector) override;
 
-	void clear();
+	void clear() override;
 	void clear(GLuint framebufferID);
 	
 	void beginFrame() override;

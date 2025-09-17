@@ -25,7 +25,7 @@ OpenGLRenderer::~OpenGLRenderer() {
 }
 
 //loads texture from file
-void OpenGLRenderer::loadTexture(std::string fileName)
+void OpenGLRenderer::loadTexture(const std::string &fileName)
 {
 	uint32_t texture;
 	glGenTextures(1, &texture);
