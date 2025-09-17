@@ -23,7 +23,7 @@ int ApplicationController::start() {
 	if (!window) return -1;
 	shapeArray->setRenderer(renderer);
 	
-	glm::mat4 Projection = glm::perspective(glm::radians(40.0f), 1.0f, 0.001f, 1000.0f);
+	glm::mat4 Projection = glm::perspective(glm::radians(40.0f), 1.0f, 0.1f, 1000.0f);
 
 	// Model Matrix
 	glm::mat4 Model = glm::mat4(1.0f);
@@ -45,7 +45,7 @@ int ApplicationController::start() {
 	//Initialize Shader
 	GLSLShader shader("Shader.shader");
 	shader.Bind();
-	shader.SetUniformMat4f("model", Model);
+	//shader.SetUniformMat4f("model", Model);
 	unsigned int ib_size;
 	uint32_t shapeArrSize;
 	float x = 1.0f;
@@ -64,7 +64,7 @@ int ApplicationController::start() {
 			mciSendString("pause mp3 ", NULL, 0, NULL);
 #endif
 		shapeArrSize = shapeArray->GetSize();
-		renderer->clear();
+		renderer->beginFrame();
 
 		x += l;
 		if (x >= 150.0f || x <= 0.0f) {
@@ -86,19 +86,19 @@ int ApplicationController::start() {
 			Model = shapeArray->GetModel(i);
 			MVP = Projection * camera->getView() * Model;
 			// update this to SSBOs
-			shader.SetUniformMat4f("u_MVP", MVP);
-			shader.SetUniform4f("u_Color", color);
-			shader.SetUniformMat4f("model", Model);
-			shader.SetUniform3f("u_Light", 150.0f, x, 150.0f);
+			//renderer->uploadData(0, MVP);
+			//shader.SetUniformMat4f("u_MVP", MVP);
+			//shader.SetUniform4f("u_Color", color);
+			//shader.SetUniformMat4f("model", Model);
+			//shader.SetUniform3f("u_Light", 150.0f, x, 150.0f);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			shader.SetUniform3f("u_vPos", camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
+			//shader.SetUniform3f("u_vPos", camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
 
 			if (i == 1 && tex) {
-
-				shader.SetUniform1i("isTexture", 2);
+				//shader.SetUniform1i("isTexture", 2);
 			}
 			else {
-				shader.SetUniform1i("isTexture", 1);
+				//shader.SetUniform1i("isTexture", 1);
 			}
 			renderer->drawElements(ib_size);
 		}

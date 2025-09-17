@@ -26,59 +26,6 @@ void GLSLShader::Unbind() const
 	glUseProgram(0);
 }
 
-void GLSLShader::SetUniform1i(const std::string& name, int value)
-{
-	glUniform1i(GetUniformLocation(name), value);
-}
-
-void GLSLShader::SetUniform1f(const std::string& name, float value)
-{
-	glUniform1f(GetUniformLocation(name), value);
-}
-
-void GLSLShader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
-{
-	glUniform4f(GetUniformLocation(name), v0, v1, v2, v3);
-}
-
-void GLSLShader::SetUniform4f(const std::string& name, float * v/*v0, float v1, float v2, float v3*/)
-{
-	glUniform4f(GetUniformLocation(name), v[0], v[1], v[2], v[3]);
-}
-
-void GLSLShader::SetUniform3f(const std::string& name, float v0, float v1, float v2)
-{
-	glUniform3f(GetUniformLocation(name), v0, v1, v2);
-}
-void GLSLShader::SetUniform3f(const std::string& name, float* v/*v0, float v1, float v2, float v3*/)
-{
-	glUniform3f(GetUniformLocation(name), v[0], v[1], v[2]);
-}
-
-void GLSLShader::SetUniform3fv(const std::string& name, glm::vec3& v0)
-{
-	glUniform3fv(GetUniformLocation(name),1, &v0[0]);
-}
-
-void GLSLShader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
-{
-	glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
-}
-
-int GLSLShader::GetUniformLocation(const std::string& name)
-{
-	if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end()) {
-		return m_UniformLocationCache[name];
-	}
-	int location = glGetUniformLocation(m_RendererID, name.c_str());
-	if (location == -1) {
-		std::cout << "Warning: uniform '" << name << "' doesn't exist!" << std::endl;
-	}
-	m_UniformLocationCache[name] = location;
-	std::cout << name << ":" << location << std::endl;
-	return location;
-}
-
 ShaderProgramSource GLSLShader::ParseShader(const std::string& filepath) {
 	std::ifstream stream(filepath);
 

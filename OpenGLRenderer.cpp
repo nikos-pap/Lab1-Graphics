@@ -129,6 +129,27 @@ void OpenGLRenderer::BindShape(int shapeType) {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shapeIBOIDmap[shapeType]);
 	}
 }
+void OpenGLRenderer::createUBO(uint32_t binding, uint16_t type, uint32_t size) {
+	GLuint ubo;
+	glGenBuffers(1, &ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+	glBufferData(GL_UNIFORM_BUFFER, size, NULL, GL_STATIC_DRAW);
+	glBindBufferRange(GL_UNIFORM_BUFFER, binding, ubo, 0, size);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	typeToUBOMap[type] = ubo;
+	typeToUBOSize[type] = size;
+}
+void OpenGLRenderer::waitIdle() {
+	// do nothing
+	BindShader();
+}
+
+void OpenGLRenderer::uploadUBOData(uint32_t binding, uint16_t type, uint32_t size, uint32_t offset, void *data) {
+	glBindBuffer(GL_UNIFORM_BUFFER, typeToUBOMap[type]);
+	glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
+	glBindBufferRange(GL_UNIFORM_BUFFER, binding, typeToUBOMap[type], 0, typeToUBOSize[type]);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
 
 void OpenGLRenderer::createObjectBuffer(Shape &shape, int32_t index_pointer_size, int32_t normal_pointer_size, float *normals, uint32_t *index_array, std::vector<float> objDataVector) {
 	unsigned int vao;
@@ -191,6 +212,9 @@ void OpenGLRenderer::BindShader() {
 	shader->Bind();
 }
 
+void OpenGLRenderer::beginFrame() {
+	clear();
+}
 void OpenGLRenderer::endFrame() {
 	glfwSwapBuffers(window);
 	glfwPollEvents();

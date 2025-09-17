@@ -4,8 +4,13 @@
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 aNormal;
 
-uniform mat4 u_MVP;
-uniform mat4 model;
+layout (std140, binding = 0) uniform Matrices {
+	mat4 u_MVP;
+	mat4 model;
+};
+
+//uniform mat4 u_MVP;
+//uniform mat4 model;
 out vec3 FragPos;
 out vec3 Normal;
 out vec3 TexCoords;
@@ -25,13 +30,20 @@ void main() {
 
 layout (location = 0) out vec4 color;
 
-uniform vec3 u_Light;
-uniform vec3 u_vPos;
-uniform vec4 u_Color;
+layout (std140, binding = 1) uniform Light {
+	vec3 u_Light;
+	vec3 u_vPos;
+	vec4 u_Color;
+};)
+//uniform vec3 u_Light;
+//uniform vec3 u_vPos;
+//uniform vec4 u_Color;
 uniform samplerCube TextureSampler;
 
 
-uniform int isTexture;
+layout (std140, binding = 2) uniform isTextured {
+	int isTexture;
+}
 in vec3 Normal;
 in vec3 FragPos;
 
