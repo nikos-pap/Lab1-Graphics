@@ -139,7 +139,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Code;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Documents\GitHub\Lab1-Graphics\Dependencies\Code\slang\include;$(SolutionDir)Dependencies\Code</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -160,6 +160,7 @@
     <ClCompile Include="OpenGLRenderer.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="GLSLShader.cpp" />
+    <ClCompile Include="ShaderCompiler.cpp" />
     <ClCompile Include="ShapeFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -171,6 +172,7 @@
     <ClInclude Include="OpenGLRenderer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="GLSLShader.h" />
+    <ClInclude Include="ShaderCompiler.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="ShapeFactory.h" />
   </ItemGroup>
