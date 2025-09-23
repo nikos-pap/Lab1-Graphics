@@ -229,6 +229,7 @@ void DynamicShapeArray::SpeedUP(bool up) {
 -handles collisions and changes speeds when it happens
 */
 void DynamicShapeArray::CheckCollision(int index) {
+	// indices 0 and 1 are the semi-transparent cube and the textured sphere. They're immovable by collision.
 	if (index >= size || index < 2) {
 		return;
 	}
