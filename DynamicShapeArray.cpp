@@ -219,8 +219,6 @@ void DynamicShapeArray::SpeedUP(bool up) {
 	
 }
 
-//private functions
-
 
 /*
 *Handling Collisions
