@@ -18,6 +18,7 @@ cbuffer Globals : register(b0)
 {
     float4x4 u_MVP;
     float4x4 model;
+    float3x3 normalModel;
 }
 
 cbuffer FragmentGlobals : register(b1)

@@ -7,6 +7,7 @@ layout (location = 1) in vec3 aNormal;
 layout (std140, binding = 0) uniform Matrices {
 	mat4 u_MVP;
 	mat4 model;
+	mat3 normalModel;
 };
 
 //uniform mat4 u_MVP;
@@ -19,7 +20,8 @@ void main() {
 	//lighting calculations
 	gl_Position = u_MVP * vec4(position,1.0);
 	FragPos = vec4(model * vec4(position,1.0)).xyz;
-	Normal = transpose(inverse(mat3(model))) * normalize(aNormal);
+	//Normal = transpose(inverse(mat3(model))) * normalize(aNormal);
+	Normal = normalModel * normalize(aNormal);
 	
 	//pass texcoords to fragment shader
 	TexCoords = position;

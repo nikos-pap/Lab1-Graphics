@@ -28,8 +28,9 @@ public:
 	void SpeedUP(bool up);
 
 	//Getters
-	inline int GetSize() { return size; };//Returns the size of the ShapeArray
-	inline glm::mat4 GetModel(int index) { return shapeArray[index].Model; };
+	inline int getSize() { return size; };//Returns the size of the ShapeArray
+	inline glm::mat4 getModel(int index) { return shapeArray[index].Model; };
+	inline glm::mat4 getNormalModel(int index) { return shapeArray[index].normalModel; };
 	float * GetColor(int index);//Returns the color of the shape to pass into the shader
 	int GetIndexPointerSize(int index);//Returns the size of the ib to use when drawing
 

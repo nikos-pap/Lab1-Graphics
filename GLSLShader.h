@@ -15,6 +15,7 @@ private:
 	unsigned int m_RendererID;
 public:
 	GLSLShader(const std::string& filepath);
+	GLSLShader();
 	~GLSLShader();
 
 	void Bind() const;

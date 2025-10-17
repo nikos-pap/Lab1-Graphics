@@ -175,6 +175,7 @@ void DynamicShapeArray::Move(int index) {
 	if (speed[0] || speed[1] || speed[2]) {
 		CheckCollision(index);
 		shapeArray[index].Model = glm::translate(glm::mat4{1.f}, glm::vec3(speed[0] * (speedUP * globalSpeed), speed[1] * (speedUP * globalSpeed), speed[2] * (speedUP * globalSpeed))) * shapeArray[index].Model;
+		shapeArray[index].normalModel = glm::transpose(glm::inverse(shapeArray[index].Model));
 		shapeArray[index].center[0] += speed[0] * (speedUP * globalSpeed);
 		shapeArray[index].center[1] += speed[1] * (speedUP * globalSpeed);
 		shapeArray[index].center[2] += speed[2] * (speedUP * globalSpeed);

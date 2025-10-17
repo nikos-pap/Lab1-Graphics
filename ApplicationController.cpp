@@ -4,6 +4,7 @@
 
 ApplicationController::ApplicationController() {
 	window = nullptr;
+	renderer = nullptr;
 	camera = new CameraController();
 	shapeArray = new DynamicShapeArray();
 	inputController = new InputController(camera, shapeArray);
@@ -29,12 +30,14 @@ int ApplicationController::start() {
 
 	// Model Matrix
 	glm::mat4 Model = glm::mat4(1.0f);
+	glm::mat4 normalModel = glm::mat4(1.0f);
+
 
 	//ModelViewProjection Matrix
 	glm::mat4 MVP;// Projection * View * Model;
 
 	shapeArray->InitFactoryPrototypes();
-	renderer->createUBO(0, MODEL_MATRIX, 2 * sizeof(glm::mat4));
+	renderer->createUBO(0, MODEL_MATRIX, 2 * sizeof(glm::mat4) + sizeof(glm::mat3));
 	renderer->createUBO(1, LIGHT_DATA, 2 * sizeof(glm::vec4));
 	renderer->createUBO(2, CAMERA_POS, sizeof(glm::vec4));
 	renderer->createUBO(3, IS_TEXTURE, 1 * sizeof(uint32_t));
@@ -49,9 +52,8 @@ int ApplicationController::start() {
 	shapeArray->CreateRandomShapes(1000);
 
 	//Initialize Shader
-	GLSLShader shader("Shader.shader");
-	shader.Bind();
-	//shader.SetUniformMat4f("model", Model);
+	renderer->initShader("Shader.shader");
+
 	unsigned int ib_size;
 	uint32_t shapeArrSize;
 	float x = 1.0f;
@@ -70,7 +72,7 @@ int ApplicationController::start() {
 		else
 			mciSendString("pause mp3 ", NULL, 0, NULL);
 #endif
-		shapeArrSize = shapeArray->GetSize();
+		shapeArrSize = shapeArray->getSize();
 		renderer->beginFrame();
 
 		x += l;
@@ -78,7 +80,6 @@ int ApplicationController::start() {
 		if (x >= 150.0f || x <= 0.0f) {
 			l = (-1.0f) * l;
 		}
-		//MVP = Projection * camera->getView() * Model;
 
 		// This can be a compute shader, then batch draw (utilize instancing and ssbos).
 		// Example:
@@ -91,29 +92,23 @@ int ApplicationController::start() {
 			if (i > 1) {
 				shapeArray->Move(i);
 			}
-			Model = shapeArray->GetModel(i);
-			renderer->uploadUBOData(0, MODEL_MATRIX, sizeof(glm::mat4), sizeof(glm::mat4), &Model[0]);
+			Model = shapeArray->getModel(i);
+			normalModel = shapeArray->getNormalModel(i);
+			renderer->uploadUBOData(0, MODEL_MATRIX, sizeof(glm::mat4), sizeof(glm::mat4), &Model[0]); // swap with glm::valueptr
+			renderer->uploadUBOData(0, MODEL_MATRIX, sizeof(glm::mat3), 2 * sizeof(glm::mat4), &normalModel[0]);
 			MVP = Projection * camera->getView() * Model;
 			renderer->uploadUBOData(0, MODEL_MATRIX, sizeof(glm::mat4), 0, &MVP[0]);
+
 			// update this to SSBOs
-			//renderer->uploadData(0, MVP);
-			//shader.SetUniformMat4f("u_MVP", MVP);
 			renderer->uploadUBOData(1, LIGHT_DATA, sizeof(glm::vec4), sizeof(glm::vec4), &color[0]);
 			renderer->uploadUBOData(1, LIGHT_DATA, sizeof(glm::vec3), 0, &lightPos[0]);
 			renderer->uploadUBOData(2, CAMERA_POS, sizeof(glm::vec3), 0, &camera->getPosition());
-			//shader.SetUniform4f("u_Color", color);
-			//shader.SetUniformMat4f("model", Model);
-			//shader.SetUniform3f("u_Light", 150.0f, x, 150.0f);
-			//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			//shader.SetUniform3f("u_vPos", camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
 
 			if (i == 1 && tex) {
 				renderer->uploadUBOData(3, IS_TEXTURE, sizeof(uint32_t), 0, &zero);
-				//shader.SetUniform1i("isTexture", 2);
 			}
 			else {
 				renderer->uploadUBOData(3, IS_TEXTURE, sizeof(uint32_t), 0, &one);
-				//shader.SetUniform1i("isTexture", 1);
 			}
 			renderer->drawElements(ib_size);
 		}

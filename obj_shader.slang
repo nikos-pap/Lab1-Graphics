@@ -8,6 +8,7 @@ SamplerState Sampler       : register(s0);
 // =======================
 // Vertex Shader
 // =======================
+[shader("vertex")]
 VSOutput vertexMain(VSInput input)
 {
     VSOutput output;
@@ -19,8 +20,7 @@ VSOutput vertexMain(VSInput input)
     output.FragPos = mul(model, float4(input.position, 1.0)).xyz;
 
     // Normal
-    float3x3 normalMat = transpose(invert((float3x3)model));
-    output.Normal = normalize(mul(normalMat, input.normal));
+    output.Normal = normalize(mul(normalModel, input.normal));
 
     // Pass texcoords (using position here)
     output.TexCoords = input.position;
@@ -31,6 +31,7 @@ VSOutput vertexMain(VSInput input)
 // =======================
 // Fragment Shader
 // =======================
+[shader("fragment")]
 float4 fragmentMain(VSOutput input) : SV_Target
 {
     // Light properties

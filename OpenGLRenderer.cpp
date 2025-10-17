@@ -15,8 +15,6 @@ void APIENTRY glDebugOutput(GLenum source,
 OpenGLRenderer::OpenGLRenderer() {
 	// Initialize OpenGL context here if needed
 	window = nullptr;
-	shader = nullptr;
-
 }
 
 OpenGLRenderer::~OpenGLRenderer() {
@@ -178,13 +176,9 @@ void OpenGLRenderer::createObjectBuffer(Shape &shape, int32_t index_pointer_size
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_pointer_size * sizeof(unsigned int), index_array, GL_STATIC_DRAW);
 
-	//keep the three buffers in the shape DEPRECATED due to abstraction. These values are stored in maps
 	shapeVAOIDmap[shape.shapeType] = vao;
 	shapeVBOIDmap[shape.shapeType] = buffer_id;
 	shapeIBOIDmap[shape.shapeType] = ibo;
-//	shape.vao_id = vao;
-//	shape.vb_id = buffer_id;
-//	shape.ib_id = ibo;
 	std::cout << "buffer created id's are:" << vao << ", " << buffer_id << ", " << ibo << std::endl;
 }
 void OpenGLRenderer::clear() {
@@ -201,15 +195,19 @@ void OpenGLRenderer::render() {
 void OpenGLRenderer::drawElements(uint32_t ib_size) {
 	glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
 }
-void OpenGLRenderer::setShader(GLSLShader* shader) {
+void OpenGLRenderer::initShader(std::string path) {
+	shader = GLSLShader(path);
+	shader.Bind();
+}
+void OpenGLRenderer::setShader(GLSLShader &shader) {
 	this->shader = shader;
-	if (shader) shader->Bind();
+	shader.Bind();
 }
 void OpenGLRenderer::setViewport(uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
 	glViewport(x, y, width, height);
 }
 void OpenGLRenderer::BindShader() {
-	shader->Bind();
+	shader.Bind();
 }
 
 void OpenGLRenderer::beginFrame() {

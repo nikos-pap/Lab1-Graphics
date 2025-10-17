@@ -10,7 +10,7 @@ class OpenGLRenderer : public Renderer
 {
 private:
 	GLFWwindow *window;
-	GLSLShader *shader; // one shader for now
+	GLSLShader shader; // one shader for now
 	std::unordered_map<uint32_t, uint32_t> typeToUBOMap;
 	std::unordered_map<uint32_t, uint32_t> typeToUBOSize;
 	std::map<uint32_t, int> shapeVAOIDmap;
@@ -25,7 +25,8 @@ public:
 	int16_t init(uint16_t windowWidth, uint16_t windowHeight) override;
 
 	inline GLFWwindow* getWindow() { return window; };
-	void setShader(GLSLShader* shader);
+	void setShader(GLSLShader& shader);
+	void initShader(std::string path);
 	void loadTexture(const std::string &fileName) override;
 
 	void BindShader();
