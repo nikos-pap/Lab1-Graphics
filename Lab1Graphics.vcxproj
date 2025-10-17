@@ -122,7 +122,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Code</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Code;$(SolutionDir)Dependencies\Code\slang\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,6 +131,9 @@
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Libraries</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib;Winmm.lib;winmm.lib</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>powershell -NoProfile -ExecutionPolicy Bypass -Command "if (-not (Test-Path '$(ProjectDir)..\Dependencies\Code\slang\build\CMakeCache.txt')) { cmake -S '$(ProjectDir)..\Dependencies\Code\slang' -B '$(ProjectDir)..\Dependencies\Code\slang\build' -G 'Visual Studio 17 2022' -A $(Platform) -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX='$(ProjectDir)..\Dependencies\Libraries\slang' }; cmake --build '$(ProjectDir)..\Dependencies\Code\slang\build' --config $(Configuration) --target install"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -139,7 +143,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\Documents\GitHub\Lab1-Graphics\Dependencies\Code\slang\include;$(SolutionDir)Dependencies\Code</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Code;$(SolutionDir)Dependencies\Code\slang\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -150,6 +154,9 @@
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Libraries</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib;Winmm.lib;</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>powershell -NoProfile -ExecutionPolicy Bypass -Command "if (-not (Test-Path '$(ProjectDir)..\Dependencies\Code\slang\build\CMakeCache.txt')) { cmake -S '$(ProjectDir)..\Dependencies\Code\slang' -B '$(ProjectDir)..\Dependencies\Code\slang\build' -G 'Visual Studio 17 2022' -A $(Platform) -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX='$(ProjectDir)..\Dependencies\Libraries\slang' }; cmake --build '$(ProjectDir)..\Dependencies\Code\slang\build' --config $(Configuration) --target install"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ApplicationController.cpp" />

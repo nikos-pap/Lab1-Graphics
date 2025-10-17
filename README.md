@@ -70,6 +70,8 @@ Once you run the demo, the program will open in the 3D scene. You can move aroun
 		-- OpenGLRenderer implements Renderer
 				--- Rewrite Shader class to be abstracted from any API specific code.
 				--- Find a way to have the same shader utilized for all solutions. Write it in slang and compile it on runtime to HLSL, GLSL, SpirV?
+					---- Visual Studio project can't compile slang. Migrate to Cmake?
+
 		-- VulkanRenderer implements Renderer
 	- Modernize code
 		-- Utilize modern OpenGL (Direct State Access)
