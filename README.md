@@ -70,7 +70,8 @@ Once you run the demo, the program will open in the 3D scene. You can move aroun
 		-- OpenGLRenderer implements Renderer
 				--- Rewrite Shader class to be abstracted from any API specific code.
 				--- Find a way to have the same shader utilized for all solutions. Write it in slang and compile it on runtime to HLSL, GLSL, SpirV?
-					---- Visual Studio project can't compile slang. Migrate to Cmake?
+					---- Debug ShaderCompiler
+						----- Utilize SpirV shaders in OpenGL. Compare SpirV results by compiling GLSL to SpirV and slang to SpirV.
 
 		-- VulkanRenderer implements Renderer
 	- Modernize code
@@ -80,7 +81,7 @@ Once you run the demo, the program will open in the 3D scene. You can move aroun
 	- Fix InputController for Windows 11
 
 DONE:
-
+	- SlangCompiler
 	- Removed every shader reference from ApplicationController. All shader commands are in OpenGLShader \/
 	- Removed uniform variables and replaced them with Uniform Buffers.	-	
 

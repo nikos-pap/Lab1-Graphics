@@ -93,6 +93,7 @@ int16_t OpenGLRenderer::init(uint16_t windowWidth, uint16_t windowHeight) {
 	glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 #ifdef _DEBUG
+	std::cout << "Debug context enabled" << std::endl;
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
 	{
@@ -196,7 +197,8 @@ void OpenGLRenderer::drawElements(uint32_t ib_size) {
 	glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
 }
 void OpenGLRenderer::initShader(std::string path) {
-	shader = GLSLShader(path);
+	GLSLShader aShader{ path };
+	shader = aShader;
 	shader.Bind();
 }
 void OpenGLRenderer::setShader(GLSLShader &shader) {

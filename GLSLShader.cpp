@@ -93,6 +93,20 @@ unsigned int GLSLShader::CreateShader(const std::string& vertexGLSLShader, const
 	glAttachShader(program, vs);
 	glAttachShader(program, fs);
 	glLinkProgram(program);
+	int32_t isLinked = 0;
+	glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
+	if (isLinked == GL_FALSE)
+	{
+		int32_t maxLength = 0;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+		// The maxLength includes the NULL character
+		char* infoLog = (char*)malloc(maxLength * sizeof(char));
+		glGetProgramInfoLog(program, maxLength, &maxLength, infoLog);
+		std::cout << "Shader linking failed: " << infoLog << std::endl;
+		free(infoLog);
+		glDeleteProgram(program);
+		return 0;
+	}
 	glValidateProgram(program);
 
 	glDeleteShader(vs);
