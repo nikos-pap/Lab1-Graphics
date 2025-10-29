@@ -193,7 +193,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="common.slang" />
+    <None Include="obj_shader.frag" />
     <None Include="obj_shader.slang" />
+    <None Include="obj_shader.vert" />
     <None Include="Shader.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

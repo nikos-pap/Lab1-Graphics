@@ -52,7 +52,9 @@ int ApplicationController::start() {
 	shapeArray->CreateRandomShapes(1000);
 
 	//Initialize Shader
-	renderer->initShader("Shader.shader");
+	//renderer->initShader("Shader.shader");
+	//renderer->initShader("obj_shader.vert", "obj_shader.frag");
+	renderer->initShader("obj_shader_vs.spv", "obj_shader_fs.spv");
 
 	unsigned int ib_size;
 	uint32_t shapeArrSize;

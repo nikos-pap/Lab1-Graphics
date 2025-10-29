@@ -196,8 +196,13 @@ void OpenGLRenderer::render() {
 void OpenGLRenderer::drawElements(uint32_t ib_size) {
 	glDrawElements(GL_TRIANGLES, ib_size, GL_UNSIGNED_INT, nullptr);
 }
-void OpenGLRenderer::initShader(std::string path) {
+void OpenGLRenderer::initShader(const std::string& path) {
 	GLSLShader aShader{ path };
+	shader = aShader;
+	shader.Bind();
+}
+void OpenGLRenderer::initShader(const std::string& vertPath, const std::string& fragPath) {
+	GLSLShader aShader{ vertPath, fragPath };
 	shader = aShader;
 	shader.Bind();
 }

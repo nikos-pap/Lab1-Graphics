@@ -26,7 +26,8 @@ public:
 
 	inline GLFWwindow* getWindow() { return window; };
 	void setShader(GLSLShader& shader);
-	void initShader(std::string path);
+	void initShader(const std::string& path);
+	void initShader(const std::string& vertPath, const std::string& fragPath);
 	void loadTexture(const std::string &fileName) override;
 
 	void BindShader();

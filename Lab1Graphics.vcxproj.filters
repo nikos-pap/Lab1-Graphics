@@ -94,5 +94,11 @@
     <None Include="obj_shader.slang">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="obj_shader.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="obj_shader.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
