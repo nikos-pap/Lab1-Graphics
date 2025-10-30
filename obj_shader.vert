@@ -9,8 +9,6 @@ layout (std140, binding = 0) uniform Matrices {
 	mat3 normalModel;
 };
 
-//uniform mat4 u_MVP;
-//uniform mat4 model;
 layout (location = 0) out vec3 FragPos;
 layout (location = 1) out vec3 Normal;
 layout (location = 2) out vec3 TexCoords;

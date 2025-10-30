@@ -2,8 +2,8 @@
 import common;
 
 // Resources
-TextureCube TextureSampler : register(t0);
-SamplerState Sampler       : register(s0);
+[[vk::binding(0, 0)]]
+SamplerCube TextureSampler;
 
 // =======================
 // Vertex Shader
@@ -14,13 +14,13 @@ VSOutput vertexMain(VSInput input)
     VSOutput output;
 
     // Clip-space position
-    output.position = mul(u_MVP, float4(input.position, 1.0));
+    output.position = mul(float4(input.position, 1.0), u_MVP);
 
     // World-space fragment position
-    output.FragPos = mul(model, float4(input.position, 1.0)).xyz;
+    output.FragPos = mul(float4(input.position, 1.0), model).xyz;
 
     // Normal
-    output.Normal = normalize(mul(normalModel, input.normal));
+    output.Normal = mul(normalize(input.normal), normalModel);
 
     // Pass texcoords (using position here)
     output.TexCoords = input.position;
@@ -45,7 +45,8 @@ float4 fragmentMain(VSOutput input) : SV_Target
     float3 diffuse = diff * LightColor;
 
     // Cubemap sample
-    float4 tex = TextureSampler.Sample(Sampler, input.TexCoords);
+    // float4 tex = TextureSampler.Sample(Sampler, input.TexCoords);
+    float4 tex = TextureSampler.Sample(input.TexCoords);
 
     // Specular
     float specularStrength = 0.5;

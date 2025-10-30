@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <sstream>
 #include <glm/glm.hpp>
+#include "ShaderCompiler.h"
 
 struct ShaderProgramSource {
 	std::string VertexSource;
@@ -11,6 +12,7 @@ struct ShaderProgramSource {
 
 class GLSLShader {
 private:
+	SlangCompiler slangCompiler;
 	std::string m_FilePath;
 	uint32_t m_RendererID;
 public:
@@ -23,7 +25,7 @@ public:
 	void Unbind() const;
 
 private:
-	ShaderProgramSource ParseShader(const std::string& filepath);
+	void ParseShader(const std::string& filepath);
 	uint32_t CompileShader(uint32_t type, const std::string& source);
 	uint32_t CreateShader(const std::string& vertexGLSLShader, const std::string& fragmentGLSLShader);
 	uint32_t CompileSpirVShader(uint32_t type, const std::vector<uint8_t>& SPV);

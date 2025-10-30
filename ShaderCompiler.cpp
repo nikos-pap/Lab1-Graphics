@@ -8,10 +8,12 @@ SlangCompiler::SlangCompiler()
 
 SlangCompiler::~SlangCompiler()
 {
+    /*
     if (m_globalSession)
     {
         m_globalSession->release();
     }
+    */
 }
 
 // Compile to GLSL text - returns all entry points
@@ -96,6 +98,7 @@ std::vector<ShaderOutput> SlangCompiler::compile(const std::string& source,
     // Load module from source string
     Slang::ComPtr<slang::IBlob> diagnostics;
 
+	// TODO: specify module name and file name properly instead of shader and shader.slang
     slang::IModule* loadedModule = session->loadModuleFromSourceString(
         "shader",
         "shader.slang",
@@ -193,8 +196,8 @@ std::vector<ShaderOutput> SlangCompiler::compile(const std::string& source,
         ShaderOutput output;
         output.target = target;
         output.entryPointName = entryPoints[i];
-        const uint8_t* data = (const uint8_t*)codeBlob->getBufferPointer();
-        size_t size = codeBlob->getBufferSize();
+        const uint8_t* data = static_cast<const uint8_t*>(codeBlob->getBufferPointer());
+        uint64_t size = codeBlob->getBufferSize();
         output.binaryData.assign(data, data + size);
 
         outputs.push_back(output);

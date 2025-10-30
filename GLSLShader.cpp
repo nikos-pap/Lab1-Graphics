@@ -25,8 +25,7 @@ std::vector<uint8_t> ReadSPIRV(const std::string& filename) {
 GLSLShader::GLSLShader(const std::string& filepath)
 	: m_FilePath{filepath}, m_RendererID{0}
 {
-	ShaderProgramSource source = ParseShader(filepath);
-	m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
+	ParseShader(filepath);
 }
 
 GLSLShader::GLSLShader(const std::string& vertFilepath, const std::string& fragFilepath)
@@ -92,8 +91,8 @@ void GLSLShader::Unbind() const
 	glUseProgram(0);
 }
 
-ShaderProgramSource GLSLShader::ParseShader(const std::string& filepath) {
-	std::ifstream stream(filepath);
+void GLSLShader::ParseShader(const std::string& filepath) {
+	std::ifstream stream(filepath); // TODO: check if file opened successfully
 
 	enum class ShaderType
 	{
@@ -103,22 +102,38 @@ ShaderProgramSource GLSLShader::ParseShader(const std::string& filepath) {
 	std::string line;
 	std::stringstream ss[2];
 	ShaderType type = ShaderType::NONE;
-
-	while (getline(stream, line)) {
-		if (line.find("#shader") != std::string::npos) {
-			if (line.find("vertex") != std::string::npos) {
-				type = ShaderType::VERTEX;
+	if (filepath.find(".shader") != std::string::npos) {
+		while (getline(stream, line)) {
+			if (line.find("#shader") != std::string::npos) {
+				if (line.find("vertex") != std::string::npos) {
+					type = ShaderType::VERTEX;
+				}
+				else if (line.find("fragment") != std::string::npos) {
+					type = ShaderType::FRAGMENT;
+				}
 			}
-			else if (line.find("fragment") != std::string::npos) {
-				type = ShaderType::FRAGMENT;
+			else {
+				ss[(int)type] << line << '\n';
+			}
+		}
+		m_RendererID = CreateShader(ss[0].str(), ss[1].str());
+	}
+	else {
+		if (filepath.find(".slang") != std::string::npos) {
+			std::string source = std::string((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+			std::vector<ShaderOutput> slangGLSLOutput = slangCompiler.compileToSPIRV(
+				source,
+				{ "vertexMain", "fragmentMain" });
+			if (slangGLSLOutput.size() == 2) {
+				m_RendererID = CreateSpirVShader(slangGLSLOutput[0].binaryData, slangGLSLOutput[1].binaryData);
+				//std::cout << "Fragment GLSL Shader:\n" << slangGLSLOutput[1].asText() << std::endl;
+				//m_RendererID = CreateShader(slangGLSLOutput[0].asText(), slangGLSLOutput[1].asText());
 			}
 		}
 		else {
-			ss[(int)type] << line << '\n';
+			std::cout << "Unsupported shader file format for parsing: " << filepath << std::endl;
 		}
 	}
-
-	return { ss[0].str(), ss[1].str() };
 }
 
 uint32_t GLSLShader::CompileShader(uint32_t type, const std::string& source) {

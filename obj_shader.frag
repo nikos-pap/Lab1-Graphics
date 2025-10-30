@@ -13,6 +13,7 @@ layout (std140, binding = 2) uniform Camera {
 //uniform vec3 u_Light;
 //uniform vec3 u_vPos;
 //uniform vec4 u_Color;
+layout (binding = 0)
 uniform samplerCube TextureSampler;
 
 

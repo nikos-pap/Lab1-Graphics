@@ -21,10 +21,16 @@ cbuffer Globals : register(b0)
     float3x3 normalModel;
 }
 
-cbuffer FragmentGlobals : register(b1)
+cbuffer FragmentColors : register(b1)
 {
     float3 u_Light;
-    float3 u_vPos;
     float4 u_Color;
+}
+cbuffer FragmentCameraPos : register(b2)
+{
+    float3 u_vPos;
+}
+cbuffer FragmentIsTexture : register(b3)
+{
     int    isTexture;
 }
