@@ -59,7 +59,7 @@ int speedUP = 50;
 bool firstCylinder = true;
 bool firstRing = true;
 bool firstSphere = true;
-bool soundsEnabled = true;
+bool soundsEnabled = false; // testing
 
 /*
 *Simple Constructor
@@ -68,7 +68,6 @@ bool soundsEnabled = true;
 DynamicShapeArray::DynamicShapeArray() {
 	shapeFactory = new ShapeFactory();
 	capacity = 10;
-	//shapeArray = (Shape *) malloc(capacity * sizeof(Shape)); Deprecated, using vector
 	shapeArray.reserve(capacity);
 	size = 0;
 }
@@ -92,6 +91,22 @@ void DynamicShapeArray::CreateRandomShape() {
 	std::cout << " Shape amount:" << size << std::endl;
 }
 
+void DynamicShapeArray::CreateRandomShapes(int amount) {
+	int count = 0;
+	int perAxis = std::ceil(std::cbrt(amount));
+	float px = 0.f, py = 0.f, pz = 0.f;
+	for (int i = 0 ; i < perAxis; ++i) {
+		for (int j = 0; j < perAxis; ++j) {
+			for (int k = 0; k < perAxis; ++k) {
+				px = i * 100.f / perAxis;
+				py = j * 100.f / perAxis;
+				pz = k * 100.f / perAxis;
+				AddShape(shapeFactory->CreateRandomShape(px, py, pz));
+			}
+		}
+	}
+}
+
 /*
 Shape Creator
 -creates new shape to add to the Array
@@ -105,29 +120,9 @@ void DynamicShapeArray::InitFactoryPrototypes()
 	shapeFactory->InitPrototypes();
 }
 
-//Assisting functions
-/* Deprecated:
-void DynamicShapeArray::Extend()
-{
-	capacity += 10;
-	Shape* temp = (Shape*)realloc(shapeArray, (capacity) * sizeof(Shape));
-	if (temp != nullptr) {
-		for (int i = 0; i < size; i++) {
-			temp[i] = shapeArray[i];
-		}
-		//shapeArray = temp;
-	}
-} */
-
 
 //Adds a shape to shapeArray
 void DynamicShapeArray::AddShape(Shape shape) {
-	/*
-	if (capacity == size) {
-		Extend();					// Deprecated, using vector
-	}
-	shapeArray[size] = shape;
-	*/ 
 	shapeArray.push_back(shape);
 	size++;
 }
@@ -139,6 +134,9 @@ void DynamicShapeArray::SetRandomColor(int index, float alpha_value) {
 
 void DynamicShapeArray::SetColor(int index, float r_value, float g_value, float b_value, float alpha_value) {
 	shapeFactory->SetColor(shapeArray[index], r_value, g_value, b_value, alpha_value);
+}
+void DynamicShapeArray::setRenderer(OpenGLRenderer* renderer) {
+	shapeFactory->setRenderer(renderer);
 }
 
 float* DynamicShapeArray::GetColor(int index) {
@@ -177,6 +175,7 @@ void DynamicShapeArray::Move(int index) {
 	if (speed[0] || speed[1] || speed[2]) {
 		CheckCollision(index);
 		shapeArray[index].Model = glm::translate(glm::mat4{1.f}, glm::vec3(speed[0] * (speedUP * globalSpeed), speed[1] * (speedUP * globalSpeed), speed[2] * (speedUP * globalSpeed))) * shapeArray[index].Model;
+		shapeArray[index].normalModel = glm::transpose(glm::inverse(shapeArray[index].Model));
 		shapeArray[index].center[0] += speed[0] * (speedUP * globalSpeed);
 		shapeArray[index].center[1] += speed[1] * (speedUP * globalSpeed);
 		shapeArray[index].center[2] += speed[2] * (speedUP * globalSpeed);
@@ -220,8 +219,6 @@ void DynamicShapeArray::SpeedUP(bool up) {
 	}
 	
 }
-
-//private functions
 
 
 /*
@@ -382,7 +379,7 @@ void DynamicShapeArray::CheckCollision(int index) {
 			Collide(s, j);
 			Collide(j, s);
 #ifdef _WIN32
-			if (size0 <= 10 && soundsEnabled) {
+			if (index <= 10 && soundsEnabled) {
 				PlaySound(TEXT("collision.wav"), NULL, SND_FILENAME | SND_ASYNC);
 			}
 #endif

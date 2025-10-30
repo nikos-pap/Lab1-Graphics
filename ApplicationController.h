@@ -1,6 +1,8 @@
 #pragma once
 #include "InputController.h"
-#include "Shader.h"
+#include "GLSLShader.h"
+#include "Renderer.h"
+#include "OpenGLRenderer.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -13,8 +15,10 @@ private:
 	CameraController* camera;
 	DynamicShapeArray* shapeArray;
 	InputController* inputController;
+	OpenGLRenderer* renderer; // TODO: change this to Renderer* when other renderers are implemented
 	unsigned int loadTexture();
 public:
 	ApplicationController();
+	~ApplicationController();
 	int start();
 };

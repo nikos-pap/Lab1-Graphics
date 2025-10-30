@@ -5,6 +5,9 @@ GLFW\include\GLFW\
 glm\glm\
 glew\include\GL\
 
+slang library (repository: https://github.com/shader-slang/slang)
+
+
 Dependencies\Libraries
 We need to copy the following files to this folder:
 GLFW\lib-vc2019\glfw3.lib

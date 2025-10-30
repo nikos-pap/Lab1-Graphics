@@ -120,16 +120,24 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;SLANG_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Code</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Code;D:\Documents\GitHub\Lab1-Graphics\Dependencies\Code\slang</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Libraries</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib;Winmm.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Libraries;D:\Documents\GitHub\Lab1-Graphics\Dependencies\Libraries\slang</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib;Winmm.lib;slang.lib;winmm.lib</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>call "$(ProjectDir)copy_dlls.bat" "$(OutDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -137,26 +145,37 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;SLANG_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Code;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Code;D:\Documents\GitHub\Lab1-Graphics\Dependencies\Code\slang</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Libraries</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib;Winmm.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Libraries;D:\Documents\GitHub\Lab1-Graphics\Dependencies\Libraries\slang</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib;Winmm.lib;slang.lib;</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>call "$(ProjectDir)copy_dlls.bat" "$(OutDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AplicationController.cpp" />
+    <ClCompile Include="ApplicationController.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="DynamicShapeArray.cpp" />
     <ClCompile Include="InputController.cpp" />
-    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="OpenGLRenderer.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="GLSLShader.cpp" />
+    <ClCompile Include="ShaderCompiler.cpp" />
     <ClCompile Include="ShapeFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,10 +184,18 @@
     <ClInclude Include="DynamicShapeArray.h" />
     <ClInclude Include="InputController.h" />
     <ClInclude Include="opengl.h" />
-    <ClInclude Include="Shader.h" />
+    <ClInclude Include="OpenGLRenderer.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="GLSLShader.h" />
+    <ClInclude Include="ShaderCompiler.h" />
+    <ClInclude Include="Shape.h" />
     <ClInclude Include="ShapeFactory.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="common.slang" />
+    <None Include="obj_shader.frag" />
+    <None Include="obj_shader.slang" />
+    <None Include="obj_shader.vert" />
     <None Include="Shader.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

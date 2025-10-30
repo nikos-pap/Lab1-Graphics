@@ -20,7 +20,7 @@ public:
 	void panY(float speed);
 	void panX(float speed);
 
-	glm::vec3 getPosition();
+	glm::vec3 &getPosition();
 	glm::vec3 getForward();
 	glm::vec3 getUp();
 	glm::mat4 getView();
