@@ -65,15 +65,15 @@ Once you run the demo, the program will open in the 3D scene. You can move aroun
 
 **TODO**: 
 
-	- Abstract Renderer from app to compare renderers:
-		-- Abstract Renderer class \
-		-- OpenGLRenderer implements Renderer
-				--- Rewrite Shader class to be abstracted from any API specific code.
-				--- Find a way to have the same shader utilized for all solutions. Write it in slang and compile it on runtime to HLSL, GLSL, SpirV?
-					---- Debug ShaderCompiler
-						----- Utilize SpirV shaders in OpenGL. Compare SpirV results by compiling GLSL to SpirV and slang to SpirV.
-
+	- Implement more renderers:
+		-- Modernize current render process. Utilize batch rendering techniques. Figure out how to store data in SSBOs.
+			--- There are 4 shape types. We can use 4 glDrawElementsInstanced calls. Use a different shader for the 2 first shapes, as one is semi-transparent and other is textured.
+				---- Store Shape References of each shape in its corresponding shape vector.
+				---- Write the shader that uses SSBOs to store all the uniform buffer variables in VRAM and how to upload them efficiently. Use gl_InstanceID to differentiate between objects.
+					----- Figure out VRAM constraints. Calculate max object count.
+					----- Try Backface culling for objects other than index 1 (large semi-transparent cube).
 		-- VulkanRenderer implements Renderer
+		-- DX12Renderer implements Renderer
 	- Modernize code
 		-- Utilize modern OpenGL (Direct State Access)
 		-- Utilize modern C++ features (RAII, coroutines?)
@@ -81,7 +81,13 @@ Once you run the demo, the program will open in the 3D scene. You can move aroun
 	- Fix InputController for Windows 11
 
 DONE:
+
+	- Abstract Renderer class
+		-- OpenGLRenderer implements Renderer
 	- SlangCompiler
-	- Removed every shader reference from ApplicationController. All shader commands are in OpenGLShader \/
+		-- Find a way to have the same shader utilized for all solutions(SLang).
+			--- Debug ShaderCompiler
+			--- Utilize SpirV shaders in OpenGL. Compare SpirV results by compiling GLSL to SpirV and slang to SpirV. \/
+	- Removed every shader reference from ApplicationController. All shader commands are in OpenGLShader
 	- Removed uniform variables and replaced them with Uniform Buffers.	-	
 
