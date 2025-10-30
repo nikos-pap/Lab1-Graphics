@@ -4,6 +4,7 @@ We need to copy the following folders to this folder:
 GLFW\include\GLFW\
 glm\glm\
 glew\include\GL\
+slang\include\
 
 slang library (repository: https://github.com/shader-slang/slang)
 
@@ -12,9 +13,15 @@ Dependencies\Libraries
 We need to copy the following files to this folder:
 GLFW\lib-vc2019\glfw3.lib
 glew\lib\Release\x64\glew32s.lib
+slang libraries folder that contains slang.lib & gfx.lib
+
+Dependencies\Binaries
+slang folder: gfx.dll, gfx.slang, slang.dll, slang-slang, slang-glslang.dll, slang-glsl-module.dll
 
 Properties
 C	preprocessor -> GLEW_STATIC
 C	general -> $(SolutionDir)Dependencies\Code
 Linker	general -> $(SolutionDir)Dependencies\Libraries
-Linker	input -> glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib;Winmm.lib
+Linker	input -> glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib;Winmm.lib;slang.lib;gfx.lib
+Build Events -> Post-Build Event -> Command Line: call "$(ProjectDir)copy_dlls.bat" "$(OutDir)"
+
