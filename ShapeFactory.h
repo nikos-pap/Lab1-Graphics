@@ -11,10 +11,6 @@
 
 #define PI 3.14159265f
 #define SQRT_2 1.41421356237f
-#define T_CUBE 0
-#define T_SPHERE 1
-#define T_CYLINDER 2
-#define T_RING 3
 
 #define CIRCLE_VERTEX_NUM (CIRCLE_TRIANGLE_NUM+2)
 
@@ -39,22 +35,14 @@ private:
 	The only easy enough to do by hand
 */
 	std::array<float, 72> cube_normals; // to be used instead of C-style array
-	//float cube_normals[72];
 	std::array<float, 2109> sphere_normals; // to be used instead of C-style array
-	//float sphere_normals[2109];
 	std::array<float, 216> cylinder_normals; // to be used instead of C-style array
-	//float cylinder_normals[216];
 	std::array<float, 8 * (CIRCLE_VERTEX_NUM - 1) * 3> ring_normals; // to be used instead of C-style array
-	//float ring_normals[8 * (CIRCLE_VERTEX_NUM - 1) * 3];
 
 	//index arrays
-	//unsigned int cube_indices[36];
 	std::array<uint32_t, 36> cube_indices;
-	//unsigned int cylinder_indices[CIRCLE_TRIANGLE_NUM * 3 * 4];
 	std::array<uint32_t, CIRCLE_TRIANGLE_NUM * 3 * 4> cylinder_indices;
-	//unsigned int sphere_indices[2 * 3 * (SPHERE_STACK_NUM - 1) * SPHERE_SECTOR_NUM];
 	std::array<uint32_t, 2 * 3 * (SPHERE_STACK_NUM - 1) * SPHERE_SECTOR_NUM> sphere_indices;
-	//unsigned int  ring_indices[2 * 8 * CIRCLE_TRIANGLE_NUM * 3];
 	std::array<uint32_t, 2 * 8 * CIRCLE_TRIANGLE_NUM * 3> ring_indices;
 
 	//flags

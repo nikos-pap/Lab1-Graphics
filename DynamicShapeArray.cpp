@@ -55,16 +55,11 @@ unsigned int  ring_indices[2 * 8 * CIRCLE_TRIANGLE_NUM * 3];
 float globalSpeed = 0.5f / GLOBAL_SPEED;
 int speedUP = 50;
 
-//flags
 bool firstCylinder = true;
 bool firstRing = true;
 bool firstSphere = true;
 bool soundsEnabled = false; // testing
 
-/*
-*Simple Constructor
--initializes the Array with a capacity of 10
-*/
 DynamicShapeArray::DynamicShapeArray() {
 	shapeFactory = new ShapeFactory();
 	capacity = 10;
@@ -72,20 +67,9 @@ DynamicShapeArray::DynamicShapeArray() {
 	size = 0;
 }
 
-/*
-*Simple Destructor
--freeing the dynamically allocated space
-*/
-//remember to free the rest
 DynamicShapeArray::~DynamicShapeArray() {
-	//free(shapeArray);
 }
 
-/*
-*Random Shape creator
--generates random shapes and adds them to the ShapeArray
-- Deprecated. Moved to ShapeFactory.
-*/
 void DynamicShapeArray::CreateRandomShape() {
 	AddShape(shapeFactory->CreateRandomShape());
 	std::cout << " Shape amount:" << size << std::endl;
@@ -110,7 +94,6 @@ void DynamicShapeArray::CreateRandomShapes(int amount) {
 /*
 Shape Creator
 -creates new shape to add to the Array
-- Deprecated. Moved to ShapeFactory.
 */
 void DynamicShapeArray::CreateShape(float x, float y, float z, int elementSize, int ShapeType) {
 	AddShape(shapeFactory->CreateShape(x, y, z, elementSize, ShapeType));
@@ -124,6 +107,7 @@ void DynamicShapeArray::InitFactoryPrototypes()
 //Adds a shape to shapeArray
 void DynamicShapeArray::AddShape(Shape shape) {
 	shapeArray.push_back(shape);
+	shapeTypeArray.at(shape.shapeType).push_back(shape);
 	size++;
 }
 
@@ -174,11 +158,16 @@ void DynamicShapeArray::Move(int index) {
 	float* speed = shapeArray[index].speed;
 	if (speed[0] || speed[1] || speed[2]) {
 		CheckCollision(index);
-		shapeArray[index].Model = glm::translate(glm::mat4{1.f}, glm::vec3(speed[0] * (speedUP * globalSpeed), speed[1] * (speedUP * globalSpeed), speed[2] * (speedUP * globalSpeed))) * shapeArray[index].Model;
-		shapeArray[index].normalModel = glm::transpose(glm::inverse(shapeArray[index].Model));
+		shapeArray[index].matrices.model = glm::translate(glm::mat4{1.f}, glm::vec3(speed[0] * (speedUP * globalSpeed), speed[1] * (speedUP * globalSpeed), speed[2] * (speedUP * globalSpeed))) * shapeArray[index].matrices.model;
+		shapeArray[index].matrices.normalModel = glm::transpose(glm::inverse(shapeArray[index].matrices.model));
 		shapeArray[index].center[0] += speed[0] * (speedUP * globalSpeed);
 		shapeArray[index].center[1] += speed[1] * (speedUP * globalSpeed);
 		shapeArray[index].center[2] += speed[2] * (speedUP * globalSpeed);
+	}
+}
+void DynamicShapeArray::MoveAll() {
+	for (int i = 2; i < size; i++) {
+		Move(i);
 	}
 }
 
@@ -198,7 +187,7 @@ void DynamicShapeArray::MoveSphere(int index, glm::vec3 speed)
 	CheckCollision(index);
 	if (next_center[0] > upper_limit || next_center[1] > upper_limit || next_center[2] > upper_limit || next_center[0] < lower_limit || next_center[1] < lower_limit || next_center[2] < lower_limit)
 		return;
-	shapeArray[index].Model = glm::translate(glm::mat4(1.0f), speed) * shapeArray[index].Model;
+	shapeArray[index].matrices.model = glm::translate(glm::mat4(1.0f), speed) * shapeArray[index].matrices.model;
 	shapeArray[index].center[0] = next_center[0];
 	shapeArray[index].center[1] = next_center[1];
 	shapeArray[index].center[2] = next_center[2];

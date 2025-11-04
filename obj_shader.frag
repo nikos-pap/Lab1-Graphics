@@ -3,12 +3,11 @@
 layout (location = 0) out vec4 color;
 
 layout (std140, binding = 1) uniform Light {
-	vec3 u_Light;
-	//float stride;
 	vec4 u_Color;
 };
 layout (std140, binding = 2) uniform Camera {
-	vec3 u_vPos;
+	vec3 lightPosition;
+	vec3 cameraPosition;
 };
 //uniform vec3 u_Light;
 //uniform vec3 u_vPos;
@@ -33,14 +32,14 @@ void main() {
 
 	//diffuse lighting
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(u_Light - FragPos);
+	vec3 lightDir = normalize(lightPosition - FragPos);
 	float diff = clamp(dot(norm, lightDir), 0.0, 1.0);
 	vec3 diffuse = diff * LightColor;
 	vec4 tex = texture(TextureSampler, TexCoords);
 
 	//specular lighting
 	float specularStrength = 0.5;
-	vec3 viewDir = normalize(u_vPos - FragPos);
+	vec3 viewDir = normalize(cameraPosition - FragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16);
 	vec3 specular = specularStrength * spec * LightColor;

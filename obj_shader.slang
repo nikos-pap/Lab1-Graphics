@@ -1,4 +1,3 @@
-// cube_shader.slang
 import common;
 
 // Resources
@@ -40,7 +39,7 @@ float4 fragmentMain(VSOutput input) : SV_Target
 
     // Diffuse
     float3 norm = normalize(input.Normal);
-    float3 lightDir = normalize(u_Light - input.FragPos);
+    float3 lightDir = normalize(lightPosition - input.FragPos);
     float diff = saturate(dot(norm, lightDir));
     float3 diffuse = diff * LightColor;
 
@@ -50,7 +49,7 @@ float4 fragmentMain(VSOutput input) : SV_Target
 
     // Specular
     float specularStrength = 0.5;
-    float3 viewDir = normalize(u_vPos - input.FragPos);
+    float3 viewDir = normalize(cameraPosition - input.FragPos);
     float3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16.0);
     float3 specular = specularStrength * spec * LightColor;

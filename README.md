@@ -68,10 +68,11 @@ Once you run the demo, the program will open in the 3D scene. You can move aroun
 	- Implement more renderers:
 		-- Modernize current render process. Utilize batch rendering techniques. Figure out how to store data in SSBOs.
 			--- There are 4 shape types. We can use 4 glDrawElementsInstanced calls. Use a different shader for the 2 first shapes, as one is semi-transparent and other is textured.
-				---- Store Shape References of each shape in its corresponding shape vector.
-				---- Write the shader that uses SSBOs to store all the uniform buffer variables in VRAM and how to upload them efficiently. Use gl_InstanceID to differentiate between objects.
-					----- Figure out VRAM constraints. Calculate max object count.
-					----- Try Backface culling for objects other than index 1 (large semi-transparent cube).
+				---- Store Shape References of each shape in its corresponding shape vector. \/
+				---- Code that uploads to SSBOs
+				---- Write the shader that uses SSBOs to store all the uniform buffer variables in VRAM and how to upload them efficiently. Use gl_InstanceID to differentiate between objects. \/
+					----- Figure out VRAM constraints. Calculate max object count. \/ 200 Bytes per shape. 400KB for 2000 shapes (more than the collision model can handle)
+				---- Try Backface culling for objects other than index 1 (large semi-transparent cube).
 		-- VulkanRenderer implements Renderer
 		-- DX12Renderer implements Renderer
 	- Modernize code

@@ -138,6 +138,17 @@ void OpenGLRenderer::createUBO(uint32_t binding, uint16_t type, uint32_t size) {
 	typeToUBOMap[type] = ubo;
 	typeToUBOSize[type] = size;
 }
+
+void OpenGLRenderer::createSSBO(uint32_t binding, uint16_t type, uint32_t size) {
+	GLuint ssbo;
+	glGenBuffers(1, &ssbo);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, size, NULL, GL_STATIC_DRAW);
+	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, binding, ssbo, 0, size);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	typeToSSBOMap[type] = ssbo;
+	typeToSSBOSize[type] = size;
+}
 void OpenGLRenderer::waitIdle() {
 	// do nothing
 	BindShader();
@@ -148,6 +159,13 @@ void OpenGLRenderer::uploadUBOData(uint32_t binding, uint16_t type, uint32_t siz
 	glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
 	glBindBufferRange(GL_UNIFORM_BUFFER, binding, typeToUBOMap[type], 0, typeToUBOSize[type]);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void OpenGLRenderer::uploadSSBOData(uint32_t binding, uint16_t type, uint32_t size, uint32_t offset, void *data) {
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, typeToUBOMap[type]);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, size, data);
+	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, binding, typeToUBOMap[type], 0, typeToUBOSize[type]);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
 void OpenGLRenderer::createObjectBuffer(Shape &shape, int32_t index_pointer_size, int32_t normal_pointer_size, float *normals, uint32_t *index_array, std::vector<float> objDataVector) {

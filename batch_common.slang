@@ -1,4 +1,3 @@
-// common.slang
 struct VSInput
 {
     float3 position : ATTRIB0;
@@ -13,24 +12,21 @@ struct VSOutput
     float3 TexCoords : TEXCOORD2;
 };
 
-// Uniforms shared between shaders
-cbuffer Globals : register(b0)
+struct objMatrices
 {
     float4x4 u_MVP;
     float4x4 model;
     float3x3 normalModel;
-}
+};
 
-cbuffer FragmentColors : register(b1)
-{
-    float4 u_Color;
-}
-cbuffer FragmentCameraPos : register(b2)
+[[vk::binding(0, 1)]]
+RWStructuredBuffer<objMatrices> matrices;
+
+[[vk::binding(1, 1)]]
+RWStructuredBuffer<float4> colors;
+
+cbuffer FragmentPositions : register(b2)
 {
     float3 lightPosition;
     float3 cameraPosition;
-}
-cbuffer FragmentIsTexture : register(b3)
-{
-    int    isTexture;
 }

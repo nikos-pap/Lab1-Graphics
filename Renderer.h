@@ -31,10 +31,29 @@ public:
 
     //virtual void setDebugName(uint32_t resourceID, const std::string& name) = 0;
 };
+
+// TODO: relocate these to a seperate file correlated to gpu storage
+// These structs include stride bits for the std140 layout. We should really change to std430
+struct colorData {
+	glm::vec4 color;
+};
+struct camLightPositions {
+    glm::vec4 camPos;
+    glm::vec4 lightPos;
+};
+
 enum BufferUsage
 {
     MODEL_MATRIX,
-	LIGHT_DATA,
-    CAMERA_POS,
-	IS_TEXTURE
+	OBJ_COLOR,
+    CAM_LIGHT_POSITIONS,
+	IS_TEXTURE,
+    CUBE_MATRICES,
+    SPHERE_MATRICES,
+    CYLINDER_MATRICES,
+    RING_MATRICES,
+    CUBE_COLORS,
+    SPHERE_COLORS,
+    CYLINDER_COLORS,
+    RING_COLORS 
 };

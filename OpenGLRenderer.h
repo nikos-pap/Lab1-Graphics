@@ -13,6 +13,8 @@ private:
 	GLSLShader shader; // one shader for now
 	std::unordered_map<uint32_t, uint32_t> typeToUBOMap;
 	std::unordered_map<uint32_t, uint32_t> typeToUBOSize;
+	std::unordered_map<uint32_t, uint32_t> typeToSSBOMap;
+	std::unordered_map<uint32_t, uint32_t> typeToSSBOSize;
 	std::map<uint32_t, int> shapeVAOIDmap;
 	std::map<uint32_t, int> shapeVBOIDmap;
 	std::map<uint32_t, int> shapeIBOIDmap;
@@ -35,7 +37,9 @@ public:
 	void setViewport(uint16_t x, uint16_t y, uint16_t width, uint16_t height) override;
 
 	void createUBO(uint32_t binding, uint16_t type, uint32_t size);
+	void createSSBO(uint32_t binding, uint16_t type, uint32_t size);
 	void uploadUBOData(uint32_t binding, uint16_t type, uint32_t size, uint32_t offset, void *data);
+	void uploadSSBOData(uint32_t binding, uint16_t type, uint32_t size, uint32_t offset, void *data);
 
 	void waitIdle() override;
 

@@ -8,7 +8,6 @@
 #include <Windows.h>
 #endif
 
-
 class ApplicationController {
 private:
 	GLFWwindow* window;
@@ -16,7 +15,6 @@ private:
 	DynamicShapeArray* shapeArray;
 	InputController* inputController;
 	OpenGLRenderer* renderer; // TODO: change this to Renderer* when other renderers are implemented
-	unsigned int loadTexture();
 public:
 	ApplicationController();
 	~ApplicationController();

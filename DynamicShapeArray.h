@@ -4,7 +4,6 @@
 #define GLOBAL_SPEED 60
 #define MAX_SPEEDUP 100
 
-
 extern bool soundsEnabled;
 
 class DynamicShapeArray
@@ -24,13 +23,14 @@ public:
 
 	//movement
 	void Move(int index);
+	void MoveAll();
 	void MoveSphere(int index, glm::vec3 speed);
 	void SpeedUP(bool up);
 
 	//Getters
 	inline int getSize() { return size; };//Returns the size of the ShapeArray
-	inline glm::mat4 getModel(int index) { return shapeArray[index].Model; };
-	inline glm::mat4 getNormalModel(int index) { return shapeArray[index].normalModel; };
+	inline glm::mat4 getModel(int index) { return shapeArray[index].matrices.model; };
+	inline glm::mat4 getNormalModel(int index) { return shapeArray[index].matrices.normalModel; };
 	float * GetColor(int index);//Returns the color of the shape to pass into the shader
 	int GetIndexPointerSize(int index);//Returns the size of the ib to use when drawing
 
@@ -41,8 +41,8 @@ public:
 
 
 private:
-	//Shape* shapeArray;
 	std::vector<Shape> shapeArray;
+	std::array<std::vector<Shape>, 4> shapeTypeArray; // for batch rendering 
 	ShapeFactory* shapeFactory;
 	int size;
 	int capacity;
@@ -51,9 +51,6 @@ private:
 	void CheckCollision(int index);
 	void Collide(int index1, int index2);
 	
-	//Extends the Array used when Array size reaches its capacity, Deprecated
-	//void Extend();
-
 	//assisting function
 	float * GetNormals(int shapeType);
 	void AddShape(Shape shape);
