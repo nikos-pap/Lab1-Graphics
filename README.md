@@ -1,6 +1,6 @@
-# OpenGL Graphics Project
+# Collision Engine Graphics Project
 ## About
-This project is a 3D Object Collision Demo developed using OpenGL, showcasing real-time collision detection and response between objects in a 3D environment. The demo simulates basic physics principles such as velocity and acceleration, allowing objects to interact upon impact. It employs shaders for lighting and surface effects, enhancing the visual quality of the scene. The project utilizes collision detection algorithms, including bounding volumes, to manage interactions between objects effectively.
+This project is a 3D Object Collision Demo developed using an abstract renderer interface and multiple renderer implementations, showcasing real-time collision detection and response between objects in a 3D environment. The demo simulates basic physics principles such as velocity and acceleration, allowing objects to interact upon impact. It employs shaders for lighting and surface effects, enhancing the visual quality of the scene. The project utilizes collision detection algorithms, including bounding volumes, to manage interactions between objects effectively.
 
 This project was a 3D Object Collision Demo developed using OpenGL as part of a university Graphics course. It's been overhauled to include a more modular architecture with an abstract Renderer class, allowing for easier integration of different rendering backends. The OpenGLRenderer implementation has been improved, and a SlangCompiler has been introduced to streamline shader management across multiple graphics APIs. The codebase has been modernized to utilize contemporary C++ features and OpenGL practices, enhancing performance and maintainability.
 ## Installation
